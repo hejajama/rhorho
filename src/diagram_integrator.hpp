@@ -10,6 +10,7 @@
 enum Diagram
 {
     DIAG_2A,
+    DIAG_2B,
 };
 
 enum IntegrationMethod
@@ -39,6 +40,7 @@ private:
     gsl_rng *rng;
     unsigned int MCINTPOINTS;
     bool use_interpolator;
+    double x;
 };
 
 

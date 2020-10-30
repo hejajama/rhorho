@@ -49,6 +49,11 @@ struct inthelper_norm
 
 
 
+/*
+ * Proton wave function normalization
+ * https://arxiv.org/pdf/2010.11245.pdf eq 13
+ */
+
 double inthelperf_mc_proton_norm(double *vec, size_t dim, void* p)
 {
     double k1 = vec[0];
@@ -60,14 +65,14 @@ double inthelperf_mc_proton_norm(double *vec, size_t dim, void* p)
     Vec k1v(k1,0);
     Vec k2v(k2*std::cos(vec[4]), k2*std::sin(vec[4]));
     
-    double r= 2.0*M_PI*k1*k2*SQR(((inthelper_norm*)p)->proton->WaveFunction(k1v,k2v, x1, x2));
+    double res= 2.0*M_PI*k1*k2*SQR(((inthelper_norm*)p)->proton->WaveFunction(k1v,k2v, x1, x2));
     
-    if (isnan(r) or isinf(r))
+    if (isnan(res) or isinf(res))
     {
-        cout << r << " at k1=" << k1 << " k2 " << k2 << " x1 " << x1 << " x2 " << x2 << endl;
+        cout << res << " at k1=" << k1 << " k2 " << k2 << " x1 " << x1 << " x2 " << x2 << endl;
     }
     
-    return r;
+    return 0.5*res/(x1*x2*(1.0-x1-x2)*8*std::pow(2.0*M_PI,6.));
 }
 double Proton::ComputeWFNormalizationCoefficient()
 {
@@ -98,9 +103,7 @@ double Proton::ComputeWFNormalizationCoefficient()
     //std::cout << "# Miser result " << result << " err " << error << " relerr " << std::abs(error/result) << std::endl;
     gsl_monte_miser_free(s);
     
-    // Required that the result / (16pi^3)^2 = 1
-    
-    wf_normalization = std::sqrt(SQR(16.0*M_PI*M_PI*M_PI)/result);
+    wf_normalization = 1./result;
     
     return wf_normalization;
     

@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(ProtonWFNorm)
     p.SetM(0.26);
     p.SetBeta(0.55);
     // Numerical MC integral, can't require too good precision...
-    BOOST_CHECK_CLOSE(p.ComputeWFNormalizationCoefficient(), 21694.861601150, 0.1);
+    BOOST_CHECK_CLOSE(p.ComputeWFNormalizationCoefficient(), 5.1625912580e7, 0.1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
