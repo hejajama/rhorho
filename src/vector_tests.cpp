@@ -15,6 +15,10 @@ BOOST_AUTO_TEST_CASE(VecTest)
     
     // Dot product
     BOOST_CHECK_CLOSE(v1*v2, 26, 0.0001);
+    
+    Vec v4 = v1+v2*2-v3*3;
+    BOOST_CHECK_CLOSE(v4.GetY(), -8, 0.0001);
+    
 }
 
 BOOST_AUTO_TEST_SUITE_END()
