@@ -20,31 +20,47 @@ int main()
     
     
    
-    int mcintpoints = 2e7;
-    integrator->SetMCIntPoints(mcintpoints);
-    cout << "# MCINTPOINTS: " << mcintpoints << endl;
+    int mcintpoints_anal = 5e5;
+    int mcintpoints_num = 5e4;  // When F is computed numerically
+    integrator->UseInterpolator(false);
+    
     for (double q=0.05; q<4; q+=0.05)
     {
-        Vec q1(0,0);
-        Vec q2(q,0);
+        Vec q1(q/2.,0);
+        Vec q2(q/2.,0);
+        cout << "### Diagram 2a" << endl;
+        integrator->SetMCIntPoints(mcintpoints_anal);
+        double diag2a = integrator->IntegrateDiagram(DIAG_2A, q1, q2);
         
-        integrator->UseInterpolator(false);
-        double diag2a = integrator->IntegrateDiagram(DIAG_2B, q1, q2);
+        cout << "### Diagram 3a" << endl;
+        integrator->SetMCIntPoints(mcintpoints_num);
+        double diag3a_1 = integrator->IntegrateDiagram(DIAG_3A, q1, q2);
+        // here in this test q1=q2
+        double diag3a_2 = diag3a_1;
+        //double diag3a_2 = integrator->IntegrateDiagram(DIAG_3A, q2, q1);
+        
+        cout << "### Diagram 3b" << endl;
+        integrator->SetMCIntPoints(mcintpoints_anal);
+        double diag3b_1 = integrator->IntegrateDiagram(DIAG_3B, q1, q2);
+        double diag3b_2 = diag3b_1;
+        //double diag3b_2 = integrator->IntegrateDiagram(DIAG_3B, q2, q1);
        
-        cout << q << " " << diag2a << endl;;
+        
+        cout << q << " " << diag2a << " " << diag3a_1 + diag3a_2 << " " << diag3b_1 + diag3b_2 << endl;;
         
     }
+    
     
     
     /*
     for (int mcintpoints=1e6; mcintpoints<1e9; mcintpoints*=2)
     {
-        Vec q1(0,0); Vec q2(1,0);
+        Vec q1(-0.5/2.,0); Vec q2(0.5/2.,0);
         integrator->SetMCIntPoints(mcintpoints);
-        double diag =integrator->IntegrateDiagram(DIAG_2B, q1, q2);
+        double diag =integrator->IntegrateDiagram(DIAG_2A, q1, q2);
         cout << mcintpoints << " " << diag << endl;
-    }*/
-    
+    }
+    */
     delete integrator;
     return 0;
 }

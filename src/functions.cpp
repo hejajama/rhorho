@@ -29,6 +29,19 @@ double B0(double hsqr, double Delta)
 
 }
 
+F_worker::F_worker(const int int_divisions_, const double intaccuracy)
+{
+    int_accuracy=intaccuracy;
+    int_divisions=int_divisions_;
+    ws = gsl_integration_workspace_alloc(int_divisions);
+}
+
+F_worker::~F_worker()
+{
+    gsl_integration_workspace_free(ws);
+    
+}
+
 /*
  * Integral of B0
  * Risto, Adrian (A22)
@@ -41,35 +54,40 @@ double inthelperf_F(double z1, void* p)
     inthelper_F* par = (inthelper_F*)p;
     double hsqr = par->l1.LenSqr() + par->l.LenSqr() * SQR(1.-z1)
         - 2.*(1.-z1)* (par->l1*par->l);
+    
+    if (hsqr < 1e-7)
+    {
+        // We always have h^2 B0, and in the limit h^2 -> 0 we easily see
+        // that h^2 B_0 -> 0, so we can just cut out this part of the phase space
+        return 0;
+    }
+    
     double Delta = SQR(1.-z1)*par->m2;
     return 1.0/z1 * (1.0 + SQR(1.-z1)) * hsqr/2. * B0(hsqr, Delta);
 }
-double F_int_B0(Vec l, Vec l1, double alpha, double m2)
+double F_worker::F_int_B0(Vec l, Vec l1, double alpha, double m2)
 {
     
     // use analytical result if l1=0
     if (l1.LenSqr() < 1e-7)
     {
-        // Without ln alpha - BREAKS TESTS 20201030
-        // And linear alpha terms -> 0
         double l4l2m2 =SQR(l.LenSqr()) + 4.*l.LenSqr()*m2; //l^4 + 4l^2m^2
         return -l.LenSqr() * std::log(2.0*m2 / (l.LenSqr() + 2.*m2+std::sqrt( l4l2m2 ) ) )
-            * (3. - 0*(4.*alpha + SQR(alpha) + 4.*std::log(alpha)))
+            * (3. - 4.*alpha + SQR(alpha) + 4.*std::log(alpha))
         / (16.*SQR(M_PI)*std::sqrt(l4l2m2) );
     }
     
     
-    const int INTPOINTS_F = 20;
-    const double ACCURACY_F = 0.00001;
     gsl_function fun;
     fun.function=inthelperf_F;
     inthelper_F helper; helper.l=l; helper.l1=l1; helper.m2=m2;
     fun.params=&helper;
     double result, abserr;
-    gsl_integration_workspace* ws = gsl_integration_workspace_alloc(INTPOINTS_F);
-    int status = gsl_integration_qag(&fun, alpha, 1., 0, ACCURACY_F,
-        INTPOINTS_F, GSL_INTEG_GAUSS41, ws, &result, &abserr);
-    gsl_integration_workspace_free(ws);
+    
+    int status = gsl_integration_qag(&fun, alpha, 1., 0, int_accuracy,
+        int_divisions, GSL_INTEG_GAUSS41, ws, &result, &abserr);
+
+
     
     if (status)
     {

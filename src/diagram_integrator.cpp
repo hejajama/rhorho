@@ -18,6 +18,7 @@ struct inthelper_diagint
     Vec q1;
     Vec q2;
     Interpolator *F_B_interpolator;
+    Diagram diag;
 };
 
 
@@ -89,18 +90,44 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     
     double wf1 = par->integrator->GetProton().WaveFunction( k1, k2, x1,  x2);
     
-    // Momentum vectors to the wf after probing the proton
-    // k1' = k1 - (1-x1)*(q1+q2)
-    Vec k12 = k1 - (q1+q2)*(1-x1);
-    // k2' = k2 + x2(q2+q2)
-    Vec k22 = k2 + (q1+q2)*x2;
-    // k3' = k3 + x3(q1+q2); fixed by the fact that no pT in the initial state (in the conjugate amplitude)
+    Vec k12; Vec k22;
+    Vec l; Vec l1;
+    double norm=1; // Normalization factof * symmetry factor,not including g^4 / 16pi^3
     
-    //Vec k32 = q1+q2; k32*=x3; k32 = k3 + k32;
-    
+    switch(par->diag)
+    {
+        case DIAG_2A:
+            l=q1+q2;
+            l1=Vec(0,0);
+            k12 =k1 - (q1+q2)*(1.-x1);
+            k22=k2 + (q1+q2)*x2;
+            norm = -1./2. * 3.;
+            break;
+        case DIAG_3A:
+            // Todo: need to add q1<->q2
+            l=q1+q2;
+            l1=q2;
+            k12=k1 - (q1+q2)*(1.-x1);
+            k22=k2 + (q1+q2)*x2;
+            norm = -1./3.*3;
+            break;
+        case DIAG_3B:
+            l=q2;
+            l1=Vec(0,0);
+            k12 = k1 + (q1+q2)*x1;
+            k22 = k2 + (q1+q2)*x2;
+            norm = -1./6. * 6;
+            break;
+        default:
+            std::cerr << "Unknown diagram " << par->diag << " encountered!" << std::endl;
+            exit(1);
+    }
+     
+
     double wf2 = par->integrator->GetProton().WaveFunction( k12, k22, x1, x2);
     
-    double alpha = par->integrator->GetAlpha(); double mf =  par->integrator->GetMf();
+    double alpha =  par->integrator->GetX() / x1;
+    double mf =  par->integrator->GetMf();
     
     if (alpha < 1e-8 or mf < 1e-8)
     {
@@ -108,14 +135,13 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
         exit(1);
     }
     
-    Vec l = q1+q2; Vec l1(0,0,0);
     
     double fintb = 0;
     if (par->integrator->UseInterpolator() == true)
         fintb = par->F_B_interpolator->Evaluate(l.Len());
     else
-        fintb =F_int_B0(l, l1, alpha, mf*mf);
-    double result = wf1*wf2*fintb;
+        fintb = par->integrator->GetF_worker()->F_int_B0(l, l1, alpha, mf*mf);
+    double result = norm*wf1*wf2*fintb;
     
     if (isinf(result) or isnan(result))
     {
@@ -132,6 +158,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
 {
     inthelper_diagint helper;
     helper.q1=q1; helper.q2=q2; helper.integrator=this;
+    helper.diag = diag;
     gsl_monte_function F;
     
     F.params = &helper;
@@ -146,6 +173,10 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
     
     switch (diag) {
         case DIAG_2A:
+        case DIAG_3A:
+        case DIAG_3B:
+        case DIAG_5A:
+        case DIAG_5C:
             F.dim=6;
             lower = new double[F.dim];
             upper = new double [F.dim];
@@ -217,10 +248,11 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
 
 Interpolator* DiagramIntegrator::InitializeInterpolator()
 {
-    double minq=0.01;
-    double maxq=10;
-    int npoints=100;
     
+    std::cerr << "Interpolator not implemented! " << std::endl;
+    
+    /*
+     
     std::vector<double> qvals; std::vector<double> F;
     for (double q=minq; q<=maxq; q+=(maxq-minq)/npoints)
     {
@@ -230,7 +262,9 @@ Interpolator* DiagramIntegrator::InitializeInterpolator()
     }
     Interpolator *interp = new Interpolator(qvals,F);
     interp->SetFreeze(true); interp->SetUnderflow(0); interp->SetOverflow(0);
-    return interp;
+     */
+    return 0;
+    
     
 }
 
@@ -238,7 +272,6 @@ Interpolator* DiagramIntegrator::InitializeInterpolator()
 DiagramIntegrator::DiagramIntegrator()
 {
     mf=0.1;
-    alpha=0.01;
     intmethod = VEGAS;
     
     proton.SetBeta(0.55);
@@ -247,6 +280,8 @@ DiagramIntegrator::DiagramIntegrator()
     double n = proton.ComputeWFNormalizationCoefficient();
     cout << "#... done, normalization coef " << n  << endl;
     gsl_rng_env_setup ();
+    
+    F = new F_worker(20, 0.0001); // divisions accuracy
 
     const gsl_rng_type *T = gsl_rng_default;
     rng = gsl_rng_alloc (T);
@@ -254,3 +289,7 @@ DiagramIntegrator::DiagramIntegrator()
 }
 
 
+DiagramIntegrator::~DiagramIntegrator()
+{
+    delete F;
+}

@@ -13,15 +13,17 @@ BOOST_AUTO_TEST_CASE(B0tests)
 
 BOOST_AUTO_TEST_CASE(Ftest)
 {
+    F_worker F(20,0.00001);
+    
     Vec l(2,1);
     Vec l1(-1,3);
     double alpha=0.1; double m2=0.1*0.1;
-    BOOST_CHECK_CLOSE(F_int_B0(l, l1, alpha, m2), -0.33946139702, 0.0001);
+    BOOST_CHECK_CLOSE(F.F_int_B0(l, l1, alpha, m2), -0.33946139702, 0.0001);
     
     l1=Vec(0,0,0);
     l=Vec(1,0);
     alpha=0.01;
     m2=0.05*0.05;
-    BOOST_CHECK_CLOSE(F_int_B0(l, l1, alpha, m2), -0.584170078, 0.0001);
+    BOOST_CHECK_CLOSE(F.F_int_B0(l, l1, alpha, m2), -0.584170078, 0.0001);
 }
 BOOST_AUTO_TEST_SUITE_END()
