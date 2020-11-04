@@ -15,8 +15,11 @@ enum Diagram
     DIAG_3A,
     DIAG_3B,
     DIAG_5A,
-    DIAG_5C
+    DIAG_5C,
 };
+
+const int NC=3;
+const double CF = (NC*NC-1.)/(2.*NC);
 
 enum IntegrationMethod
 {

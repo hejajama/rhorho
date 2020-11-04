@@ -40,6 +40,8 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     
     double x1=vec[4];
     double x2=vec[5];
+    if (x1+x2 >= 1) return 0;
+    
     double xg = vec[6];
     if (xg > std::min(x1,1.-x2)) return 0;
     double z1 = xg/x1; double z2 = xg/x2;
@@ -84,6 +86,8 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     
     double x1=vec[4];
     double x2=vec[5];
+    if (x1+x2 >=1) return 0;
+    
     //double x3 = 1.-x1-x2;
     
     //Vec k3 = (k1+k2)*(-1);
@@ -117,6 +121,20 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
             k12 = k1 + (q1+q2)*x1;
             k22 = k2 + (q1+q2)*x2;
             norm = -1./6. * 6;
+            break;
+        case DIAG_5A:
+            l=q1+q2;
+            l1=q1+q2;
+            k12 = k1 - (q1+q2)*(1.-x1);
+            k22 = k2 + (q1+q2)*x2;
+            norm = 4.*CF/3.*3;
+            break;
+        case DIAG_5C:
+            l=q2;
+            l1=q2;
+            k12 = k1+(q1+q2)*x1;
+            k22 = k2+(q1+q2)*x2;
+            norm = 2./(3.*6.)*6;
             break;
         default:
             std::cerr << "Unknown diagram " << par->diag << " encountered!" << std::endl;

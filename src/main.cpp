@@ -20,11 +20,14 @@ int main()
     
     
    
-    int mcintpoints_anal = 5e5;
-    int mcintpoints_num = 5e4;  // When F is computed numerically
+    int mcintpoints_anal = 1e7;
+    int mcintpoints_num = 1e6;  // When F is computed numerically
     integrator->UseInterpolator(false);
     
-    for (double q=0.05; q<4; q+=0.05)
+    
+    
+    /*
+    for (double q=0.05; q<4; q+=0.1)
     {
         Vec q1(q/2.,0);
         Vec q2(q/2.,0);
@@ -49,7 +52,28 @@ int main()
         cout << q << " " << diag2a << " " << diag3a_1 + diag3a_2 << " " << diag3b_1 + diag3b_2 << endl;;
         
     }
+     */
     
+    
+    for (double q=0.05; q<4; q+=0.1)
+    {
+        Vec q1(q/2.,0);
+        Vec q2(q/2.,0);
+        cout << "### Diagram 5a" << endl;
+        integrator->SetMCIntPoints(mcintpoints_num);
+        double diag5a = integrator->IntegrateDiagram(DIAG_5A, q1, q2);
+        
+        cout << "### Diagram 5c" << endl;
+        integrator->SetMCIntPoints(mcintpoints_num);
+        double diag5a_1 = integrator->IntegrateDiagram(DIAG_5C, q1, q2);
+        // here in this test q1=q2
+        double diag5a_2 = diag5a_1;
+        
+       
+        
+        cout << q << " " << diag5a << " " << diag5a_1 + diag5a_2 << endl;;
+        
+    }
     
     
     /*
