@@ -22,9 +22,6 @@ enum Diagram
     DIAG_2B,
     DIAG_3C,
     DIAG_3D,
-    DIAG_6E,
-    DIAG_6F,
-    DIAG_6G,
     DIAG_6E_1,
     DIAG_6E_2,
     DIAG_6F_1,
@@ -43,9 +40,9 @@ enum Diagram
     DIAG_8L_2,
     
 };
-const int NUM_OF_DIAGRAMS = 27;
+const int NUM_OF_DIAGRAMS = 24;
 const std::string DIAGRAM_STRINGS[NUM_OF_DIAGRAMS] = {"2a", "3a", "3b", "5a", "5c",
-        "2b", "3c", "3d", "6e", "6f", "6g", "6e_1", "6e_2", "6f_1",
+        "2b", "3c", "3d", "6e_1", "6e_2", "6f_1",
         "6f_2", "6g_1", "6g_2", "7h", "7j", "7k", "7l", "8h_1",
     "8h_2", "8j_1", "8j_2", "8l_1", "8l_2"};
 const Diagram DIAGRAMS[NUM_OF_DIAGRAMS] = {
@@ -59,9 +56,6 @@ const Diagram DIAGRAMS[NUM_OF_DIAGRAMS] = {
     DIAG_2B,
     DIAG_3C,
     DIAG_3D,
-    DIAG_6E,
-    DIAG_6F,
-    DIAG_6G,
     DIAG_6E_1,
     DIAG_6E_2,
     DIAG_6F_1,
