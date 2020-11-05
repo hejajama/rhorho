@@ -44,24 +44,166 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     
     double xg = vec[6];
     if (xg > std::min(x1,1.-x2)) return 0;
-    double z1 = xg/x1; double z2 = xg/x2;
+    double z1,z2;
+    z1 = xg/x1; z2 = xg /( x2+xg );
     
     
     /// We work in the frame where P=0
     Vec p1 = k1; Vec p2 = k2;
     
-    // z*p1-kg
-    Vec zp1_m_kg = p1*z1 - kg;
+    Vec ktilde_1; Vec ktilde_2;
+    Vec A,B;
+    double f_xg=std::sqrt(x1*x2/((x1-xg)*(x2+xg))) * (1. - (z1+z2)/2. + z1*z2/6.);
+    double norm=1; // normalization * symmetry factor
     
-    // z2*p2 - (1-z_2)(k_g - q1 - q2)
-    Vec z2p2_m_kgq1q1 = p2*z2 - (kg-q1-q2)*(1.-z2);
+    switch (par->diag) {
+        case DIAG_2B:
+            ktilde_1 = k1 + (q1+q2)*x1-kg;
+            ktilde_2 = k2 - (q1+q2)*(1.-x2) + kg;
+            A = p1*z1 - kg;
+            B = p2*z2 - (kg-q1-q2)*(1.-z2);
+            norm=-1./6. * 6;
+            
+            break;
+        case DIAG_3C:
+            ktilde_1 =k1 + (q1+q2)*x1 - q1 - kg;
+            ktilde_2 = k2 + (q1+q2)*x2 - q2 + kg;
+            A = p1*z1 - kg;
+            B = p2*z2 - (kg-q2)*(1.-z2);
+            norm=1./12.*6;
+            break;
+        case DIAG_3D:
+            ktilde_1 = k1 + (q1+q2)*x1 - kg;
+            ktilde_2 = k2 - (q1+q2)*(1.-x2) + kg;
+            A = p1*z1 - kg;
+            B = (p2-q1)*z2 - (kg-q2)*(1.-z2);
+            norm=1./12.*6.;
+            break;
+        case DIAG_6E_1:
+            ktilde_1 = k1 - (q1+q2)*(1.-x1) - kg;
+            ktilde_2 = k2 + (q1+q2)*x2 + kg;
+            A = p1*z1 - kg;
+            B = p2*z2 - kg*(1.-z2);
+            norm = 1./3.*6;
+            break;
+        case DIAG_6E_2:
+            ktilde_1 = k1 - (q1+q2)*(1.-x1);
+            ktilde_2 = k2 + (q1+q2)*x2 + kg;
+            A = (p1-q1-q2)*z1 -kg;
+            B = p2*z2 - kg*(1.-z2);
+            norm = 1./3.6;
+            break;
+        case DIAG_6F_1:
+            ktilde_1 = k1 + (q1+q2)*x1 - kg;
+            ktilde_2 = k2 - (q1+q2)*(1.-x2) + kg;
+            A = p1*z1 - kg;
+            B = p2*z2 - kg*(1.-z2);
+            norm = 1./3. * 6;
+            break;
+        case DIAG_6F_2:
+            ktilde_1 = k1 + (q1+q2)*x1 - kg;
+            ktilde_2 = k2 - (q1+q2)*(1.-x2)+kg;
+            A = p1*z1-kg;
+            B = (p2-q1-q2)*z2 - kg*(1.-z2);
+            norm = 1./3. * 6;
+            break;
+        case DIAG_6G_1:
+            ktilde_1 = k1 + (q1+q2)*x1 - kg;
+            ktilde_2 = k2 + (q1+q2)*x2 + kg;
+            A = p1*z1 - kg;
+            B = p2*z2 - kg*(1.-z2);
+            norm = CF*1./3. * 6;
+            break;
+        case DIAG_6G_2:
+            ktilde_1 = k1 + (q1+q2)*x1 - kg;
+            ktilde_2 = k2 + (q1+q2)*x2 + kg;
+            A = p1*z1 - kg;
+            B = p2*z2 - kg*(1.-z2);
+            norm = 1./3. * CF * 6;
+            break;
+        case DIAG_7H:
+            ktilde_1 = k1 + (q1+q2)*x1 - q2 - kg;
+            ktilde_2 = k2 + (q1+q2)*x2 - q1 + kg;
+            A = p1*z1 - kg;
+            B = (p2-q1)*z2 - kg*(1.-z2);
+            norm = 1./3.*(0.5-CF) * 6;
+            break;
+        case DIAG_7J:
+            ktilde_1 = k1 + (q1+q2)*x1 - q2 - kg;
+            ktilde_2 = k2 + (q1+q2)*x2 + kg;
+            A = p1*z1 - kg;
+            B = p2*z2 - kg*(1.-z2);
+            norm = 1./3. * (CF-1./2. - 1./6.);
+            break;
+        case DIAG_7K:
+            ktilde_1 = k1 + (q1+q2)*x1 - q1 - kg;
+            ktilde_2 = k2 + (q1+q2)*x2 + kg;
+            A = p1*z1 - kg;
+            B = p2*z2 - kg*(1.-z2);
+            norm = 1./3. * (CF-1./2. - 1./6.);
+            break;
+        case DIAG_7L:
+            ktilde_1 = k1 + (q1+q2)*x1 - kg;
+            ktilde_2 = k2 + (q1+q2)*x2 - q2 + kg;
+            A = p1*z1 - kg;
+            B = (p2-q2)*z2 - kg*(1.-z2);
+            norm = 1./3. * (CF-1./2.-1./6.);
+            break;
+        case DIAG_8H_1:
+            ktilde_1 = k1 + (q1+q2)*x1 - kg - q2;
+            ktilde_2 = k2 + (q1+q2)*x2 + kg - q1;
+            A = p1*z1 - kg;
+            B = p2*z2 - kg*(1.-z2);
+            norm = -2./9.*6;
+            break;
+        case DIAG_8H_2:
+            ktilde_1 = k1 + (q1+q2)*x1 - kg - q2;
+            ktilde_2 = k2 + (q1+q2)*x2 + kg - q1;
+            A = (p1-q2)*z1-kg;
+            B = (p2-q1)*z2 - kg*(1.-z2);
+            norm = -2./9. * 6;
+            break;
+        case DIAG_8J_1:
+            ktilde_1 = k1 + (q1+q2)*x1 - kg - q2;
+            ktilde_2 = k2 + (q1+q2)*x2 + kg;
+            A = p1*z1 - kg;
+            B = p2*z2 - kg*(1.-z2);
+            norm = -1./3. * (CF-2./3.)*6;
+            break;
+        case DIAG_8J_2:
+            ktilde_1 = k1 + (q1+q2)*x1 - kg - q2;
+            ktilde_2 = k2 + (q1+q2)*x2 + kg;
+            A = (p1-q2)*z1 - kg;
+            B = p2*z2 - kg*(1.-z2);
+            norm = -1./3. * (CF-2./3.);
+            break;
+        case DIAG_8L_1:
+            ktilde_1 = k1 + (q1+q2)*x1 - kg;
+            ktilde_2 = k2 + (q1+q2)*x2 + kg - q2;
+            A = p1*z1 - kg;
+            B = p2*z1 - kg*(1.-z2);
+            norm = -1./3. * (CF-2./3);
+            break;
+        case DIAG_8L_2:
+            ktilde_1 = k1 + (q1+q2)*x1 - kg;
+            ktilde_2 = k2 + (q1+q2)*x2 + kg - q2;
+            A = p1*z1 - kg;
+            B = (p2-q2)*z2 - kg*(1.-z2);
+            norm = -1./3. * (CF-2./3);
+            break;
+        default:
+            cerr << "Unknown diagram " << par->diag << endl;
+            exit(1);
+            break;
+    }
     
-    double res = (zp1_m_kg*z2p2_m_kgq1q1)/(z2p2_m_kgq1q1.LenSqr() * zp1_m_kg.LenSqr()) ;
+   
+    double wf1 =par->integrator->GetProton().WaveFunction(k1, k2, x1, x2);
+    double wf2 = par->integrator->GetProton().WaveFunction(ktilde_1,ktilde_2,x1-xg, x2+xg);
     
-    res *= std::sqrt(x1*x2/((x1-xg)*(x2+xg))) * (1. - (z1+z2)/2. + z1*z2/6.);
+    double res = norm*wf1*wf2*f_xg*(A*B)/(A.LenSqr()*B.LenSqr());
     
-    res*=par->integrator->GetProton().WaveFunction(k1, k2, x1, x2);
-    res*=par->integrator->GetProton().WaveFunction(k1+(q1+q2)*x1-kg, k2-(q1+q2)*(1.-x2)+kg, x1-xg, x2+xg);
+    res /= xg;
     
     // Jacobian
     res /= 8.0*x1*x2*(1.-x1-x2)*std::pow(2.0*M_PI,6.0);
@@ -204,7 +346,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
             upper[4]=upper[5]=1.-xlim;
             F.f=inthelperf_mc_diag2a;
             break;
-        case DIAG_2B:
+        default: // Other diagrams are of this type
             F.dim=9;
             lower = new double[F.dim];
             upper = new double [F.dim];
@@ -214,10 +356,6 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
             upper[4]=upper[5]=upper[6]=1.-xlim;
             F.f=inthelperf_mc_diag2b;
             break;
-            
-        default:
-            std::cerr << "Unknown diagram!" << std::endl;
-            return 0;
     }
     
     Interpolator *F_b_interp;
@@ -310,4 +448,29 @@ DiagramIntegrator::DiagramIntegrator()
 DiagramIntegrator::~DiagramIntegrator()
 {
     delete F;
+}
+
+
+Diagram DiagramIntegrator::DiagramType(std::string str)
+{
+    for (int i=0; i < NUM_OF_DIAGRAMS; i++)
+    {
+        if (DIAGRAM_STRINGS[i] == str)
+        {
+            return DIAGRAMS[i];
+        }
+    }
+    std::cerr << "Unknown diagram " << str << std::endl;
+    exit(1);
+}
+
+bool DiagramIntegrator::Add_Q1Q2_exchange(Diagram diag)
+{
+    if (diag == DIAG_5C or diag == DIAG_7H or diag == DIAG_7J
+        or diag == DIAG_7L or diag == DIAG_8H_1 or diag == DIAG_8H_2
+        or diag == DIAG_8L_1 or diag == DIAG_8L_2
+        or diag == DIAG_3A or diag == DIAG_3B
+        or diag == DIAG_3C or diag == DIAG_3D)
+        return true;
+    return false;
 }
