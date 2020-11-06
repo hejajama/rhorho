@@ -21,6 +21,45 @@ struct inthelper_diagint
     Diagram diag;
 };
 
+/*
+ * LO diagram
+ * [k1x,k1y,k2x,k2y,x1,x2,xg,kgx,kgy]
+ */
+double inthelperf_mc_lo(double *vec, size_t dim, void* p)
+{
+    if (dim != 6) exit(1);
+    inthelper_diagint *par = (inthelper_diagint*)p;
+    Vec k1(vec[0],vec[1]);
+    Vec k2(vec[2], vec[3]);
+    Vec q1 = par->q1;
+    Vec q2 = par->q2;
+    
+    // Assume P=0
+    Vec p1 = q1;
+    Vec p2 = q2;
+    
+    double x1=vec[4];
+    double x2=vec[5];
+    if (x1+x2 >=1) return 0;
+    
+    //double x3 = 1.-x1-x2;
+    
+    //Vec k3 = (k1+k2)*(-1);
+    
+    double wf1 = par->integrator->GetProton().WaveFunction( k1, k2, x1,  x2);
+    
+    Vec K = (q1+q2)*(-1.);
+    double wf2 = par->integrator->GetProton().WaveFunction(p1-q1-q2-K*x1, p2-K*x2, x1, x2)
+        - par->integrator->GetProton().WaveFunction(p1-q1-K*x1, p2-q2-K*x2, x1, x2);
+    
+    double res = wf1*wf2;
+    
+    // 16pi^3 because NLO diagrams do not include 1/(16pi^3) prefactor
+    // Python analysis notebook divides by 1/16pi^3
+    return 16.*std::pow(M_PI,3.) * 1./2. * 1./4. * res / (8.0*x1*x2*(1.-x1-x2)*std::pow(2.0*M_PI,6.0));
+    
+
+}
 
 /*
  * Diagram 2b
@@ -250,7 +289,6 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
             norm = -1./2. * 3.;
             break;
         case DIAG_3A:
-            // Todo: need to add q1<->q2
             l=q1+q2;
             l1=q2;
             k12=k1 - (q1+q2)*(1.-x1);
@@ -337,6 +375,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
         case DIAG_3B:
         case DIAG_5A:
         case DIAG_5C:
+        case DIAG_LO:
             F.dim=6;
             lower = new double[F.dim];
             upper = new double [F.dim];
@@ -357,6 +396,9 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
             F.f=inthelperf_mc_diag2b;
             break;
     }
+    
+    if (diag == DIAG_LO)
+        F.f = inthelperf_mc_lo;
     
     Interpolator *F_b_interp;
     if (use_interpolator)
@@ -398,7 +440,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
     if (use_interpolator)
         delete F_b_interp;
     
-    return result/(8*std::pow(2.0*M_PI,6.));
+    return result;
     
 }
 

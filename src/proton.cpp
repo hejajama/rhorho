@@ -27,7 +27,7 @@ double Proton::WaveFunction(Vec k1, Vec k2, double x1, double x2)
     if (x3 < 0 or x3 > 1) return 0;
     
     if (wave_function ==HarmoinicOscillator)
-        return wf_normalization*std::exp(-( (k1.LenSqr()+mq*mq)/x1 + (k2.LenSqr()+mq*mq)/x2 + (k3.LenSqr()+mq*mq)/x3)/(2.0*beta*beta));
+        return wf_normalization*std::sqrt(x1*x2*x3)*std::exp(-( (k1.LenSqr()+mq*mq)/x1 + (k2.LenSqr()+mq*mq)/x2 + (k3.LenSqr()+mq*mq)/x3)/(2.0*beta*beta));
     
     std::cerr << "Unknown proton wave function!" << std::endl;
     return 0;
