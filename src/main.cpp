@@ -19,9 +19,6 @@ int main(int argc, char* argv[])
     DiagramIntegrator *integrator = new DiagramIntegrator;
    
     Diagram diag = integrator->DiagramType(string(argv[1]));
-   
-    cout << "# Computing diagram " << diag << " (" << argv[1] << ")" << endl;
-   
     
     /*for (double q12=0.05; q12<3; q12+=0.05)
     {
@@ -38,9 +35,12 @@ int main(int argc, char* argv[])
    
     integrator->UseInterpolator(false);
     
+    cout << "# Computing diagram " << diag << " (" << argv[1] << "). m = " << integrator->GetProton().GetM() <<" GeV, beta = " << integrator->GetProton().GetBeta() << " GeV" << endl;
+    
+    
     
     integrator->SetMCIntPoints(mcintpoints);
-    for (double q=0.05; q<4; q+=0.1)
+    for (double q=0.02; q<5; q+=0.05)
     {
         Vec q1(q/2.,0);
         Vec q2(q/2.,0);

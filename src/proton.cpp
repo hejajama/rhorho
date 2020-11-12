@@ -103,7 +103,7 @@ double Proton::ComputeWFNormalizationCoefficient()
     //std::cout << "# Miser result " << result << " err " << error << " relerr " << std::abs(error/result) << std::endl;
     gsl_monte_miser_free(s);
     
-    wf_normalization = 1./result;
+    wf_normalization = 1./std::sqrt(result);
     
     return wf_normalization;
     

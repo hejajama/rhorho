@@ -56,7 +56,7 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
     
     // 16pi^3 because NLO diagrams do not include 1/(16pi^3) prefactor
     // Python analysis notebook divides by 1/16pi^3
-    return 16.*std::pow(M_PI,3.) * 1./2. * 1./4. * res / (8.0*x1*x2*(1.-x1-x2)*std::pow(2.0*M_PI,6.0));
+    return 16.*std::pow(M_PI,3.) * res / (8.0*x1*x2*(1.-x1-x2)*std::pow(2.0*M_PI,6.0));
     
 
 }

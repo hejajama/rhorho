@@ -19,6 +19,8 @@ public:
     void SetBeta(double b) { beta=b; }
     void SetM(double m) { mq=m; }
     void SetWFNormalizationCoefficient(double n) { wf_normalization=n; }
+    double GetM() { return mq; }
+    double GetBeta() { return beta; }
 private:
     ProtonWaveFunction wave_function;
     double beta;   // In HO wave function
