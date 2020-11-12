@@ -25,7 +25,6 @@ target_link_libraries(
 	rhorho
 	PRIVATE
 	rholib
-	${Boost_LIBRARIES}
 	GSL::gsl
 	GSL::gslcblas
 )
