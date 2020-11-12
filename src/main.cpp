@@ -37,7 +37,9 @@ int main(int argc, char* argv[])
     
     cout << "# Computing diagram " << diag << " (" << argv[1] << "). m = " << integrator->GetProton().GetM() <<" GeV, beta = " << integrator->GetProton().GetBeta() << " GeV" << endl;
     
-    
+    if ( diag == DIAG_3A or diag == DIAG_5A or diag == DIAG_5C)
+        mcintpoints /= 50; // there is one more intergal
+                            // within the MC integral
     
     integrator->SetMCIntPoints(mcintpoints);
     for (double q=0.02; q<5; q+=0.05)
