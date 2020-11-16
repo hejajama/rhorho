@@ -23,7 +23,7 @@ struct inthelper_diagint
 
 /*
  * LO diagram
- * [k1x,k1y,k2x,k2y,x1,x2,xg,kgx,kgy]
+ * [k1x,k1y,k2x,k2y,x1,x2]
  */
 double inthelperf_mc_lo(double *vec, size_t dim, void* p)
 {
@@ -419,7 +419,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
     {
         gsl_monte_vegas_state *s = gsl_monte_vegas_alloc(F.dim);
         gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS/2, rng, s, &result, &error);
-        cout << "# vegas warmup " << result << " +/- " << error << endl;
+        //cout << "# vegas warmup " << result << " +/- " << error << endl;
         int iter=0;
         do
         {

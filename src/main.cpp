@@ -41,7 +41,11 @@ int main(int argc, char* argv[])
         mcintpoints /= 50; // there is one more intergal
                             // within the MC integral
     
+    
     integrator->SetMCIntPoints(mcintpoints);
+    // q1=q2
+    /*
+    
     for (double q=0.02; q<5; q+=0.05)
     {
         Vec q1(q/2.,0);
@@ -57,8 +61,37 @@ int main(int argc, char* argv[])
         
         cout << q << " " << d << endl;
         
-    }
+    }*/
     
+    // LO paper reproduce at finite q12
+    double q12 = StrToReal(argv[3]);
+    double theta_b_q= StrToReal(argv[4]);
+    Vec q12v(q12*cos(theta_b_q), q12*sin(theta_b_q));
+    
+    cout << "# q12 = " << q12v << endl;
+    
+    const double MAXK = 4;
+    const int KPOINTS = 40;
+    const double kstep =static_cast<double>(2*MAXK)/KPOINTS;
+    
+    for (double kx = -MAXK; kx <= MAXK + kstep/2.; kx += kstep  )
+    {
+        for (double ky = -MAXK; ky <= MAXK + kstep/2.; ky += kstep )
+         {
+             Vec K(kx,ky);
+             Vec q1 = (q12v - K)*0.5;
+             Vec q2 = (q12v + K)*(-0.5);
+             
+             double d = integrator->IntegrateDiagram(diag, q1, q2);
+             if (integrator->Add_Q1Q2_exchange(diag))
+             {
+                 cout << "#... adding cross graph q1<->q2" << endl;
+                 d +=integrator->IntegrateDiagram(diag, q1, q2);
+             }
+             
+             cout << kx << " " << ky << " " << d << endl;
+         }
+    }
     
     delete integrator;
     return 0;
