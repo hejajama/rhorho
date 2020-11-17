@@ -270,7 +270,7 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     
     Vec k12; Vec k22;
     Vec l; Vec l1;
-    double norm=1; // Normalization factof * symmetry factor,not including g^4 / 16pi^3
+    double norm=1; // Normalization factor * symmetry factor,not including g^4 / 16pi^3
     
     switch(par->diag)
     {
@@ -279,11 +279,11 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
             l1=Vec(0,0);
             k12 =k1 - (q1+q2)*(1.-x1);
             k22=k2 + (q1+q2)*x2;
-            norm = -1./2. * 3.;
+            norm = 2./3. * 3.;
             break;
         case DIAG_3A:
             l=q1+q2;
-            l1=q2;
+            l1=q1;
             k12=k1 - (q1+q2)*(1.-x1);
             k22=k2 + (q1+q2)*x2;
             norm = -1./3.*3;
@@ -291,8 +291,8 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
         case DIAG_3B:
             l=q2;
             l1=Vec(0,0);
-            k12 = k1 + (q1+q2)*x1;
-            k22 = k2 + (q1+q2)*x2;
+            k12 = k1 + (q1+q2)*x1-q2;
+            k22 = k2 + (q1+q2)*x2-q1;
             norm = -1./6. * 6;
             break;
         case DIAG_5A:
@@ -305,8 +305,8 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
         case DIAG_5C:
             l=q2;
             l1=q2;
-            k12 = k1+(q1+q2)*x1;
-            k22 = k2+(q1+q2)*x2;
+            k12 = k1+(q1+q2)*x1-q2;
+            k22 = k2+(q1+q2)*x2-q1;
             norm = 2./(3.*6.)*6;
             break;
         default:
