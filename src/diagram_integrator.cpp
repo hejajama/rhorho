@@ -12,14 +12,7 @@
 
 using namespace std;
 
-struct inthelper_diagint
-{
-    DiagramIntegrator *integrator;
-    Vec q1;
-    Vec q2;
-    Interpolator *F_B_interpolator;
-    Diagram diag;
-};
+
 
 /*
  * LO diagram
@@ -35,8 +28,8 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
     Vec q2 = par->q2;
     
     // Assume P=0
-    Vec p1 = q1;
-    Vec p2 = q2;
+    Vec p1 = k1;
+    Vec p2 = k2;
     
     double x1=vec[4];
     double x2=vec[5];
@@ -46,7 +39,7 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
     
     //Vec k3 = (k1+k2)*(-1);
     
-    double wf1 = par->integrator->GetProton().WaveFunction( k1, k2, x1,  x2);
+    double wf1 = par->integrator->GetProton().WaveFunction( p1, p2, x1,  x2);
     
     Vec K = (q1+q2)*(-1.);
     double wf2 = par->integrator->GetProton().WaveFunction(p1-q1-q2-K*x1, p2-K*x2, x1, x2)

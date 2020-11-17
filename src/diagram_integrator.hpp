@@ -119,4 +119,13 @@ private:
 };
 
 
+struct inthelper_diagint
+{
+    DiagramIntegrator *integrator;
+    Vec q1;
+    Vec q2;
+    Interpolator *F_B_interpolator;
+    Diagram diag;
+};
+
 #endif
