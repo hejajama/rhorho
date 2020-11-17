@@ -16,6 +16,11 @@ double StrToReal(std::string str)
 
 int main(int argc, char* argv[])
 {
+    cout << "# Command: ";
+    for (int i=1; i<argc; i++)
+        cout << argv[i] << " ";
+    cout << endl;
+    
     DiagramIntegrator *integrator = new DiagramIntegrator;
    
     Diagram diag = integrator->DiagramType(string(argv[1]));
@@ -44,8 +49,9 @@ int main(int argc, char* argv[])
     
     integrator->SetMCIntPoints(mcintpoints);
     // q1=q2
-    /*
     
+    
+    /*
     for (double q=0.02; q<5; q+=0.05)
     {
         Vec q1(q/2.,0);
@@ -61,17 +67,19 @@ int main(int argc, char* argv[])
         
         cout << q << " " << d << endl;
         
-    }*/
+    }
+     */
     
     // LO paper reproduce at finite q12
+    
     double q12 = StrToReal(argv[3]);
     double theta_b_q= StrToReal(argv[4]);
     Vec q12v(q12*cos(theta_b_q), q12*sin(theta_b_q));
     
-    cout << "# q12 = " << q12v << endl;
+    cout << "# q12 = " << q12v << " orientation " << theta_b_q << endl;
     
-    const double MAXK = 4;
-    const int KPOINTS = 40;
+    const double MAXK = 3;
+    const int KPOINTS = 30;
     const double kstep =static_cast<double>(2*MAXK)/KPOINTS;
     
     for (double kx = -MAXK; kx <= MAXK + kstep/2.; kx += kstep  )
@@ -92,6 +100,7 @@ int main(int argc, char* argv[])
              cout << kx << " " << ky << " " << d << endl;
          }
     }
+     
     
     delete integrator;
     return 0;
