@@ -474,9 +474,12 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
     switch (diag) {
         case DIAG_2A:
         case DIAG_3A:
+        case DIAG_3A_2:
         case DIAG_3B:
+        case DIAG_3B_2:
         case DIAG_5A:
         case DIAG_5C:
+        case DIAG_5C_1:
         case DIAG_LO:
             F.dim=6;
             lower = new double[F.dim];
