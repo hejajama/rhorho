@@ -42,10 +42,15 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
     double wf1 = par->integrator->GetProton().WaveFunction( p1, p2, x1,  x2);
     
     Vec K = (q1+q2)*(-1.);
-    double wf2 = par->integrator->GetProton().WaveFunction(p1-q1-q2-K*x1, p2-K*x2, x1, x2)
-        - par->integrator->GetProton().WaveFunction(p1-q1-K*x1, p2-q2-K*x2, x1, x2);
+    //double wf2 = par->integrator->GetProton().WaveFunction(p1-q1-q2-K*x1, p2-K*x2, x1, x2)
+    //    - par->integrator->GetProton().WaveFunction(p1-q1-K*x1, p2-q2-K*x2, x1, x2);
     
-    double res = wf1*wf2;
+    // Risto (77)
+    double wf2 =par->integrator->GetProton().WaveFunction(k1 - (q1+q2)*(1.-x1), k2+(q1+q2)*x2, x1, x2)
+    - 0.5*par->integrator->GetProton().WaveFunction(k1+(q1+q2)*x1-q1, k2+(q1+q2)*x2-q2, x1, x2)
+    - 0.5*par->integrator->GetProton().WaveFunction(k1+(q1+q2)*x1-q2, k2+(q1+q2)*x2-q1, x1, x2);
+    
+    double res = wf1*wf2 * 1./6.*3; // 3 is the symmetry factor and 1/6 the normalization in Risto (77)
     
     // 16pi^3 because NLO diagrams do not include 1/(16pi^3) prefactor
     // Python analysis notebook divides by 1/16pi^3
