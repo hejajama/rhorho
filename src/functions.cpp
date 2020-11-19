@@ -72,9 +72,11 @@ double F_worker::F_int_B0(Vec l, Vec l1, double alpha, double m2)
     if (l1.LenSqr() < 1e-7)
     {
         double l4l2m2 =SQR(l.LenSqr()) + 4.*l.LenSqr()*m2; //l^4 + 4l^2m^2
-        return -l.LenSqr() * std::log(2.0*m2 / (l.LenSqr() + 2.*m2+std::sqrt( l4l2m2 ) ) )
+        double res = -l.LenSqr() * std::log(2.0*m2 / (l.LenSqr() + 2.*m2+std::sqrt( l4l2m2 ) ) )
             * (3. - 4.*alpha + SQR(alpha) + 4.*std::log(alpha))
         / (16.*SQR(M_PI)*std::sqrt(l4l2m2) );
+        
+        return res;
     }
     
     

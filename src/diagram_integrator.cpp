@@ -365,6 +365,8 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     Vec l; Vec l1;
     double norm=1; // Normalization factor * symmetry factor,not including g^4 / 16pi^3
     
+    double alpha =  par->integrator->GetX() / x1;
+    // Default, changed below if necessary
     switch(par->diag)
     {
         case DIAG_2A:
@@ -396,11 +398,12 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
             norm = -1./6. * 6;
             break;
         case DIAG_3B_2:
-            l=q2;
+            l=q1;
             l1=Vec(0,0);
             k12 = k1 + (q1+q2)*x1-q1;
             k22 = k2 + (q1+q2)*x2-q2;
             norm = -1./6. * 6;
+            alpha = par->integrator->GetX() / x2;
             break;
         case DIAG_5A:
             l=q1+q2;
@@ -422,6 +425,7 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
             k12 = k1+(q1+q2)*x1-q1;
             k22 = k2+(q1+q2)*x2-q2;
             norm = 2./(3.*6.)*6;
+            alpha = par->integrator->GetX() / x2;
             break;
         default:
             std::cerr << "Unknown diagram " << par->diag << " encountered!" << std::endl;
@@ -431,7 +435,7 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
 
     double wf2 = par->integrator->GetProton().WaveFunction( k12, k22, x1, x2);
     
-    double alpha =  par->integrator->GetX() / x1;
+    
     double mf =  par->integrator->GetMf();
     
     if (alpha < 1e-8 or mf < 1e-8)

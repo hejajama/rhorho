@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <gsl/gsl_errno.h>
+
 #include "functions.hpp"
 #include "diagram_integrator.hpp"
 using namespace std;
@@ -13,9 +15,19 @@ double StrToReal(std::string str)
     return tmp;
 }
 
+void handler (const char * reason,
+const char * file,
+int line,
+int gsl_errno)
+{
+    cerr << "# Error " << gsl_errno << " line " << line << " file " << file << " reason " << reason << endl;
+    
+}
 
 int main(int argc, char* argv[])
 {
+    gsl_set_error_handler(handler);
+    
     cout << "# Command: ";
     for (int i=1; i<argc; i++)
         cout << argv[i] << " ";
@@ -25,15 +37,7 @@ int main(int argc, char* argv[])
    
     Diagram diag = integrator->DiagramType(string(argv[1]));
     
-    /*for (double q12=0.05; q12<3; q12+=0.05)
-    {
-        Vec q1(q12/2.,0);
-        Vec q2(q12/2.,0);
-        double diag2a = integrator->IntegrateDiagram(DIAG_2A, q1, q2);
-        cout << q12 << " " << diag2a << endl;
-    }
-    */
-    
+  
     
     
     int mcintpoints = StrToReal(argv[2]);
@@ -48,6 +52,20 @@ int main(int argc, char* argv[])
     
     
     integrator->SetMCIntPoints(mcintpoints);
+    
+    
+    // Test limit q1->0, q2->K, should vanish
+    Vec K(1,0);
+    for (double q=0.47; q<0.5; q+=0.002)
+    {
+        Vec q1(q,0);
+        double d = integrator->IntegrateDiagram(diag, q1-K*0.5, q1*(-1)-K*0.5);
+        cout << (q1-K*0.5).Len() << " " << d << endl;
+    }
+    
+    //cout <<integrator->IntegrateDiagram(diag,Vec(1,0), Vec(0,0)) << endl;
+    
+    
     // q1=q2
     
     
@@ -68,10 +86,10 @@ int main(int argc, char* argv[])
         cout << q << " " << d << endl;
         
     }
-     */
+   */
     
     // LO paper reproduce at finite q12
-    
+    /*
     double q12 = StrToReal(argv[3]);
     double theta_b_q= StrToReal(argv[4]);
     Vec q12v(q12*cos(theta_b_q), q12*sin(theta_b_q));
@@ -100,7 +118,7 @@ int main(int argc, char* argv[])
              cout << kx << " " << ky << " " << d << endl;
          }
     }
-     
+     */
     
     delete integrator;
     return 0;
