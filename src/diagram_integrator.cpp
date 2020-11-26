@@ -209,28 +209,28 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             ktilde_2 = k2 + (q1+q2)*x2 + kg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = 1./3. * (CF-1./2. - 1./6.);
+            norm = 1./3. * (CF-1./2. - 1./6.)*6;
             break;
         case DIAG_7K:
             ktilde_1 = k1 + (q1+q2)*x1 - q1 - kg;
             ktilde_2 = k2 + (q1+q2)*x2 + kg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = 1./3. * (CF-1./2. - 1./6.);
+            norm = 1./3. * (CF-1./2. - 1./6.)*6;
             break;
         case DIAG_7L:
             ktilde_1 = k1 + (q1+q2)*x1 - kg;
             ktilde_2 = k2 + (q1+q2)*x2 - q2 + kg;
             A = p1*z1 - kg;
             B = (p2-q2)*z2 - kg*(1.-z2);
-            norm = 1./3. * (CF-1./2.-1./6.);
+            norm = 1./3. * (CF-1./2.-1./6.)*6;
             break;
         case DIAG_7M:
             ktilde_1 = k1 + (q1+q2)*x1 - kg;
             ktilde_2 = k2 + (q1+q2)*x2 - q1 + kg;
             A = p1*z1 - kg;
             B = (p2-q1)*z2 - kg*(1.-z2);
-            norm = 1./3. * (CF-1./2.-1./6.);
+            norm = 1./3. * (CF-1./2.-1./6.)*6;
             break;
         case DIAG_8H_1:
             ktilde_1 = k1 + (q1+q2)*x1 - kg - q2;
@@ -272,7 +272,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             ktilde_2 = k2 + (q1+q2)*x2 + kg;
             A = (p1-q2)*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3.);
+            norm = -1./3. * (CF-2./3.)*6;
             break;
         case DIAG_8K_1:
             ktilde_1 = k1 + (q1+q2)*x1 - kg - q1;
@@ -286,35 +286,35 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             ktilde_2 = k2 + (q1+q2)*x2 + kg;
             A = (p1-q1)*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3.);
+            norm = -1./3. * (CF-2./3.)*6;
             break;
         case DIAG_8L_1:
             ktilde_1 = k1 + (q1+q2)*x1 - kg;
             ktilde_2 = k2 + (q1+q2)*x2 + kg - q2;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3);
+            norm = -1./3. * (CF-2./3)*6;
             break;
         case DIAG_8L_2:
             ktilde_1 = k1 + (q1+q2)*x1 - kg;
             ktilde_2 = k2 + (q1+q2)*x2 + kg - q2;
             A = p1*z1 - kg;
             B = (p2-q2)*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3);
+            norm = -1./3. * (CF-2./3)*6;
             break;
         case DIAG_8M_1:
             ktilde_1 = k1 + (q1+q2)*x1 - kg;
             ktilde_2 = k2 + (q1+q2)*x2 + kg - q1;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3);
+            norm = -1./3. * (CF-2./3)*6;
             break;
         case DIAG_8M_2:
             ktilde_1 = k1 + (q1+q2)*x1 - kg;
             ktilde_2 = k2 + (q1+q2)*x2 + kg - q1;
             A = p1*z1 - kg;
             B = (p2-q1)*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3);
+            norm = -1./3. * (CF-2./3)*6;
             break;
         default:
             cerr << "Unknown diagram " << par->diag << endl;
@@ -431,6 +431,9 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
             std::cerr << "Unknown diagram " << par->diag << " encountered!" << std::endl;
             exit(1);
     }
+    
+    if (l1.LenSqr() < 1e-20 and l.LenSqr() < 1e-20)
+        return 0;
      
 
     double wf2 = par->integrator->GetProton().WaveFunction( k12, k22, x1, x2);

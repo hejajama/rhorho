@@ -4,6 +4,7 @@
 #include <boost/test/unit_test.hpp>
 
 double inthelperf_mc_lo(double *vec, size_t dim, void* p);
+double inthelperf_mc_diag2b(double *vec, size_t dim, void* p);
 
 BOOST_AUTO_TEST_SUITE(HelperFunctions)
 BOOST_AUTO_TEST_CASE(B0tests)
@@ -59,4 +60,56 @@ BOOST_AUTO_TEST_CASE(LO_DIAG)
     
     delete integrator;
 }
+
+
+
+BOOST_AUTO_TEST_CASE(Q1_0_SET_2)
+{
+    // When q_1=0, we should get 6e_2 + 8h_2 + 8j_2=0 at all x_i, k_i
+    double x1=0.3; double x2=0.3;
+    double xg = 0.1;
+    //[k1x,k1y,k2x,k2y,x1,x2,xg,kgx,kgy]
+    if (xg > std::min(x1,1.-x2)) cerr << "Invalid x1,x2,xg in q1=0 test!" << endl;
+    double intvec[9] = {0.1, -0.4, 0.2,0.3, x1,x2, xg, 0.2, -0.05};
+    
+    DiagramIntegrator *integrator = new DiagramIntegrator;
+    integrator->GetProton().SetBeta(0.55);
+    integrator->GetProton().SetM(0.26);
+    integrator->GetProton().ComputeWFNormalizationCoefficient();
+    
+    Diagram diag1 = integrator->DiagramType("6e_2");
+    Diagram diag2 = integrator->DiagramType("8h_2");
+    Diagram diag3 = integrator->DiagramType("8j_2");
+    
+    inthelper_diagint helper;
+    Vec q1(0,0); Vec q2(0.2,0.1);
+    helper.q1=q1; helper.q2=q2;
+    helper.integrator=integrator;
+    
+    helper.diag = diag1;
+    double integrand1 = inthelperf_mc_diag2b(intvec, 9, &helper);
+    
+    helper.diag = diag2;
+    double integrand2 = inthelperf_mc_diag2b(intvec, 9, &helper);
+    
+    helper.diag = diag3;
+    double integrand3 = inthelperf_mc_diag2b(intvec, 9, &helper);
+    
+    BOOST_CHECK_SMALL(integrand1+integrand2+integrand3, 1e-6);
+    
+    // Check also integrated
+    integrator->SetMCIntPoints(1e7);
+    integrator->UseInterpolator(false);
+    double int1 = integrator->IntegrateDiagram(diag1, q1, q2);
+    double int2 = integrator->IntegrateDiagram(diag2, q1, q2);
+    double int3 = integrator->IntegrateDiagram(diag3, q1, q2);
+    
+    
+    BOOST_CHECK_SMALL(int1+int2+int3, 1e-2);
+    
+    delete integrator;
+}
+
+
+
 BOOST_AUTO_TEST_SUITE_END()
