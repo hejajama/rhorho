@@ -113,7 +113,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             ktilde_1 =k1 + (q1+q2)*x1 - q2 - kg;
             ktilde_2 = k2 + (q1+q2)*x2 - q1 + kg;
             A = p1*z1 - kg;
-            B = p2*z2 - (kg-q2)*(1.-z2);
+            B = p2*z2 - (kg-q1)*(1.-z2);
             norm=1./12.*6;
             break;
         case DIAG_3D:

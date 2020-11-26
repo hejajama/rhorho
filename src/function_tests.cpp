@@ -98,15 +98,29 @@ BOOST_AUTO_TEST_CASE(Q1_0_SET_2)
     BOOST_CHECK_SMALL(integrand1+integrand2+integrand3, 1e-6);
     
     // Check also integrated
-    integrator->SetMCIntPoints(1e7);
+    /*
+    integrator->SetMCIntPoints(4e6);
     integrator->UseInterpolator(false);
     double int1 = integrator->IntegrateDiagram(diag1, q1, q2);
     double int2 = integrator->IntegrateDiagram(diag2, q1, q2);
     double int3 = integrator->IntegrateDiagram(diag3, q1, q2);
     
     
-    BOOST_CHECK_SMALL(int1+int2+int3, 1e-2);
+    BOOST_CHECK_SMALL(int1+int2+int3, 5.);
+     */
     
+    // Test ingerand in set 1 of finite diagrams, 3c' + 7h + 7j + 8h' + 8j'
+    double sum=0;
+    Diagram diags[5] = {integrator->DiagramType("3c_2"), integrator->DiagramType("7h"), integrator->DiagramType("7j"),
+        integrator->DiagramType("8h_1"), integrator->DiagramType("8j_1") };
+    double color_factors[5] = {3., 0.5, 0.5, 0.5, 0.5};
+    for (int i=0; i<5; i++)
+    {
+        helper.diag = diags[i];
+        double integrand = inthelperf_mc_diag2b(intvec, 9, &helper);
+        sum += color_factors[i]*integrand;
+    }
+    BOOST_CHECK_SMALL(sum, 0.001);
     delete integrator;
 }
 
