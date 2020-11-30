@@ -14,6 +14,20 @@ double StrToReal(std::string str)
     buff >> tmp;
     return tmp;
 }
+long int StrToInt(std::string str)
+{
+    std::stringstream buff(str);
+    double  tmp;
+    buff >> tmp;
+    return static_cast<long int>(tmp);
+}
+
+enum MODE
+{
+    ONEDIM,
+    TWODIM,
+    WARD
+};
 
 void handler (const char * reason,
 const char * file,
@@ -34,91 +48,129 @@ int main(int argc, char* argv[])
     cout << endl;
     
     DiagramIntegrator *integrator = new DiagramIntegrator;
+    long int mcintpoints = 1e6;
+    string diagram = "LO";
+    MODE mode = ONEDIM;
+    
+    for (int i=1; i< argc; i++)
+    {
+        if (string(argv[i])=="-x")
+            integrator->SetX(StrToReal(argv[i+1]));
+        else if (string(argv[i])=="-beta")
+            integrator->GetProton().SetBeta(StrToReal(argv[i+1]));
+        else if (string(argv[i])=="-wavef_mass")
+            integrator->GetProton().SetM(StrToReal(argv[i+1]));
+        else if (string(argv[i])=="-perturbative_mass")
+            integrator->SetPerturbativeMass(StrToReal(argv[i+1]));
+        else if (string(argv[i])=="-mcintpoints")
+            mcintpoints = StrToInt(argv[i+1]);
+        else if (string(argv[i])=="-diag")
+            diagram = argv[i+1];
+        else if (string(argv[i])=="-powerlaw")
+            integrator->GetProton().SetWaveFunction(Power);
+        else if (string(argv[i])=="-harmonic_oscillator")
+            integrator->GetProton().SetWaveFunction(HarmoinicOscillator);
+        else if (string(argv[i])=="-1d")
+            mode = ONEDIM;
+        else if (string(argv[i])=="-2d")
+            mode = TWODIM;
+        else if (string(argv[i])=="-ward")
+            mode = WARD;
+        else if (string(argv[i]).substr(0,1)=="-")
+        {
+            cerr << "Unknown parameter " << argv[i] << endl;
+            exit(1);
+        }
+    
+    }
+    
+    integrator->GetProton().ComputeWFNormalizationCoefficient();
+    
+    
+    
    
-    Diagram diag = integrator->DiagramType(string(argv[1]));
+    Diagram diag = integrator->DiagramType(diagram);
     
-  
-    
-    
-    int mcintpoints = StrToReal(argv[2]);
    
     integrator->UseInterpolator(false);
     
-    cout << "# Computing diagram " << diag << " (" << argv[1] << "). m = " << integrator->GetProton().GetM() <<" GeV, beta = " << integrator->GetProton().GetBeta() << " GeV" << endl;
+    cout << integrator->InfoStr();
     
     if ( diag == DIAG_3A or diag == DIAG_3A_2 or diag == DIAG_5A or diag == DIAG_5C or diag == DIAG_5C_1)
-        mcintpoints /= 50; // there is one more intergal
+        mcintpoints /= 70; // there is one more intergal
                             // within the MC integral
     
-    
+    cout << "# Diagram " << diagram << " id " << diag << " mcintpoints " << mcintpoints << endl << "#" << endl;
     integrator->SetMCIntPoints(mcintpoints);
     
     
     // Test limit q1->0, q2->K, should vanish
-    Vec K(1,0);
-    for (double q=0.47; q<0.5; q+=0.002)
+    if (mode == WARD)
     {
-        Vec q1(q,0);
-        double d = integrator->IntegrateDiagram(diag, q1-K*0.5, q1*(-1)-K*0.5);
-        cout << (q1-K*0.5).Len() << " " << d << endl;
-    }
-    
-    //cout <<integrator->IntegrateDiagram(diag,Vec(1,0), Vec(0,0)) << endl;
-    
-    
-    // q1=q2
-    
-    
-    /*
-    for (double q=0.02; q<5; q+=0.05)
-    {
-        Vec q1(q/2.,0);
-        Vec q2(q/2.,0);
-        
-        double d = integrator->IntegrateDiagram(diag, q1, q2);
-        if (integrator->Add_Q1Q2_exchange(diag))
+        Vec K(1,0);
+        for (double q=0.47; q<0.5; q+=0.002)
         {
-            cout << "#... adding cross graph q1<->q2" << endl;
-            d +=integrator->IntegrateDiagram(diag, q1, q2);
+            Vec q1(q,0);
+            double d = integrator->IntegrateDiagram(diag, q1-K*0.5, q1*(-1)-K*0.5);
+            cout << (q1-K*0.5).Len() << " " << d << endl;
         }
-       
-        
-        cout << q << " " << d << endl;
-        
     }
-   */
+    
+    if (mode == ONEDIM)
+    {
+    // q1=q2
+
+        for (double q=0.02; q<5; q+=0.05)
+        {
+            Vec q1(q/2.,0);
+            Vec q2(q/2.,0);
+            
+            double d = integrator->IntegrateDiagram(diag, q1, q2);
+            if (integrator->Add_Q1Q2_exchange(diag))
+            {
+                cout << "#... adding cross graph q1<->q2" << endl;
+                d +=integrator->IntegrateDiagram(diag, q1, q2);
+            }
+           
+            
+            cout << q << " " << d << endl;
+            
+        }
+    }
+    if (mode == TWODIM)
+    {
     
     // LO paper reproduce at finite q12
-    /*
-    double q12 = StrToReal(argv[3]);
-    double theta_b_q= StrToReal(argv[4]);
-    Vec q12v(q12*cos(theta_b_q), q12*sin(theta_b_q));
     
-    cout << "# q12 = " << q12v << " orientation " << theta_b_q << endl;
-    
-    const double MAXK = 3;
-    const int KPOINTS = 30;
-    const double kstep =static_cast<double>(2*MAXK)/KPOINTS;
-    
-    for (double kx = -MAXK; kx <= MAXK + kstep/2.; kx += kstep  )
-    {
-        for (double ky = -MAXK; ky <= MAXK + kstep/2.; ky += kstep )
-         {
-             Vec K(kx,ky);
-             Vec q1 = (q12v - K)*0.5;
-             Vec q2 = (q12v + K)*(-0.5);
-             
-             double d = integrator->IntegrateDiagram(diag, q1, q2);
-             if (integrator->Add_Q1Q2_exchange(diag))
+        double q12 = StrToReal(argv[3]);
+        double theta_b_q= StrToReal(argv[4]);
+        Vec q12v(q12*cos(theta_b_q), q12*sin(theta_b_q));
+        
+        cout << "# q12 = " << q12v << " orientation " << theta_b_q << endl;
+        
+        const double MAXK = 5;
+        const int KPOINTS = 50;
+        const double kstep =static_cast<double>(2*MAXK)/KPOINTS;
+        
+        for (double kx = -MAXK; kx <= MAXK + kstep/2.; kx += kstep  )
+        {
+            for (double ky = -MAXK; ky <= MAXK + kstep/2.; ky += kstep )
              {
-                 cout << "#... adding cross graph q1<->q2" << endl;
-                 d +=integrator->IntegrateDiagram(diag, q1, q2);
+                 Vec K(kx,ky);
+                 Vec q1 = (q12v - K)*0.5;
+                 Vec q2 = (q12v + K)*(-0.5);
+                 
+                 double d = integrator->IntegrateDiagram(diag, q1, q2);
+                 if (integrator->Add_Q1Q2_exchange(diag))
+                 {
+                     cout << "#... adding cross graph q1<->q2" << endl;
+                     d +=integrator->IntegrateDiagram(diag, q1, q2);
+                 }
+                 
+                 cout << kx << " " << ky << " " << d << endl;
              }
-             
-             cout << kx << " " << ky << " " << d << endl;
-         }
+        }
     }
-     */
     
     delete integrator;
     return 0;

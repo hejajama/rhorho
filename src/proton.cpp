@@ -26,8 +26,13 @@ double Proton::WaveFunction(Vec k1, Vec k2, double x1, double x2)
     
     if (x3 < 0 or x3 > 1) return 0;
     
+    // Invariant mass of the qqq state
+    double M2 = (k1.LenSqr()+mq*mq)/x1 + (k2.LenSqr()+mq*mq)/x2 + (k3.LenSqr()+mq*mq)/x3;
+    
     if (wave_function ==HarmoinicOscillator)
-        return wf_normalization*std::sqrt(x1*x2*x3)*std::exp(-( (k1.LenSqr()+mq*mq)/x1 + (k2.LenSqr()+mq*mq)/x2 + (k3.LenSqr()+mq*mq)/x3)/(2.0*beta*beta));
+        return wf_normalization*std::sqrt(x1*x2*x3)*std::exp(-M2/(2.0*beta*beta));
+    if (wave_function == Power)
+        return wf_normalization*sqrt(x1*x2*x3)*std::pow(1.+M2/(beta*beta), -wf_power);
     
     std::cerr << "Unknown proton wave function!" << std::endl;
     return 0;
@@ -37,6 +42,7 @@ Proton::Proton()
 {
     mq=0.14;
     beta=0.55;
+    wf_power=3.5;
     wave_function=HarmoinicOscillator;
     wf_normalization=-1;
 }
@@ -106,5 +112,16 @@ double Proton::ComputeWFNormalizationCoefficient()
     wf_normalization = 1./std::sqrt(result);
     
     return wf_normalization;
+    
+}
+
+std::string WaveFunctionString(ProtonWaveFunction wf)
+{
+    if (wf == HarmoinicOscillator)
+        return "Harmonic oscillator";
+    else if (wf == Power)
+        return "Power law";
+    else
+        return "UNKNOWN!";
     
 }

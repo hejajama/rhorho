@@ -5,6 +5,8 @@
 #include "proton.hpp"
 #include <vector>
 #include <cmath>
+#include <string>
+#include <sstream>
 #include <gsl/gsl_monte.h>
 #include <gsl/gsl_monte_miser.h>
 #include <gsl/gsl_integration.h>
@@ -41,9 +43,6 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
     
     double wf1 = par->integrator->GetProton().WaveFunction( p1, p2, x1,  x2);
     
-    Vec K = (q1+q2)*(-1.);
-    //double wf2 = par->integrator->GetProton().WaveFunction(p1-q1-q2-K*x1, p2-K*x2, x1, x2)
-    //    - par->integrator->GetProton().WaveFunction(p1-q1-K*x1, p2-q2-K*x2, x1, x2);
     
     // Risto (77)
     double wf2 =par->integrator->GetProton().WaveFunction(k1 - (q1+q2)*(1.-x1), k2+(q1+q2)*x2, x1, x2)
@@ -541,9 +540,9 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
         do
         {
             gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS, rng, s, &result, &error);
-            cout << "# Vegas interation " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
+            //cout << "# Vegas interation " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
             iter++;
-        } while ((fabs( gsl_monte_vegas_chisq(s) - 1.0) > 0.4 or iter < 2) and iter < 5);
+        } while ((fabs( gsl_monte_vegas_chisq(s) - 1.0) > 0.4 or iter < 2) and iter < 6);
         gsl_monte_vegas_free(s);
     }
     else
@@ -591,9 +590,7 @@ DiagramIntegrator::DiagramIntegrator()
     
     proton.SetBeta(0.55);
     proton.SetM(0.26);
-    cout <<"# Initializing proton..." << endl;
-    double n = proton.ComputeWFNormalizationCoefficient();
-    cout << "#... done, normalization coef " << n  << endl;
+   
     gsl_rng_env_setup ();
     
     F = new F_worker(20, 0.0001); // divisions accuracy
@@ -626,4 +623,15 @@ Diagram DiagramIntegrator::DiagramType(std::string str)
 bool DiagramIntegrator::Add_Q1Q2_exchange(Diagram diag)
 {
     return false;
+}
+
+std::string DiagramIntegrator::InfoStr()
+{
+    std::stringstream ss;
+    ss << "# x=" << x << endl <<
+    "# Perturbative m_f=" << endl
+    << "# Proton wave function: " << WaveFunctionString(proton.GetWaveFunction()) << endl
+    << "# Proton wave function params: mq=" << proton.GetM() << "GeV, beta=" << proton.GetBeta() <<" GeV, p=" << proton.GetP() << endl;
+    
+    return ss.str();
 }

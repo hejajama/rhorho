@@ -7,6 +7,7 @@
 
 #include <gsl/gsl_monte.h>
 #include <gsl/gsl_rng.h>
+#include <string>
 
 
 
@@ -128,12 +129,17 @@ public:
     void UseInterpolator(bool s) { use_interpolator = s; }
     Interpolator* InitializeInterpolator();
     bool UseInterpolator() { return use_interpolator; }
+    void SetX(double x_) { x=x_; }
     double GetX() { return x; }
     F_worker* GetF_worker() { return F; }
+    
+    void SetPerturbativeMass(double mf_) { mf=mf_; }
     
     Diagram DiagramType(std::string str); // Map str to Diagram
     
     bool Add_Q1Q2_exchange(Diagram diag); // Should I add q1<->q2
+              
+    std::string InfoStr();
     
 private:
     double mf;      // Quark mass

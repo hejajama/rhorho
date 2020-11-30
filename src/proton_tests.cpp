@@ -25,4 +25,15 @@ BOOST_AUTO_TEST_CASE(ProtonWFNorm)
     BOOST_CHECK_CLOSE(p.ComputeWFNormalizationCoefficient(), 43389.7232, 0.1);
 }
 
+BOOST_AUTO_TEST_CASE(ProtonPowerLawWFNorm)
+{
+    Proton p;
+    p.SetWaveFunction(Power);
+    p.SetM(0.26);
+    p.SetBeta(0.55);
+    p.SetP(3.5);
+    // Numerical MC integral, can't require too good precision...
+    BOOST_CHECK_CLOSE(p.ComputeWFNormalizationCoefficient(), 1.50206095e6, 1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
