@@ -26,7 +26,8 @@ enum MODE
 {
     ONEDIM,
     TWODIM,
-    WARD
+    WARD,
+    FOURDIM
 };
 
 void handler (const char * reason,
@@ -77,6 +78,8 @@ int main(int argc, char* argv[])
             mode = ONEDIM;
         else if (string(argv[i])=="-2d")
             mode = TWODIM;
+        else if (string(argv[i])=="-4d")
+            mode = FOURDIM;
         else if (string(argv[i])=="-ward")
             mode = WARD;
         else if (string(argv[i])=="-q12")
@@ -174,6 +177,55 @@ int main(int argc, char* argv[])
                  
                  cout << kx << " " << ky << " " << d << endl;
              }
+        }
+    }
+    
+    if (mode == FOURDIM)
+    {
+        const double MAXK = 3;
+        const int KPOINTS = 15;
+        const double kstep =static_cast<double>(2*MAXK)/KPOINTS;
+        cout << "# G(q - 1/2*k, q + 1/2*k) /( (q-1/2k)^2(q+1/2k)^2" << endl;
+        cout << "# kx  ky  qx  qy  diagram" << endl;
+        for (double kx = -MAXK; kx <= MAXK + kstep/2.; kx += kstep  )
+        {
+            for (double ky = -MAXK; ky <= MAXK + kstep/2.; ky += kstep )
+            {
+                for (double qx = -MAXK; qx <= MAXK + kstep/2.; qx += kstep  )
+                {
+                    for (double qy = -MAXK; qy <= MAXK + kstep/2.; qy += kstep )
+                    {
+                        Vec q(qx,qy);
+                        Vec K(kx,ky);
+                        Vec qmink2 = q - K*0.5;
+                        Vec qplusk2 = q + K*0.5;
+                        
+                        double d = 0;
+                        // Ward->0 if one of the momenta vanishes
+                        if (qplusk2.Len() > 1e-4 and qmink2.Len() > 1e-4)
+                        {
+                        
+                            d = integrator->IntegrateDiagram(diag, qmink2, qplusk2);
+                            if (integrator->Add_Q1Q2_exchange(diag))
+                            {
+                                cout << "#... adding cross graph q1<->q2" << endl;
+                                d +=integrator->IntegrateDiagram(diag, qplusk2, qmink2);
+                            }
+                        }
+                        double res =d/(qplusk2.LenSqr()*qmink2.LenSqr());
+                        if (isnan(res))
+                        {
+                            cerr << "Note NaN at kx=" << kx << ", ky=" << ky << ", qx=" << qx <<", qy=" << qy << endl;
+                            cerr << "d=" << d << endl;
+                            cerr << "q-K/2:" << endl << qmink2 << endl;
+                            cerr << "q+K/2:" << endl << qplusk2 << endl;
+                            res=0;
+                        }
+                        cout << kx << " " << ky << " " << qx << " " << qy << " " << res  << endl;
+                        
+                    }
+                }
+            }
         }
     }
     
