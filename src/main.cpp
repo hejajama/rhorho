@@ -52,6 +52,9 @@ int main(int argc, char* argv[])
     string diagram = "LO";
     MODE mode = ONEDIM;
     
+    double q12=0.5;
+    double theta_b_q = 0;
+    
     for (int i=1; i< argc; i++)
     {
         if (string(argv[i])=="-x")
@@ -76,6 +79,10 @@ int main(int argc, char* argv[])
             mode = TWODIM;
         else if (string(argv[i])=="-ward")
             mode = WARD;
+        else if (string(argv[i])=="-q12")
+            q12 = StrToReal(argv[i+1]);
+        else if (string(argv[i])=="-theta_b_q")
+            theta_b_q = StrToReal(argv[i+1]);
         else if (string(argv[i]).substr(0,1)=="-")
         {
             cerr << "Unknown parameter " << argv[i] << endl;
@@ -142,8 +149,6 @@ int main(int argc, char* argv[])
     
     // LO paper reproduce at finite q12
     
-        double q12 = StrToReal(argv[3]);
-        double theta_b_q= StrToReal(argv[4]);
         Vec q12v(q12*cos(theta_b_q), q12*sin(theta_b_q));
         
         cout << "# q12 = " << q12v << " orientation " << theta_b_q << endl;

@@ -35,11 +35,11 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
     
     double x1=vec[4];
     double x2=vec[5];
+    
+    double x3 = 1.-x1-x2;
+    double x = par->integrator->GetX();
+    if (x3 >= 1 or x3 < x) return 0;
     if (x1+x2 >=1) return 0;
-    
-    //double x3 = 1.-x1-x2;
-    
-    //Vec k3 = (k1+k2)*(-1);
     
     double wf1 = par->integrator->GetProton().WaveFunction( p1, p2, x1,  x2);
     
@@ -76,7 +76,11 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     
     double x1=vec[4];
     double x2=vec[5];
-    if (x1+x2 >= 1) return 0;
+    
+    double x3 = 1.-x1-x2;
+    double x = par->integrator->GetX();
+    if (x3 >= 1 or x3 < x) return 0;
+    if (x1+x2 >=1) return 0;
     
     double xg = vec[6];
     if (xg > std::min(x1,1.-x2)) return 0;
@@ -352,11 +356,11 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     
     double x1=vec[4];
     double x2=vec[5];
+    
+    double x3 = 1.-x1-x2;
+    double x = par->integrator->GetX();
+    if (x3 >= 1 or x3 < x) return 0;
     if (x1+x2 >=1) return 0;
-    
-    //double x3 = 1.-x1-x2;
-    
-    //Vec k3 = (k1+k2)*(-1);
     
     double wf1 = par->integrator->GetProton().WaveFunction( k1, k2, x1,  x2);
     
@@ -474,7 +478,8 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
     
     F.params = &helper;
     const double KLIM=12;
-    double xlim=0.001;
+    double xup=1.-0.0001;
+    double xlow = x;
     
     //double lower[6]={-KLIM,-KLIM,-KLIM,-KLIM,xlim,xlim};
     //double upper[6]={KLIM,KLIM,KLIM,KLIM,1.-xlim,1.-xlim};
@@ -496,9 +501,9 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
             lower = new double[F.dim];
             upper = new double [F.dim];
             lower[0]=lower[1]=lower[2]=lower[3]=-KLIM;
-            lower[4]=lower[5]=xlim;
+            lower[4]=lower[5]=xlow;
             upper[0]=upper[1]=upper[2]=upper[3]=KLIM;
-            upper[4]=upper[5]=1.-xlim;
+            upper[4]=upper[5]=xup;
             F.f=inthelperf_mc_diag2a;
             break;
         default: // Other diagrams are of this type
@@ -506,9 +511,9 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
             lower = new double[F.dim];
             upper = new double [F.dim];
             lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=-KLIM;
-            lower[4]=lower[5]=xlim; lower[6]=x;
+            lower[4]=lower[5]=xlow; lower[6]=x;
             upper[0]=upper[1]=upper[2]=upper[3]=upper[7]=upper[8]=KLIM;
-            upper[4]=upper[5]=upper[6]=1.-xlim;
+            upper[4]=upper[5]=upper[6]=xup;
             F.f=inthelperf_mc_diag2b;
             break;
     }
@@ -629,7 +634,7 @@ std::string DiagramIntegrator::InfoStr()
 {
     std::stringstream ss;
     ss << "# x=" << x << endl <<
-    "# Perturbative m_f=" << endl
+    "# Perturbative m_f=" << mf << endl
     << "# Proton wave function: " << WaveFunctionString(proton.GetWaveFunction()) << endl
     << "# Proton wave function params: mq=" << proton.GetM() << "GeV, beta=" << proton.GetBeta() <<" GeV, p=" << proton.GetP() << endl;
     
