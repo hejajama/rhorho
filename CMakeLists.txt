@@ -10,6 +10,16 @@ if (APPLE)
 	MESSAGE("Setting MACOSX_DEPLOYMENT_TARGET to '${MACOSX_DEPLOYMENT_TARGET}'.")
 endif()
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+    message("Using Clang compiler without OpenMP parallelization... ")
+else ()
+    find_package(OpenMP)
+    if (OpenMP_FOUND)
+        set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${OpenMP_CXX_FLAGS})
+        set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${OpenMP_EXE_LINKER_FLAGS})
+    endif ()
+endif()
+
 # Optimization on (for debug flags, change to Debug)
 set(CMAKE_BUILD_TYPE Release)
 

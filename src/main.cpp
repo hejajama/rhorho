@@ -182,52 +182,88 @@ int main(int argc, char* argv[])
     
     if (mode == FOURDIM)
     {
-        const double MAXK = 3;
-        const int KPOINTS = 15;
+        const double MAXK = 3.0;
+        const int KPOINTS = 35;
         const double kstep =static_cast<double>(2*MAXK)/KPOINTS;
-        cout << "# G(q - 1/2*k, q + 1/2*k) /( (q-1/2k)^2(q+1/2k)^2" << endl;
+        cout << "# G(q - 1/2*k, -q - 1/2*k) /( (q-1/2k)^2(q+1/2k)^2" << endl;
         cout << "# kx  ky  qx  qy  diagram" << endl;
-        for (double kx = -MAXK; kx <= MAXK + kstep/2.; kx += kstep  )
+        
+        double *result = new double[KPOINTS*KPOINTS*KPOINTS*KPOINTS];
+        cerr << "NOTE: 4D GRID CALCULATION IS NOT THREAD SAFE! ONLY LO and NLO TYPE B WORK!" << endl;
+#pragma omp parallel for collapse(4)
+        for (int kyi=0; kyi < KPOINTS; kyi++)
         {
-            for (double ky = -MAXK; ky <= MAXK + kstep/2.; ky += kstep )
+            for (int kxi=0; kxi < KPOINTS; kxi++)
             {
-                for (double qx = -MAXK; qx <= MAXK + kstep/2.; qx += kstep  )
+                for (int qyi=0; qyi < KPOINTS; qyi++)
                 {
-                    for (double qy = -MAXK; qy <= MAXK + kstep/2.; qy += kstep )
+                    for (int qxi=0; qxi < KPOINTS; qxi++)
                     {
+                        double ky = -MAXK + kyi*kstep;
+                        double kx = -MAXK + kxi*kstep;
+                        double qy = -MAXK + qyi*kstep;
+                        double qx = -MAXK + qxi*kstep;
+                
                         Vec q(qx,qy);
                         Vec K(kx,ky);
-                        Vec qmink2 = q - K*0.5;
-                        Vec qplusk2 = q + K*0.5;
+                        Vec q1 = q - K*0.5;
+                        Vec q2 = q*(-0.5) + K*(-0.5);
                         
-                        double d = 0;
+                        double res = 0;
+                        
                         // Ward->0 if one of the momenta vanishes
-                        if (qplusk2.Len() > 1e-4 and qmink2.Len() > 1e-4)
+                        if (q1.Len() > 1e-4 and q2.Len() > 1e-4)
                         {
                         
-                            d = integrator->IntegrateDiagram(diag, qmink2, qplusk2);
+                            double d = integrator->IntegrateDiagram(diag, q1, q2);
                             if (integrator->Add_Q1Q2_exchange(diag))
                             {
                                 cout << "#... adding cross graph q1<->q2" << endl;
-                                d +=integrator->IntegrateDiagram(diag, qplusk2, qmink2);
+                                d +=integrator->IntegrateDiagram(diag, q1, q2);
                             }
+                             res =d/(q1.LenSqr()*q2.LenSqr());
                         }
-                        double res =d/(qplusk2.LenSqr()*qmink2.LenSqr());
+                        
                         if (isnan(res))
                         {
                             cerr << "Note NaN at kx=" << kx << ", ky=" << ky << ", qx=" << qx <<", qy=" << qy << endl;
-                            cerr << "d=" << d << endl;
-                            cerr << "q-K/2:" << endl << qmink2 << endl;
-                            cerr << "q+K/2:" << endl << qplusk2 << endl;
+                            cerr << "q-K/2:" << endl << q1 << endl;
+                            cerr << "q+K/2:" << endl << q2 << endl;
                             res=0;
                         }
-                        cout << kx << " " << ky << " " << qx << " " << qy << " " << res  << endl;
+                        
+                        int i = kyi*pow(KPOINTS,3) + kxi*pow(KPOINTS,2) + qyi*KPOINTS + qxi;
+                        result[i] = res;
+                       
                         
                     }
                 }
             }
         }
+        
+        for (int kyi=0; kyi < KPOINTS; kyi++)
+        {
+            for (int kxi=0; kxi < KPOINTS; kxi++)
+            {
+                for (int qyi=0; qyi < KPOINTS; qyi++)
+                {
+                    for (int qxi=0; qxi < KPOINTS; qxi++)
+                    {
+                        double ky = -MAXK + kyi*kstep;
+                        double kx = -MAXK + kxi*kstep;
+                        double qy = -MAXK + qyi*kstep;
+                        double qx = -MAXK + qxi*kstep;
+                        
+                        int i = kyi*pow(KPOINTS,3) + kxi*pow(KPOINTS,2) + qyi*KPOINTS + qxi;
+                        cout << ky << " " << kx << " " << qy << " " << qx << " " << result[i] << endl;
+                    }
+                }
+            }
+        }
     }
+    
+    
+    
     
     delete integrator;
     return 0;
