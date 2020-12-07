@@ -133,6 +133,8 @@ public:
     double GetX() { return x; }
     F_worker* GetF_worker() { return F; }
     
+    double DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b);
+    
     void SetPerturbativeMass(double mf_) { mf=mf_; }
     
     Diagram DiagramType(std::string str); // Map str to Diagram

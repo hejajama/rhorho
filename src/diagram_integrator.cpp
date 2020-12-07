@@ -49,6 +49,9 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
     - 0.5*par->integrator->GetProton().WaveFunction(k1+(q1+q2)*x1-q1, k2+(q1+q2)*x2-q2, x1, x2)
     - 0.5*par->integrator->GetProton().WaveFunction(k1+(q1+q2)*x1-q2, k2+(q1+q2)*x2-q1, x1, x2);
     
+    if (isnan(wf1) or isnan(wf2))
+        cerr <<"Note: WF NaN at x1 " << x1 << " x2 "<<  x2 << " k1 " << k1 << " k2 " << k2 << " q1 " << q1 << " q2 " << q2 << endl;
+    
     double res = wf1*wf2 * 1./6.*3; // 3 is the symmetry factor and 1/6 the normalization in Risto (77)
     
     // 16pi^3 because NLO diagrams do not include 1/(16pi^3) prefactor
@@ -555,6 +558,8 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
         result=0;error=0;
     }
     
+    
+    
     delete lower;
     delete upper;
     
@@ -564,6 +569,107 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
     return result;
     
 }
+
+
+
+////
+/////// Dipole ampiltude
+
+struct dipole_helper
+{
+    DiagramIntegrator* integrator;
+    Vec r;
+    Vec b;
+    Diagram diag;
+};
+
+double inthelperf_mc_dipole(double *vec, size_t dim, void* p)
+{
+    if (dim != 4) exit(1);
+    dipole_helper *par = (dipole_helper*)p;
+    Vec r = par->r;
+    Vec b = par->b;
+    Vec K (vec[0]*std::cos(vec[1]),vec[0]*std::sin(vec[1]));
+    Vec q (vec[2]*std::cos(vec[3]),vec[2]*std::sin(vec[3]));
+    double Klen=vec[0];
+    double qlen=vec[2];
+    
+    // Ward limit
+    if ((q-K*0.5).LenSqr() < 1e-5 or (q+K*0.5).LenSqr() < 1e-5)
+        return 0;
+    
+    
+    double res = 1./ std::pow(2.0*M_PI,4.);
+    
+    res /= ((q - K*0.5).LenSqr() * (q + K*0.5).LenSqr());
+    
+    res *= std::cos(b*K) * (std::cos(r*q) - std::cos((r*K)/2.));
+    
+    double diag_momentumspace = par->integrator->IntegrateDiagram(par->diag, q - K*0.5, q*(-1) - K*(0.5));
+    res *= diag_momentumspace;
+    
+    // Jacobian
+    res *= Klen*qlen;
+    
+    if (isnan(res))
+    {
+        return 0;
+        cerr << "NaN with K " << K << " q " << q << endl;
+        cerr << "Diag is " << diag_momentumspace << endl;
+        cerr << "Argumets" << endl;
+        Vec qk1 = q- K*0.5;
+        Vec qk2 =q*(-1) - K*(0.5);
+        cerr << qk1 << endl;
+        cerr << qk2 << endl;
+        cerr << endl;
+    }
+    
+    return res;
+}
+
+// Color factor -g^2/2 Cf not included
+double DiagramIntegrator::DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b)
+{
+    // Integrate over k, ktheta, q, qhteta
+    double lower[4] = {0.01, 0, 0.01,0};
+    double upper[4] = {10,2.0*M_PI,10,2.0*M_PI};
+    dipole_helper helper;
+    helper.r=r; helper.b=b; helper.integrator=this;
+    helper.diag = diag;
+    gsl_monte_function F;
+       
+    F.params = &helper;
+    F.f = inthelperf_mc_dipole;
+    F.dim=4;
+    
+    double result,error;
+    if (intmethod == MISER)
+    {
+        gsl_monte_miser_state *s = gsl_monte_miser_alloc(F.dim);
+        gsl_monte_miser_integrate(&F, lower, upper, F.dim, MCINTPOINTS, rng, s, &result, &error);
+        cout << "# Miser result " << result << " err " << error << " relerr " << std::abs(error/result) << endl;
+        gsl_monte_miser_free(s);
+    }
+    else if (intmethod == VEGAS)
+    {
+        gsl_monte_vegas_state *s = gsl_monte_vegas_alloc(F.dim);
+        gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS/2, rng, s, &result, &error);
+        //cout << "# vegas warmup " << result << " +/- " << error << endl;
+        int iter=0;
+        do
+        {
+            gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS, rng, s, &result, &error);
+            //cout << "# Vegas interation " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
+            iter++;
+        } while ((fabs( gsl_monte_vegas_chisq(s) - 1.0) > 0.4 or iter < 2) and iter < 6);
+        gsl_monte_vegas_free(s);
+    }
+    else
+        return 0;
+    
+    return result;
+}
+
 
 Interpolator* DiagramIntegrator::InitializeInterpolator()
 {

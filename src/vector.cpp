@@ -100,7 +100,7 @@ REAL Vec::Len()
 
 std::ostream& operator<<(std::ostream& os, Vec& ic)
 {
-    return os << "Vector (" << ic.GetX() << ", " << ic.GetY() <<
+    return os << "(" << ic.GetX() << ", " << ic.GetY() <<
         ", " << ic.GetZ() << "), |vec| = " << ic.Len() << " ";
 }
 

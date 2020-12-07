@@ -2,6 +2,8 @@
 #include <string>
 #include <sstream>
 #include <gsl/gsl_errno.h>
+#include <cmath>
+#include "vector.hpp"
 
 #include "functions.hpp"
 #include "diagram_integrator.hpp"
@@ -27,7 +29,8 @@ enum MODE
     ONEDIM,
     TWODIM,
     WARD,
-    FOURDIM
+    FOURDIM,
+    DIPOLE_BRUTEFORCE
 };
 
 void handler (const char * reason,
@@ -55,6 +58,7 @@ int main(int argc, char* argv[])
     
     double q12=0.5;
     double theta_b_q = 0;
+    double b=0;
     
     for (int i=1; i< argc; i++)
     {
@@ -86,6 +90,10 @@ int main(int argc, char* argv[])
             q12 = StrToReal(argv[i+1]);
         else if (string(argv[i])=="-theta_b_q")
             theta_b_q = StrToReal(argv[i+1]);
+        else if (string(argv[i])=="-dipole_bruteforce")
+            mode = DIPOLE_BRUTEFORCE;
+        else if (string(argv[i])=="-b")
+            b = StrToReal(argv[i+1]);
         else if (string(argv[i]).substr(0,1)=="-")
         {
             cerr << "Unknown parameter " << argv[i] << endl;
@@ -190,7 +198,7 @@ int main(int argc, char* argv[])
         
         double *result = new double[KPOINTS*KPOINTS*KPOINTS*KPOINTS];
         cerr << "NOTE: 4D GRID CALCULATION IS NOT THREAD SAFE! ONLY LO and NLO TYPE B WORK!" << endl;
-#pragma omp parallel for collapse(4)
+#pragma omp parallel for collapse(3)
         for (int kyi=0; kyi < KPOINTS; kyi++)
         {
             for (int kxi=0; kxi < KPOINTS; kxi++)
@@ -260,8 +268,37 @@ int main(int argc, char* argv[])
                 }
             }
         }
+        
+        delete[] result;
     }
     
+    else if (mode == DIPOLE_BRUTEFORCE)
+    {
+        Vec bv(b*std::cos(theta_b_q), b*std::sin(theta_b_q));
+        cout <<"# Dipole amplitude, b=" << bv << endl;
+        cout << "# r = (r,0)" << endl;
+        const double MAXR = 10;
+        const double MINR = 0.1;
+        const int rpoints = 30;
+        const double RSTEP = (MAXR-MINR)/rpoints;
+        double dipoles[rpoints];
+        
+#pragma omp parallel for
+        for (int i=0; i<rpoints; i++)
+        {
+            double r = MINR + i*RSTEP;
+            Vec rv(r,0);
+            double d = integrator->DipoleAmplitudeBruteForce(DIAG_LO, rv, bv);
+            dipoles[i]=d;
+        }
+        for (int i=0; i<rpoints; i++)
+        {
+            double r = MINR + i*RSTEP;
+            cout << r << " " << dipoles[i] << endl;
+        }
+        
+        
+    }
     
     
     
