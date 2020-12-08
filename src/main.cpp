@@ -4,6 +4,7 @@
 #include <gsl/gsl_errno.h>
 #include <cmath>
 #include "vector.hpp"
+#include "gitsha1.h"
 
 #include "functions.hpp"
 #include "diagram_integrator.hpp"
@@ -50,6 +51,8 @@ int main(int argc, char* argv[])
     for (int i=1; i<argc; i++)
         cout << argv[i] << " ";
     cout << endl;
+    cout << "# Git version " << g_GIT_SHA1 << " local repo " << g_GIT_LOCAL_CHANGES << " main build " << __DATE__  << " " << __TIME__ << endl;
+    
     
     DiagramIntegrator *integrator = new DiagramIntegrator;
     long int mcintpoints = 1e6;

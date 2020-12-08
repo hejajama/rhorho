@@ -1,3 +1,5 @@
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/gitsha1.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/gitsha1.cpp" @ONLY)
+
 add_library(
 	rholib
 	STATIC
@@ -11,6 +13,7 @@ add_library(
 add_executable(
 	rhorho
 	main.cpp
+	${CMAKE_CURRENT_BINARY_DIR}/gitsha1.cpp
 )
 
 add_executable(

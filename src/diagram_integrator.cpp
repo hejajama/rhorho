@@ -585,42 +585,57 @@ struct dipole_helper
 
 double inthelperf_mc_dipole(double *vec, size_t dim, void* p)
 {
-    if (dim != 4) exit(1);
+    /*if (dim != 4) exit(1);*/
     dipole_helper *par = (dipole_helper*)p;
     Vec r = par->r;
     Vec b = par->b;
-    Vec K (vec[0]*std::cos(vec[1]),vec[0]*std::sin(vec[1]));
-    Vec q (vec[2]*std::cos(vec[3]),vec[2]*std::sin(vec[3]));
-    double Klen=vec[0];
-    double qlen=vec[2];
-    
-    // Ward limit
-    if ((q-K*0.5).LenSqr() < 1e-5 or (q+K*0.5).LenSqr() < 1e-5)
+    Vec K (vec[6]*std::cos(vec[7]),vec[6]*std::sin(vec[7]));
+    Vec q (vec[8]*std::cos(vec[9]),vec[8]*std::sin(vec[9]));
+    double Klen=vec[6];
+    double qlen=vec[8];
+    Vec qv1 = q - K*0.5;
+    Vec qv2 = q*(-1) - K*0.5;
+    if (qv1.LenSqr() < 1e-5 or qv2.LenSqr() < 1e-5)
         return 0;
     
+    inthelper_diagint lohelper;
+    lohelper.integrator=par->integrator;
+    lohelper.q1 = qv1;
+    lohelper.q2 = qv2;
+    lohelper.diag = par->diag;
     
-    double res = 1./ std::pow(2.0*M_PI,4.);
+    double loparvec[6]={vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]};
     
-    res /= ((q - K*0.5).LenSqr() * (q + K*0.5).LenSqr());
+    double lodiag =inthelperf_mc_lo(loparvec, 6, &lohelper);
+    
+    // Ward limit
+    //if ((q-K*0.5).LenSqr() < 1e-5 or (q+K*0.5).LenSqr() < 1e-5)
+    //    return 0;
+    
+    
+    double res = lodiag / std::pow(2.0*M_PI,4.);
+    
+    res /= (qv1.LenSqr() * qv2.LenSqr());
     
     res *= std::cos(b*K) * (std::cos(r*q) - std::cos((r*K)/2.));
     
-    double diag_momentumspace = par->integrator->IntegrateDiagram(par->diag, q - K*0.5, q*(-1) - K*(0.5));
-    res *= diag_momentumspace;
+    /*double diag_momentumspace = par->integrator->IntegrateDiagram(par->diag, q - K*0.5, q*(-1) - K*(0.5));
+    res *= diag_momentumspace;*/
     
     // Jacobian
     res *= Klen*qlen;
     
     if (isnan(res))
     {
-        return 0;
+        //return 0;
         cerr << "NaN with K " << K << " q " << q << endl;
-        cerr << "Diag is " << diag_momentumspace << endl;
+        //cerr << "Diag is " << diag_momentumspace << endl;
         cerr << "Argumets" << endl;
-        Vec qk1 = q- K*0.5;
-        Vec qk2 =q*(-1) - K*(0.5);
-        cerr << qk1 << endl;
-        cerr << qk2 << endl;
+        cerr << qv1 << endl;
+        cerr << qv2 << endl;
+        cerr << "This probably means that you need more MC integration points" << endl;
+        
+        
         cerr << endl;
     }
     
@@ -631,8 +646,20 @@ double inthelperf_mc_dipole(double *vec, size_t dim, void* p)
 double DiagramIntegrator::DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b)
 {
     // Integrate over k, ktheta, q, qhteta
+    /*
     double lower[4] = {0.01, 0, 0.01,0};
     double upper[4] = {10,2.0*M_PI,10,2.0*M_PI};
+     */
+    // Integrata over the same variables as in the lO diagram + k,ktheta,q,qtheta
+    double KLIM = 12;
+    double xlow=x;
+    double xup = 0.999;
+    
+    double lower[10] = {-KLIM,-KLIM,-KLIM,-KLIM,xlow,xlow,0.01,0,0.01,0};
+    double upper[10] = {KLIM, KLIM, KLIM, KLIM,xup, xup, 10, 2.0*M_PI, 10, 2.0*M_PI};
+    
+    
+    
     dipole_helper helper;
     helper.r=r; helper.b=b; helper.integrator=this;
     helper.diag = diag;
@@ -640,7 +667,8 @@ double DiagramIntegrator::DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b)
        
     F.params = &helper;
     F.f = inthelperf_mc_dipole;
-    F.dim=4;
+    //F.dim=4;
+    F.dim=10;
     
     double result,error;
     if (intmethod == MISER)
