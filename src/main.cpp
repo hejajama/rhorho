@@ -31,7 +31,8 @@ enum MODE
     TWODIM,
     WARD,
     FOURDIM,
-    DIPOLE_BRUTEFORCE
+    DIPOLE_BRUTEFORCE,
+    DIPOLE_BRUTEFORCE_ANGLEDEP
 };
 
 void handler (const char * reason,
@@ -62,6 +63,7 @@ int main(int argc, char* argv[])
     double q12=0.5;
     double theta_b_q = 0;
     double b=0;
+    double r=1;
     
     for (int i=1; i< argc; i++)
     {
@@ -95,8 +97,12 @@ int main(int argc, char* argv[])
             theta_b_q = StrToReal(argv[i+1]);
         else if (string(argv[i])=="-dipole_bruteforce")
             mode = DIPOLE_BRUTEFORCE;
+        else if (string(argv[i])=="-dipole_bruteforce_angledep")
+            mode = DIPOLE_BRUTEFORCE_ANGLEDEP;
         else if (string(argv[i])=="-b")
             b = StrToReal(argv[i+1]);
+        else if (string(argv[i])=="-r")
+            r = StrToReal(argv[i+1]);
         else if (string(argv[i]).substr(0,1)=="-")
         {
             cerr << "Unknown parameter " << argv[i] << endl;
@@ -302,6 +308,34 @@ int main(int argc, char* argv[])
         
         
     }
+    else if (mode == DIPOLE_BRUTEFORCE_ANGLEDEP)
+        {
+            
+            Vec bv(b,0);
+            cout <<"# Dipole amplitude, b=" << b << endl;
+            cout << "# r = r" << endl;
+            const double MINTH = 0;
+            const double MAXTH = 2.0*M_PI;
+            const int THPOINTS = 15;
+            const double THSTEP = (MAXTH-MINTH)/THPOINTS;
+            double dipoles[THPOINTS];
+            cout <<"# th(r,b)   N(r,b,thrb)" << endl;
+    #pragma omp parallel for
+            for (int i=0; i<=THPOINTS; i++)
+            {
+                double th = MINTH + i*THSTEP;
+                Vec rv(r*std::cos(th),r*std::sin(th));
+                double d = integrator->DipoleAmplitudeBruteForce(DIAG_LO, rv, bv);
+                dipoles[i]=d;
+            }
+            for (int i=0; i<=THPOINTS; i++)
+            {
+                double r = MINTH + i*THSTEP;
+                cout << r << " " << dipoles[i] << endl;
+            }
+            
+            
+        }
     
     
     
