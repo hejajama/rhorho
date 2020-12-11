@@ -174,13 +174,17 @@ int main(int argc, char* argv[])
         cout << "# q12 = " << q12v << " orientation " << theta_b_q << endl;
         
         const double MAXK = 5;
-        const int KPOINTS = 50;
-        const double kstep =static_cast<double>(2*MAXK)/KPOINTS;
+        const int KPOINTS = 49;
+        const double kstep =static_cast<double>(2*MAXK)/(KPOINTS-1);
         
-        for (double kx = -MAXK; kx <= MAXK + kstep/2.; kx += kstep  )
+        double *result = new double[KPOINTS*KPOINTS];
+#pragma omp parallel for collapse(2)
+        for (int kyi = 0; kyi < KPOINTS; kyi++)
         {
-            for (double ky = -MAXK; ky <= MAXK + kstep/2.; ky += kstep )
+            for (int kxi = 0; kxi < KPOINTS; kxi ++ )
              {
+                 double kx = -MAXK + kyi*kstep;
+                 double ky = -MAXK + kxi*kstep;
                  Vec K(kx,ky);
                  Vec q1 = (q12v - K)*0.5;
                  Vec q2 = (q12v + K)*(-0.5);
@@ -192,9 +196,21 @@ int main(int argc, char* argv[])
                      d +=integrator->IntegrateDiagram(diag, q1, q2);
                  }
                  
-                 cout << kx << " " << ky << " " << d << endl;
+                 result[kyi*KPOINTS+kxi] = d;
              }
         }
+        
+       for (int kyi = 0; kyi < KPOINTS; kyi++)
+        {
+            for (int kxi = 0; kxi < KPOINTS; kxi ++ )
+             {
+                 double kx = -MAXK + kyi*kstep;
+                 double ky = -MAXK + kxi*kstep;
+                 cout << kx << " " << ky << " " << result[kyi*KPOINTS+kxi] << endl;
+             }
+        }
+        
+        delete[] result;
     }
     
     if (mode == FOURDIM)
@@ -316,24 +332,25 @@ int main(int argc, char* argv[])
             cout << "# r = r" << endl;
             const double MINTH = 0;
             const double MAXTH = 2.0*M_PI;
-            const int THPOINTS = 15;
-            const double THSTEP = (MAXTH-MINTH)/THPOINTS;
-            double dipoles[THPOINTS];
+            const int THPOINTS = 20;
+            const double THSTEP = (MAXTH-MINTH)/(THPOINTS-1);
+            double *dipoles = new double[THPOINTS];
             cout <<"# th(r,b)   N(r,b,thrb)" << endl;
     #pragma omp parallel for
-            for (int i=0; i<=THPOINTS; i++)
+            for (int i=0; i<THPOINTS; i++)
             {
                 double th = MINTH + i*THSTEP;
                 Vec rv(r*std::cos(th),r*std::sin(th));
                 double d = integrator->DipoleAmplitudeBruteForce(DIAG_LO, rv, bv);
                 dipoles[i]=d;
             }
-            for (int i=0; i<=THPOINTS; i++)
+            for (int i=0; i<THPOINTS; i++)
             {
-                double r = MINTH + i*THSTEP;
-                cout << r << " " << dipoles[i] << endl;
+                double th = MINTH + i*THSTEP;
+                cout << th << " " << dipoles[i] << endl;
             }
             
+            delete[] dipoles;
             
         }
     

@@ -4,6 +4,8 @@
 
 inline double SQR(double x) { return x*x; }
 
+const bool USE_THREAD_SAFE_GSL_INTEGRATION_WORKSPACE = true;
+
 /* B0 from PV reduction
  *
  * Delta = m^2(1-z_1)^2 [GeV^2]
@@ -86,9 +88,18 @@ double F_worker::F_int_B0(Vec l, Vec l1, double alpha, double m2)
     fun.params=&helper;
     double result, abserr;
     
+    gsl_integration_workspace *ws_local;
+    if (USE_THREAD_SAFE_GSL_INTEGRATION_WORKSPACE == false)
+        ws_local = ws;
+    else
+        ws_local = gsl_integration_workspace_alloc(int_divisions);
+    
     int status = gsl_integration_qag(&fun, alpha, 1., 0, int_accuracy,
-        int_divisions, GSL_INTEG_GAUSS41, ws, &result, &abserr);
+        int_divisions, GSL_INTEG_GAUSS41, ws_local, &result, &abserr);
 
+    
+    if (USE_THREAD_SAFE_GSL_INTEGRATION_WORKSPACE)
+        gsl_integration_workspace_free(ws_local);
 
     
     if (status)
