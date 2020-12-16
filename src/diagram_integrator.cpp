@@ -86,7 +86,8 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     if (x1+x2 >=1) return 0;
     
     double xg = vec[6];
-    if (xg > std::min(x1,1.-x2)) return 0;
+    // Do not allow exactly the upper limit.
+    if (xg > std::min(x1,1.-x2)-1e-4) return 0;
     double z1,z2;
     z1 = xg/x1; z2 = xg /( x2+xg );
     
@@ -327,6 +328,9 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             exit(1);
             break;
     }
+    
+    if (A.LenSqr() < 1e-6 or B.LenSqr() < 1e-6)
+        return 0;
     
    
     double wf1 =par->integrator->GetProton().WaveFunction(k1, k2, x1, x2);
@@ -572,6 +576,144 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
 
 
 
+///////////////
+// Mixed space brute force
+////
+/////// Dipole ampiltude
+
+struct mixed_space_helper
+{
+    DiagramIntegrator* integrator;
+    Vec q12;
+    Vec b;
+    Diagram diag;
+};
+
+double inthelperf_mc_mixedspace(double *vec, size_t dim, void* p)
+{
+    /*if (dim != 4) exit(1);*/
+    mixed_space_helper *par = (mixed_space_helper*)p;
+    Vec q12 = par->q12;
+    Vec b = par->b;
+    Vec K (vec[6]*std::cos(vec[7]),vec[6]*std::sin(vec[7]));
+    double Klen=vec[6];
+    Vec qv1 = q12*0.5 - K*0.5;
+    Vec qv2 = q12*(-0.5) - K*0.5;
+    
+    // Ward
+    if (qv1.LenSqr() < 1e-5 or qv2.LenSqr() < 1e-5)
+        return 0;
+    
+    inthelper_diagint lohelper;
+    lohelper.integrator=par->integrator;
+    lohelper.q1 = qv1;
+    lohelper.q2 = qv2;
+    lohelper.diag = par->diag;
+    
+    double loparvec[6]={vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]};
+    
+    double lodiag =inthelperf_mc_lo(loparvec, 6, &lohelper);
+    
+    // Ward limit
+    //if ((q-K*0.5).LenSqr() < 1e-5 or (q+K*0.5).LenSqr() < 1e-5)
+    //    return 0;
+    
+    
+    double res = lodiag / std::pow(2.0*M_PI,2.);
+    
+    
+    res *= std::cos(b*K);
+    
+    /*double diag_momentumspace = par->integrator->IntegrateDiagram(par->diag, q - K*0.5, q*(-1) - K*(0.5));
+    res *= diag_momentumspace;*/
+    
+    // Jacobian
+    res *= Klen;
+    
+    if (isnan(res))
+    {
+        //return 0;
+        cerr << "NaN with K " << K << " q12 " << q12 << endl;
+        //cerr << "Diag is " << diag_momentumspace << endl;
+        cerr << "Argumets" << endl;
+        cerr << qv1 << endl;
+        cerr << qv2 << endl;
+        cerr << "This probably means that you need more MC integration points" << endl;
+        
+        
+        cerr << endl;
+    }
+    
+    return res;
+}
+
+double DiagramIntegrator::MixedSpaceBruteForce(Diagram diag, Vec q12, Vec b)
+{
+    if (diag != DIAG_LO)
+    {
+        cerr << "DipoleAmplitudeBruteForce only supports LO at the moment" << endl;
+        exit(1);
+    }
+    
+    // Integrate over k, ktheta
+    /*
+    double lower[4] = {0.01, 0, 0.01,0};
+    double upper[4] = {10,2.0*M_PI,10,2.0*M_PI};
+     */
+    // Integrata over the same variables as in the LO diagram + k,ktheta
+    double KLIM = 12;
+    double xlow=x;
+    double xup = 0.999;
+    
+    double lower[8] = {-KLIM,-KLIM,-KLIM,-KLIM,xlow,xlow,0.01,0};
+    double upper[8] = {KLIM, KLIM, KLIM, KLIM,xup, xup, 10, 2.0*M_PI};
+    
+    
+    
+    mixed_space_helper helper;
+    helper.q12=q12; helper.b=b; helper.integrator=this;
+    helper.diag = diag;
+    gsl_monte_function F;
+       
+    F.params = &helper;
+    F.f = inthelperf_mc_mixedspace;
+    //F.dim=4;
+    F.dim=8;
+    
+    double result,error;
+    if (intmethod == MISER)
+    {
+        gsl_monte_miser_state *s = gsl_monte_miser_alloc(F.dim);
+        gsl_monte_miser_integrate(&F, lower, upper, F.dim, MCINTPOINTS, rng, s, &result, &error);
+        cout << "# Miser result " << result << " err " << error << " relerr " << std::abs(error/result) << endl;
+        gsl_monte_miser_free(s);
+    }
+    else if (intmethod == VEGAS)
+    {
+        gsl_monte_vegas_state *s = gsl_monte_vegas_alloc(F.dim);
+        gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS/2, rng, s, &result, &error);
+        //cout << "# vegas warmup " << result << " +/- " << error << endl;
+        int iter=0;
+        do
+        {
+            gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS, rng, s, &result, &error);
+            //cout << "# Vegas interation " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
+            iter++;
+        } while ((fabs( gsl_monte_vegas_chisq(s) - 1.0) > 0.4 or iter < 2) and iter < 6);
+        gsl_monte_vegas_free(s);
+    }
+    else
+        return 0;
+    
+    return result;
+}
+
+
+
+
+
+
+
 ////
 /////// Dipole ampiltude
 
@@ -645,6 +787,11 @@ double inthelperf_mc_dipole(double *vec, size_t dim, void* p)
 // Color factor -g^2/2 Cf not included
 double DiagramIntegrator::DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b)
 {
+    if (diag != DIAG_LO)
+    {
+        cerr << "DipoleAmplitudeBruteForce only supports LO at the moment" << endl;
+        exit(1);
+    }
     // Integrate over k, ktheta, q, qhteta
     /*
     double lower[4] = {0.01, 0, 0.01,0};

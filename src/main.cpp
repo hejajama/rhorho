@@ -32,7 +32,8 @@ enum MODE
     WARD,
     FOURDIM,
     DIPOLE_BRUTEFORCE,
-    DIPOLE_BRUTEFORCE_ANGLEDEP
+    DIPOLE_BRUTEFORCE_ANGLEDEP,
+    MIXED_SPACE_BRUTEFORCE
 };
 
 void handler (const char * reason,
@@ -99,6 +100,8 @@ int main(int argc, char* argv[])
             mode = DIPOLE_BRUTEFORCE;
         else if (string(argv[i])=="-dipole_bruteforce_angledep")
             mode = DIPOLE_BRUTEFORCE_ANGLEDEP;
+        else if (string(argv[i])=="-mixed_space_bruteforce")
+            mode = MIXED_SPACE_BRUTEFORCE;
         else if (string(argv[i])=="-b")
             b = StrToReal(argv[i+1]);
         else if (string(argv[i])=="-r")
@@ -200,6 +203,7 @@ int main(int argc, char* argv[])
              }
         }
         
+        cout <<"# kx   ky   result" << endl;
        for (int kyi = 0; kyi < KPOINTS; kyi++)
         {
             for (int kxi = 0; kxi < KPOINTS; kxi ++ )
@@ -342,6 +346,37 @@ int main(int argc, char* argv[])
                 double th = MINTH + i*THSTEP;
                 Vec rv(r*std::cos(th),r*std::sin(th));
                 double d = integrator->DipoleAmplitudeBruteForce(DIAG_LO, rv, bv);
+                dipoles[i]=d;
+            }
+            for (int i=0; i<THPOINTS; i++)
+            {
+                double th = MINTH + i*THSTEP;
+                cout << th << " " << dipoles[i] << endl;
+            }
+            
+            delete[] dipoles;
+            
+        }
+    
+    
+    else if (mode == MIXED_SPACE_BRUTEFORCE)
+        {
+            
+            Vec bv(b,0);
+            cout <<"#  Mixed space, b=" << b << ", q12=" << q12 << endl;
+            
+            const double MINTH = -M_PI;
+            const double MAXTH = M_PI;
+            const int THPOINTS = 11;
+            const double THSTEP = (MAXTH-MINTH)/(THPOINTS-1);
+            double *dipoles = new double[THPOINTS];
+            cout <<"# th(r,b)   G2" << endl;
+    #pragma omp parallel for
+            for (int i=0; i<THPOINTS; i++)
+            {
+                double th = MINTH + i*THSTEP;
+                Vec q12v(q12*std::cos(th),q12*std::sin(th));
+                double d = integrator->MixedSpaceBruteForce(DIAG_LO, q12v, bv);
                 dipoles[i]=d;
             }
             for (int i=0; i<THPOINTS; i++)

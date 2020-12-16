@@ -134,6 +134,7 @@ public:
     F_worker* GetF_worker() { return F; }
     
     double DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b);
+    double MixedSpaceBruteForce(Diagram diag, Vec q12, Vec b);
     
     void SetPerturbativeMass(double mf_) { mf=mf_; }
     
