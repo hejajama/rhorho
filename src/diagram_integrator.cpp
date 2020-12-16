@@ -324,7 +324,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             norm = -1./3. * (CF-2./3)*6;
             break;
         default:
-            cerr << "Unknown diagram " << par->diag << endl;
+            cerr << "Unknown diagram in inthelperf_mc_diag2b: " << par->diag << endl;
             exit(1);
             break;
     }
@@ -595,31 +595,59 @@ double inthelperf_mc_mixedspace(double *vec, size_t dim, void* p)
     mixed_space_helper *par = (mixed_space_helper*)p;
     Vec q12 = par->q12;
     Vec b = par->b;
-    Vec K (vec[6]*std::cos(vec[7]),vec[6]*std::sin(vec[7]));
-    double Klen=vec[6];
-    Vec qv1 = q12*0.5 - K*0.5;
-    Vec qv2 = q12*(-0.5) - K*0.5;
+    Vec K;
+    
+    Vec qv1;
+    Vec qv2;
+    inthelper_diagint momspacehelper;
+    momspacehelper.integrator=par->integrator;
+    
+    momspacehelper.diag = par->diag;
+    
+    
+    double momspace=0;
+    if (dim == 8) // LO or type a
+    {
+        K = Vec (vec[6]*std::cos(vec[7]),vec[6]*std::sin(vec[7]));
+        qv1= q12*0.5 - K*0.5;
+        qv2= q12*(-0.5) - K*0.5;
+        momspacehelper.q1 = qv1;
+        momspacehelper.q2 = qv2;
+        
+        double loparvec[6]={vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]};
+        
+        if (par->diag == DIAG_LO)
+            momspace = inthelperf_mc_lo(loparvec, 6, &momspacehelper);
+        else
+            momspace = inthelperf_mc_diag2a(loparvec, 6, &momspacehelper);
+        
+    }
+    else
+    {
+        K =  Vec(vec[9]*std::cos(vec[10]),vec[9]*std::sin(vec[10]));
+        qv1= q12*0.5 - K*0.5;
+        qv2= q12*(-0.5) - K*0.5;
+        momspacehelper.q1 = qv1;
+        momspacehelper.q2 = qv2;
+        
+        double parvec[9] = {vec[0],vec[1],vec[2],vec[3],vec[4],vec[5],vec[6],vec[7],vec[8]};
+        momspace = inthelperf_mc_diag2b(parvec, 9, &momspacehelper);
+        
+    }
+
+    
     
     // Ward
     if (qv1.LenSqr() < 1e-5 or qv2.LenSqr() < 1e-5)
         return 0;
     
-    inthelper_diagint lohelper;
-    lohelper.integrator=par->integrator;
-    lohelper.q1 = qv1;
-    lohelper.q2 = qv2;
-    lohelper.diag = par->diag;
-    
-    double loparvec[6]={vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]};
-    
-    double lodiag =inthelperf_mc_lo(loparvec, 6, &lohelper);
-    
+ 
     // Ward limit
     //if ((q-K*0.5).LenSqr() < 1e-5 or (q+K*0.5).LenSqr() < 1e-5)
     //    return 0;
     
     
-    double res = lodiag / std::pow(2.0*M_PI,2.);
+    double res = momspace / std::pow(2.0*M_PI,2.);
     
     
     res *= std::cos(b*K);
@@ -628,7 +656,7 @@ double inthelperf_mc_mixedspace(double *vec, size_t dim, void* p)
     res *= diag_momentumspace;*/
     
     // Jacobian
-    res *= Klen;
+    res *= K.Len();
     
     if (isnan(res))
     {
@@ -647,13 +675,18 @@ double inthelperf_mc_mixedspace(double *vec, size_t dim, void* p)
     return res;
 }
 
+
+
+
+
+
 double DiagramIntegrator::MixedSpaceBruteForce(Diagram diag, Vec q12, Vec b)
 {
-    if (diag != DIAG_LO)
+    /*if (diag != DIAG_LO)
     {
         cerr << "DipoleAmplitudeBruteForce only supports LO at the moment" << endl;
         exit(1);
-    }
+    }*/
     
     // Integrate over k, ktheta
     /*
@@ -665,20 +698,54 @@ double DiagramIntegrator::MixedSpaceBruteForce(Diagram diag, Vec q12, Vec b)
     double xlow=x;
     double xup = 0.999;
     
-    double lower[8] = {-KLIM,-KLIM,-KLIM,-KLIM,xlow,xlow,0.01,0};
-    double upper[8] = {KLIM, KLIM, KLIM, KLIM,xup, xup, 10, 2.0*M_PI};
-    
-    
-    
     mixed_space_helper helper;
     helper.q12=q12; helper.b=b; helper.integrator=this;
     helper.diag = diag;
     gsl_monte_function F;
        
-    F.params = &helper;
+    double *lower;
+    double *upper;
+    
+    switch (diag) {
+        case DIAG_2A:
+        case DIAG_3A:
+        case DIAG_3A_2:
+        case DIAG_3B:
+        case DIAG_3B_2:
+        case DIAG_5A:
+        case DIAG_5C:
+        case DIAG_5C_1:
+        case DIAG_LO:
+            F.dim=8;
+            lower = new double[F.dim];
+            upper = new double [F.dim];
+            lower[0]=lower[1]=lower[2]=lower[3]=-KLIM;
+            lower[4]=lower[5]=xlow;
+            lower[6]=0.01; lower[7]=0; // minK mink theta_k
+            
+            upper[0]=upper[1]=upper[2]=upper[3]=KLIM;
+            upper[4]=upper[5]=xup;
+            upper[6]=KLIM; upper[7]=2.0*M_PI; // minK mink theta_k
+            break;
+        default:
+            F.dim=11;
+            lower = new double[F.dim];
+            upper = new double [F.dim];
+            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=-KLIM;
+            lower[4]=lower[5]=xlow; lower[6]=x;
+            lower[9]=0.01; lower[10]=0;
+            upper[0]=upper[1]=upper[2]=upper[3]=upper[7]=upper[8]=KLIM;
+            upper[4]=upper[5]=upper[6]=xup;
+            upper[9]=KLIM; upper[10]=2.0*M_PI;
+            
+    };
+    
+    
+    
     F.f = inthelperf_mc_mixedspace;
-    //F.dim=4;
-    F.dim=8;
+    F.params = &helper;
+    
+
     
     double result,error;
     if (intmethod == MISER)
@@ -704,6 +771,9 @@ double DiagramIntegrator::MixedSpaceBruteForce(Diagram diag, Vec q12, Vec b)
     }
     else
         return 0;
+    
+    delete[] upper;
+    delete[] lower;
     
     return result;
 }
