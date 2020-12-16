@@ -186,8 +186,8 @@ int main(int argc, char* argv[])
         {
             for (int kxi = 0; kxi < KPOINTS; kxi ++ )
              {
-                 double kx = -MAXK + kyi*kstep;
-                 double ky = -MAXK + kxi*kstep;
+                 double kx = -MAXK + kxi*kstep;
+                 double ky = -MAXK + kyi*kstep;
                  Vec K(kx,ky);
                  Vec q1 = (q12v - K)*0.5;
                  Vec q2 = (q12v + K)*(-0.5);
@@ -204,12 +204,12 @@ int main(int argc, char* argv[])
         }
         
         cout <<"# kx   ky   result" << endl;
-       for (int kyi = 0; kyi < KPOINTS; kyi++)
+       for (int kxi = 0; kxi < KPOINTS; kxi++)
         {
-            for (int kxi = 0; kxi < KPOINTS; kxi ++ )
+            for (int kyi = 0; kyi < KPOINTS; kyi ++ )
              {
-                 double kx = -MAXK + kyi*kstep;
-                 double ky = -MAXK + kxi*kstep;
+                 double kx = -MAXK + kxi*kstep;
+                 double ky = -MAXK + kyi*kstep;
                  cout << kx << " " << ky << " " << result[kyi*KPOINTS+kxi] << endl;
              }
         }
