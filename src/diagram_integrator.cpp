@@ -799,31 +799,67 @@ double inthelperf_mc_dipole(double *vec, size_t dim, void* p)
     dipole_helper *par = (dipole_helper*)p;
     Vec r = par->r;
     Vec b = par->b;
-    Vec K (vec[6]*std::cos(vec[7]),vec[6]*std::sin(vec[7]));
-    Vec q (vec[8]*std::cos(vec[9]),vec[8]*std::sin(vec[9]));
-    double Klen=vec[6];
-    double qlen=vec[8];
-    Vec qv1 = q - K*0.5;
-    Vec qv2 = q*(-1) - K*0.5;
-    if (qv1.LenSqr() < 1e-5 or qv2.LenSqr() < 1e-5)
-        return 0;
     
-    inthelper_diagint lohelper;
-    lohelper.integrator=par->integrator;
-    lohelper.q1 = qv1;
-    lohelper.q2 = qv2;
-    lohelper.diag = par->diag;
+    Vec K;
+    Vec q;
+    Vec qv1;
+    Vec qv2;
+    inthelper_diagint momspacehelper;
+    momspacehelper.integrator=par->integrator;
     
-    double loparvec[6]={vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]};
+    momspacehelper.diag = par->diag;
     
-    double lodiag =inthelperf_mc_lo(loparvec, 6, &lohelper);
+    
+    double momspace=0;
+    if (dim == 10) // LO or type a
+    {
+        K = Vec(vec[6]*std::cos(vec[7]),vec[6]*std::sin(vec[7]));
+        q = Vec(vec[8]*std::cos(vec[9]),vec[8]*std::sin(vec[9]));
+        
+        qv1= q - K*0.5;
+        qv2= q*(-1) - K*0.5;
+        
+        if (qv1.LenSqr() < 1e-6 or qv2.LenSqr() < 1e-6)
+            return 0;
+        
+        momspacehelper.q1 = qv1;
+        momspacehelper.q2 = qv2;
+        
+        double loparvec[6]={vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]};
+        
+        if (par->diag == DIAG_LO)
+            momspace = inthelperf_mc_lo(loparvec, 6, &momspacehelper);
+        else
+            momspace = inthelperf_mc_diag2a(loparvec, 6, &momspacehelper);
+        
+    }
+    else
+    {
+        K =  Vec(vec[9]*std::cos(vec[10]),vec[9]*std::sin(vec[10]));
+        q = Vec(vec[11]*std::cos(vec[12]),vec[11]*std::sin(vec[12]));
+        qv1= q - K*0.5;
+        qv2= q*(-1) - K*0.5;
+        if (qv1.LenSqr() < 1e-6 or qv2.LenSqr() < 1e-6)
+            return 0;
+        momspacehelper.q1 = qv1;
+        momspacehelper.q2 = qv2;
+        
+        double parvec[9] = {vec[0],vec[1],vec[2],vec[3],vec[4],vec[5],vec[6],vec[7],vec[8]};
+        momspace = inthelperf_mc_diag2b(parvec, 9, &momspacehelper);
+        
+    }
+    
+    
+    double Klen=K.Len();
+    double qlen=q.Len();
+
     
     // Ward limit
     //if ((q-K*0.5).LenSqr() < 1e-5 or (q+K*0.5).LenSqr() < 1e-5)
     //    return 0;
     
     
-    double res = lodiag / std::pow(2.0*M_PI,4.);
+    double res = momspace / std::pow(2.0*M_PI,4.);
     
     res /= (qv1.LenSqr() * qv2.LenSqr());
     
@@ -870,38 +906,77 @@ double DiagramIntegrator::DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b)
     double xlow=x;
     double xup = 0.999;
     
-    double lower[10] = {-KLIM,-KLIM,-KLIM,-KLIM,xlow,xlow,0.01,0,0.01,0};
-    double upper[10] = {KLIM, KLIM, KLIM, KLIM,xup, xup, 10, 2.0*M_PI, 10, 2.0*M_PI};
+    double *lower;
+    double *upper;
     
+    gsl_monte_function Ff;
+    
+    switch (diag) {
+        case DIAG_2A:
+        case DIAG_3A:
+        case DIAG_3A_2:
+        case DIAG_3B:
+        case DIAG_3B_2:
+        case DIAG_5A:
+        case DIAG_5C:
+        case DIAG_5C_1:
+        case DIAG_LO:
+            Ff.dim=10;
+            lower = new double[Ff.dim];
+            upper = new double [Ff.dim];
+            lower[0]=lower[1]=lower[2]=lower[3]=-KLIM;
+            lower[4]=lower[5]=xlow;
+            lower[6]=0.01; lower[7]=0; // minK mink theta_k
+            lower[8]=0.01; lower[9]=0;
+            upper[0]=upper[1]=upper[2]=upper[3]=KLIM;
+            upper[4]=upper[5]=xup;
+            upper[6]=KLIM; upper[7]=2.0*M_PI; // minK mink theta_k
+            upper[8]=KLIM; upper[9]=2.0*M_PI;
+            break;
+        default:
+            Ff.dim=13;
+            lower = new double[Ff.dim];
+            upper = new double [Ff.dim];
+            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=-KLIM;
+            lower[4]=lower[5]=xlow; lower[6]=x;
+            lower[9]=0.01; lower[10]=0;
+            lower[11]=0.01; lower[12]=0;
+            upper[0]=upper[1]=upper[2]=upper[3]=upper[7]=upper[8]=KLIM;
+            upper[4]=upper[5]=upper[6]=xup;
+            upper[9]=KLIM; upper[10]=2.0*M_PI;
+            upper[11]=KLIM; upper[12]=2.0*M_PI;
+            
+    };
+    
+   
     
     
     dipole_helper helper;
     helper.r=r; helper.b=b; helper.integrator=this;
     helper.diag = diag;
-    gsl_monte_function F;
+    
        
-    F.params = &helper;
-    F.f = inthelperf_mc_dipole;
-    //F.dim=4;
-    F.dim=10;
+    Ff.params = &helper;
+    Ff.f = inthelperf_mc_dipole;
+
     
     double result,error;
     if (intmethod == MISER)
     {
-        gsl_monte_miser_state *s = gsl_monte_miser_alloc(F.dim);
-        gsl_monte_miser_integrate(&F, lower, upper, F.dim, MCINTPOINTS, rng, s, &result, &error);
+        gsl_monte_miser_state *s = gsl_monte_miser_alloc(Ff.dim);
+        gsl_monte_miser_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS, rng, s, &result, &error);
         cout << "# Miser result " << result << " err " << error << " relerr " << std::abs(error/result) << endl;
         gsl_monte_miser_free(s);
     }
     else if (intmethod == VEGAS)
     {
-        gsl_monte_vegas_state *s = gsl_monte_vegas_alloc(F.dim);
-        gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS/2, rng, s, &result, &error);
+        gsl_monte_vegas_state *s = gsl_monte_vegas_alloc(Ff.dim);
+        gsl_monte_vegas_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS/2, rng, s, &result, &error);
         //cout << "# vegas warmup " << result << " +/- " << error << endl;
         int iter=0;
         do
         {
-            gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS, rng, s, &result, &error);
+            gsl_monte_vegas_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS, rng, s, &result, &error);
             //cout << "# Vegas interation " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
             iter++;
         } while ((fabs( gsl_monte_vegas_chisq(s) - 1.0) > 0.4 or iter < 2) and iter < 6);
@@ -909,6 +984,9 @@ double DiagramIntegrator::DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b)
     }
     else
         return 0;
+    
+    delete[] upper;
+    delete[] lower;
     
     return result;
 }

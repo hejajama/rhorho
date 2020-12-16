@@ -336,10 +336,10 @@ int main(int argc, char* argv[])
             
             Vec bv(b,0);
             cout <<"# Dipole amplitude, b=" << b << endl;
-            cout << "# r = r" << endl;
+            cout << "# r = " << r  << endl;
             const double MINTH = 0;
             const double MAXTH = 2.0*M_PI;
-            const int THPOINTS = 20;
+            const int THPOINTS = 11;
             const double THSTEP = (MAXTH-MINTH)/(THPOINTS-1);
             double *dipoles = new double[THPOINTS];
             cout <<"# th(r,b)   N(r,b,thrb)" << endl;
