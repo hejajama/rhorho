@@ -33,7 +33,8 @@ enum MODE
     FOURDIM,
     DIPOLE_BRUTEFORCE,
     DIPOLE_BRUTEFORCE_ANGLEDEP,
-    MIXED_SPACE_BRUTEFORCE
+    MIXED_SPACE_BRUTEFORCE,
+    MIXED_SPACE_BRUTEFORCE_ANGLEDEP
 };
 
 void handler (const char * reason,
@@ -102,6 +103,8 @@ int main(int argc, char* argv[])
             mode = DIPOLE_BRUTEFORCE_ANGLEDEP;
         else if (string(argv[i])=="-mixed_space_bruteforce")
             mode = MIXED_SPACE_BRUTEFORCE;
+        else if (string(argv[i])=="-mixed_space_bruteforce_angledep")
+        mode = MIXED_SPACE_BRUTEFORCE_ANGLEDEP;
         else if (string(argv[i])=="-b")
             b = StrToReal(argv[i+1]);
         else if (string(argv[i])=="-r")
@@ -317,7 +320,7 @@ int main(int argc, char* argv[])
         {
             double r = MINR + i*RSTEP;
             Vec rv(r,0);
-            double d = integrator->DipoleAmplitudeBruteForce(DIAG_LO, rv, bv);
+            double d = integrator->DipoleAmplitudeBruteForce(diag, rv, bv);
             dipoles[i]=d;
         }
         for (int i=0; i<rpoints; i++)
@@ -345,7 +348,7 @@ int main(int argc, char* argv[])
             {
                 double th = MINTH + i*THSTEP;
                 Vec rv(r*std::cos(th),r*std::sin(th));
-                double d = integrator->DipoleAmplitudeBruteForce(DIAG_LO, rv, bv);
+                double d = integrator->DipoleAmplitudeBruteForce(diag, rv, bv);
                 dipoles[i]=d;
             }
             for (int i=0; i<THPOINTS; i++)
@@ -359,7 +362,7 @@ int main(int argc, char* argv[])
         }
     
     
-    else if (mode == MIXED_SPACE_BRUTEFORCE)
+    else if (mode == MIXED_SPACE_BRUTEFORCE_ANGLEDEP)
         {
             
             Vec bv(b,0);
@@ -376,7 +379,7 @@ int main(int argc, char* argv[])
             {
                 double th = MINTH + i*THSTEP;
                 Vec q12v(q12*std::cos(th),q12*std::sin(th));
-                double d = integrator->MixedSpaceBruteForce(DIAG_LO, q12v, bv);
+                double d = integrator->MixedSpaceBruteForce(diag, q12v, bv);
                 dipoles[i]=d;
             }
             for (int i=0; i<THPOINTS; i++)
@@ -388,6 +391,36 @@ int main(int argc, char* argv[])
             delete[] dipoles;
             
         }
+    
+    else if (mode == MIXED_SPACE_BRUTEFORCE)
+           {
+               
+               Vec q12v(q12,0);
+               cout <<"#  Mixed space, q12=" << q12 << " angle " << theta_b_q << endl;
+               
+               const double MINB = 0;
+               const double MAXB = 10;
+               const int BPOINTS = 20;
+               const double BSTEP = (MAXB-MINB)/(BPOINTS-1);
+               double *dipoles = new double[BPOINTS];
+               cout <<"# th(r,b)   G2" << endl;
+       #pragma omp parallel for
+               for (int i=0; i<BPOINTS; i++)
+               {
+                   double b = MINB + i*BSTEP;
+                   Vec bv(b*std::cos(theta_b_q),b*std::sin(theta_b_q));
+                   double d = integrator->MixedSpaceBruteForce(diag, q12v, bv);
+                   dipoles[i]=d;
+               }
+               for (int i=0; i<BPOINTS; i++)
+               {
+                   double b = MINB + i*BSTEP;
+                   cout << b << " " << dipoles[i] << endl;
+               }
+               
+               delete[] dipoles;
+               
+           }
     
     
     

@@ -652,8 +652,6 @@ double inthelperf_mc_mixedspace(double *vec, size_t dim, void* p)
     
     res *= std::cos(b*K);
     
-    /*double diag_momentumspace = par->integrator->IntegrateDiagram(par->diag, q - K*0.5, q*(-1) - K*(0.5));
-    res *= diag_momentumspace;*/
     
     // Jacobian
     res *= K.Len();
