@@ -155,11 +155,24 @@ int main(int argc, char* argv[])
     {
     // q1=q2
 
-        for (double q=0.02; q<5; q+=0.05)
+	const double MINQ=0.02;
+	const double MAXQ = 5;
+	const double QSTEP = 0.05;
+	const int QPOINTS = static_cast<int>((MAXQ-MINQ)/QSTEP);
+	double *res = new double[QPOINTS];
+
+	#pragma omp parallel for
+        for (int qi=0; qi <= QPOINTS; qi++)
         {
-            Vec q1(q/2.,0);
-            Vec q2(q/2.,0);
+	   double q = MINQ + qi*QSTEP;
+
+	    // Parallel
+            //Vec q1(q/2.,0);
+            //Vec q2(q/2.,0);
             
+	    // Perpend
+	    Vec q1(q/std::sqrt(2.),0);
+	    Vec q2(0, q/std::sqrt(2.));
             double d = integrator->IntegrateDiagram(diag, q1, q2);
             if (integrator->Add_Q1Q2_exchange(diag))
             {
@@ -167,10 +180,14 @@ int main(int argc, char* argv[])
                 d +=integrator->IntegrateDiagram(diag, q1, q2);
             }
            
-            
-            cout << q << " " << d << endl;
-            
+           res[qi]=d; 
         }
+
+	for (int qi=0; qi <= QPOINTS; qi++)
+        {
+	   double q = MINQ + qi*QSTEP;
+	   cout << q << " " << res[qi] << endl;
+   	}
     }
     if (mode == TWODIM)
     {
@@ -340,7 +357,7 @@ int main(int argc, char* argv[])
             cout <<"# Dipole amplitude, b=" << b << endl;
             cout << "# r = " << r  << endl;
             const double MINTH = 0;
-            const double MAXTH = 2.0*M_PI;
+            const double MAXTH = M_PI;
             const int THPOINTS = 11;
             const double THSTEP = (MAXTH-MINTH)/(THPOINTS-1);
             double *dipoles = new double[THPOINTS];
