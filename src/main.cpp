@@ -109,6 +109,8 @@ int main(int argc, char* argv[])
             b = StrToReal(argv[i+1]);
         else if (string(argv[i])=="-r")
             r = StrToReal(argv[i+1]);
+        else if (string(argv[i])=="-smallx")
+            integrator->SetSmallX(true);
         else if (string(argv[i]).substr(0,1)=="-")
         {
             cerr << "Unknown parameter " << argv[i] << endl;
