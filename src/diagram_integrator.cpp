@@ -88,8 +88,19 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     if (x1+x2 >=1) return 0;
     
     double xg = vec[6];
+    
+    // This is bit of a hack, but for now the small xg limit
+    // is computed by performing exactly the same integrals, so we don't
+    // do one simple integral analycially in order to keep the code structure
+    // the same.
+    double inv_xg = 1.0/xg;
+    
     // Do not allow exactly the upper limit.
     if (xg > std::min(x1,1.-x2)-1e-4) return 0;
+    
+    if (par->integrator->SmallXLimit()== true)
+        xg = 0;
+    
     double z1,z2;
     z1 = xg/x1; z2 = xg /( x2+xg );
     
@@ -339,7 +350,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     
     double res = norm*wf1*wf2*f_xg*(A*B)/(A.LenSqr()*B.LenSqr());
     
-    res /= xg;
+    res *= inv_xg; // same as res /= xg;
     
     // Jacobian
     res /= 8.0*x1*x2*(1.-x1-x2)*std::pow(2.0*M_PI,6.0);
@@ -460,12 +471,29 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     
     
     double fintb = 0;
-    if (par->integrator->UseInterpolator() == true)
-        fintb = par->F_B_interpolator->Evaluate(l.Len());
-    else
-        fintb = par->integrator->GetF_worker()->F_int_B0(l, l1, alpha, mf*mf);
-    double result = norm*wf1*wf2*fintb;
     
+    if (par->integrator->SmallXLimit())
+    {
+        // A22 in the small-x limit
+        double hsqr = l1.LenSqr() + l.LenSqr() - 2.0*(l*l1);
+        double delta = mf*mf;
+        // -1/(8pi^2) \int_{alpha}^1 dz_1/z_1 2 h^2/2 B_0(m^2,m^2,h^2)
+        fintb = -1.0/(8.0*M_PI*M_PI) * (-2.0*std::log(alpha)) * hsqr/2.0 * B0(hsqr,delta);
+        /*double exact=par->integrator->GetF_worker()->F_int_B0(l, l1, alpha, mf*mf);
+        cout << l << endl;
+        cout << l1 << endl;
+        cout << "alpha " << alpha << " smallx " << fintb << " exact " << exact  << " ratio " << exact/fintb <<  endl;
+        exit(1);*/
+    }
+    else
+    {
+        if (par->integrator->UseInterpolator() == true)
+            fintb = par->F_B_interpolator->Evaluate(l.Len());
+        else
+            fintb = par->integrator->GetF_worker()->F_int_B0(l, l1, alpha, mf*mf);
+    }
+    double result = norm*wf1*wf2*fintb;
+        
     if (isinf(result) or isnan(result))
     {
         cerr << "Result "<< result << " k1=" << k1 <<", k2=" << k2 << " wf1 " << wf1 << " wf2 " << wf2 << endl;
@@ -1027,6 +1055,8 @@ DiagramIntegrator::DiagramIntegrator()
     const gsl_rng_type *T = gsl_rng_default;
     rng = gsl_rng_alloc (T);
     x=0.01;
+    
+    small_x = false;
 }
 
 
@@ -1061,6 +1091,7 @@ std::string DiagramIntegrator::InfoStr()
     "# Perturbative m_f=" << mf << endl
     << "# Proton wave function: " << WaveFunctionString(proton.GetWaveFunction()) << endl
     << "# Proton wave function params: mq=" << proton.GetM() << "GeV, beta=" << proton.GetBeta() <<" GeV, p=" << proton.GetP() << endl;
+    ss << "# small-x limit: "; if (small_x) ss << "true"; else ss << "false"; ss << endl;
     
     return ss.str();
 }

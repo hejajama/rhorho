@@ -144,6 +144,9 @@ public:
               
     std::string InfoStr();
     
+    void SetSmallX(bool sx) { small_x = x; }
+    bool SmallXLimit() { return small_x; }
+    
 private:
     double mf;      // Quark mass
     IntegrationMethod intmethod;
@@ -153,6 +156,7 @@ private:
     unsigned int MCINTPOINTS;
     bool use_interpolator;
     double x; // cutoff
+    bool small_x;
 };
 
 
