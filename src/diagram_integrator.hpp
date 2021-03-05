@@ -147,6 +147,9 @@ public:
     void SetSmallX(bool sx) { small_x = x; }
     bool SmallXLimit() { return small_x; }
     
+    bool CollinearCutoffUVFinite() { return collinear_cutoff_uv_finite; }
+    void SetCollinearCutoffUVFinite(bool s){ collinear_cutoff_uv_finite=s; }
+    
 private:
     double mf;      // Quark mass
     IntegrationMethod intmethod;
@@ -157,6 +160,7 @@ private:
     bool use_interpolator;
     double x; // cutoff
     bool small_x;
+    bool collinear_cutoff_uv_finite; // Use collinear cutoff (m) in UV finite diagrams also
 };
 
 

@@ -48,7 +48,7 @@ int gsl_errno)
 
 int main(int argc, char* argv[])
 {
-    gsl_set_error_handler(handler);
+    //gsl_set_error_handler(handler);
     
     cout << "# Command: ";
     for (int i=1; i<argc; i++)
@@ -111,6 +111,8 @@ int main(int argc, char* argv[])
             r = StrToReal(argv[i+1]);
         else if (string(argv[i])=="-smallx")
             integrator->SetSmallX(true);
+        else if (string(argv[i])=="-regulate_uv_finite")
+            integrator->SetCollinearCutoffUVFinite(true);
         else if (string(argv[i]).substr(0,1)=="-")
         {
             cerr << "Unknown parameter " << argv[i] << endl;
@@ -118,6 +120,7 @@ int main(int argc, char* argv[])
         }
     
     }
+    
     
     integrator->GetProton().ComputeWFNormalizationCoefficient();
     
@@ -137,6 +140,7 @@ int main(int argc, char* argv[])
     
     cout << "# Diagram " << diagram << " id " << diag << " mcintpoints " << mcintpoints << endl << "#" << endl;
     integrator->SetMCIntPoints(mcintpoints);
+    
     
     
     // Test limit q1->0, q2->K, should vanish
