@@ -70,7 +70,7 @@ LCPT_Dipole::LCPT_Dipole(string fname)
         
     }
     
-    interpolator2d = new Interpolator2D(rvals, bvals, datavals);
+    interpolator2d = new DipoleInterpolator2D(rvals, bvals, datavals);
     cout << "# Interpolation constructed from the data file " << fname  << endl;
     cout <<  "# In total " << datavals.size() << " points (" << rvals.size() << " rpoints, " << bvals.size() << " bpoints)" << endl;
    

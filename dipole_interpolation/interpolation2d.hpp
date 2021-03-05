@@ -27,7 +27,7 @@
  * Uses Interpolator class to perform 1D interpolations
  */
 
-class Interpolator2D
+class DipoleInterpolator2D
 {
     public:
         // data format [xind][yind]
@@ -36,10 +36,10 @@ class Interpolator2D
          * Initialize 2D interpolator
          * zgrid[i] is the point at xgrid[i],ygrid[i]
          */
-        Interpolator2D(std::vector<double> xgrid, std::vector<double> ygrid,
+        DipoleInterpolator2D(std::vector<double> xgrid, std::vector<double> ygrid,
                        std::vector<double> zgrid);
                        
-        ~Interpolator2D();
+        ~DipoleInterpolator2D();
         
         double Evaluate(double x, double y);
 

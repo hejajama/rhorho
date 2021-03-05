@@ -13,7 +13,7 @@
 
 
 
-double Interpolator2D::Evaluate(double x, double y)
+double DipoleInterpolator2D::Evaluate(double x, double y)
 {
     return gsl_spline2d_eval(gslinterp,x,y, xacc, yacc);
 
@@ -25,7 +25,7 @@ double Interpolator2D::Evaluate(double x, double y)
 // Note that we assume that xgrid and ygrid contain ONLY the
 // distinct grid points
 // z[x_i,y_j] = zgrid[j*xgridsize+i]
-Interpolator2D::Interpolator2D(std::vector<double> xgrid,
+DipoleInterpolator2D::DipoleInterpolator2D(std::vector<double> xgrid,
                 std::vector<double> ygrid, std::vector<double> zgrid)
 {
 
@@ -45,7 +45,7 @@ Interpolator2D::Interpolator2D(std::vector<double> xgrid,
 
 
 
-Interpolator2D::~Interpolator2D()
+DipoleInterpolator2D::~DipoleInterpolator2D()
 {
     gsl_spline2d_free(gslinterp);
     gsl_interp_accel_free(xacc);

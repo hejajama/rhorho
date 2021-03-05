@@ -24,7 +24,7 @@ public:
     
     
 private:
-    Interpolator2D* interpolator2d;
+    DipoleInterpolator2D* interpolator2d;
     double minr;
     double maxr;
     double minb;
