@@ -99,7 +99,9 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     if (xg > std::min(x1,1.-x2)-1e-4) return 0;
     
     if (par->integrator->SmallXLimit()== true)
+    {
         xg = 0;
+    }
     
     double z1,z2;
     z1 = xg/x1; z2 = xg /( x2+xg );
@@ -348,7 +350,14 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     double wf1 =par->integrator->GetProton().WaveFunction(k1, k2, x1, x2);
     double wf2 = par->integrator->GetProton().WaveFunction(ktilde_1,ktilde_2,x1-xg, x2+xg);
     
-    double res = norm*wf1*wf2*f_xg*(A*B)/(A.LenSqr()*B.LenSqr());
+    double dotprod = 0;
+    double mf = par->integrator->GetMf();
+    if (par->integrator->CollinearCutoffUVFinite())
+        dotprod = (A*B) / ( (A.LenSqr()+mf*mf)*(B.LenSqr()+mf*mf));
+    else
+        dotprod =(A*B)/(A.LenSqr()*B.LenSqr());
+    
+    double res = norm*wf1*wf2*f_xg*dotprod;
     
     res *= inv_xg; // same as res /= xg;
     
@@ -476,8 +485,8 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     {
         // A22 in the small-x limit
         double hsqr = l1.LenSqr() + l.LenSqr() - 2.0*(l*l1);
-        if (hsqr < 1e-7)    
-            return 0;
+        if (hsqr < 1e-7)
+            return 0; // h^2 B0 -> 0
         double delta = mf*mf;
         // -1/(8pi^2) \int_{alpha}^1 dz_1/z_1 2 h^2/2 B_0(m^2,m^2,h^2)
         fintb = -1.0/(8.0*M_PI*M_PI) * (-2.0*std::log(alpha)) * hsqr/2.0 * B0(hsqr,delta);
@@ -1059,6 +1068,7 @@ DiagramIntegrator::DiagramIntegrator()
     x=0.01;
     
     small_x = false;
+    collinear_cutoff_uv_finite = false;
 }
 
 
@@ -1094,6 +1104,8 @@ std::string DiagramIntegrator::InfoStr()
     << "# Proton wave function: " << WaveFunctionString(proton.GetWaveFunction()) << endl
     << "# Proton wave function params: mq=" << proton.GetM() << "GeV, beta=" << proton.GetBeta() <<" GeV, p=" << proton.GetP() << endl;
     ss << "# small-x limit: "; if (small_x) ss << "true"; else ss << "false"; ss << endl;
+    if (collinear_cutoff_uv_finite)
+        ss << "# IR regulator included in UV finite diagrams" << endl;
     
     return ss.str();
 }

@@ -42,9 +42,18 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.45.0 COMPONENTS unit_test_framework)
 
 add_subdirectory(src)
+add_subdirectory(dipole_interpolation)
 
 
 set_target_properties(rhorho PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set_target_properties(rhotest PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set_target_properties(dipole PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+	LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+)
+set_target_properties(dipolelib PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+	LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib
+)
