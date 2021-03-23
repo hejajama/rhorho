@@ -19,6 +19,11 @@ BOOST_AUTO_TEST_CASE(VecTest)
     Vec v4 = v1+v2*2-v3*3;
     BOOST_CHECK_CLOSE(v4.GetY(), -8, 0.0001);
     
+    Vec q1(1,2);
+    Vec q2(3,4);
+    Vec K = q1*(-1)-q2;
+    BOOST_CHECK_CLOSE(K.GetY(), -6, 0.0001);
+    BOOST_CHECK_CLOSE(K.GetX(), -4, 0.0001);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

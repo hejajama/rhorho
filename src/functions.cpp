@@ -64,14 +64,14 @@ double inthelperf_F(double z1, void* p)
         return 0;
     }
     
-    double Delta = SQR(1.-z1)*par->m2;
+    double Delta = SQR(z1)*par->m2;  // originally 1-z1 in Risto&Adrian
     return 1.0/z1 * (1.0 + SQR(1.-z1)) * hsqr/2. * B0(hsqr, Delta);
 }
 double F_worker::F_int_B0(Vec l, Vec l1, double alpha, double m2)
 {
     
     // use analytical result if l1=0
-    if (l1.LenSqr() < 1e-7)
+/*    if (l1.LenSqr() < 1e-7)
     {
         double l4l2m2 =SQR(l.LenSqr()) + 4.*l.LenSqr()*m2; //l^4 + 4l^2m^2
         double res = -l.LenSqr() * std::log(2.0*m2 / (l.LenSqr() + 2.*m2+std::sqrt( l4l2m2 ) ) )
@@ -80,7 +80,7 @@ double F_worker::F_int_B0(Vec l, Vec l1, double alpha, double m2)
         
         return res;
     }
-    
+ */   
     
     gsl_function fun;
     fun.function=inthelperf_F;
