@@ -171,12 +171,12 @@ int main(int argc, char* argv[])
 	   double q = MINQ + qi*QSTEP;
 
 	    // Parallel
-            //Vec q1(q/2.,0);
-            //Vec q2(q/2.,0);
+         Vec q1(q/2.,0);
+         Vec q2(q/2.,0);
             
 	    // Perpend
-	    Vec q1(q/std::sqrt(2.),0);
-	    Vec q2(0, q/std::sqrt(2.));
+	    //Vec q1(q/std::sqrt(2.),0);
+	    //Vec q2(0, q/std::sqrt(2.));
             double d = integrator->IntegrateDiagram(diag, q1, q2);
             if (integrator->Add_Q1Q2_exchange(diag))
             {
@@ -360,7 +360,7 @@ int main(int argc, char* argv[])
             Vec bv(b,0);
             cout <<"# Dipole amplitude, b=" << b << endl;
             cout << "# r = " << r  << endl;
-            const double MINTH = 0;
+            const double MINTH = -M_PI;
             const double MAXTH = M_PI;
             const int THPOINTS = 11;
             const double THSTEP = (MAXTH-MINTH)/(THPOINTS-1);
@@ -391,9 +391,9 @@ int main(int argc, char* argv[])
             Vec bv(b,0);
             cout <<"#  Mixed space, b=" << b << ", q12=" << q12 << endl;
             
-            const double MINTH = -M_PI;
-            const double MAXTH = M_PI;
-            const int THPOINTS = 11;
+            const double MINTH = 0; //-M_PI;
+            const double MAXTH = M_PI/2.0;
+            const int THPOINTS = 2;
             const double THSTEP = (MAXTH-MINTH)/(THPOINTS-1);
             double *dipoles = new double[THPOINTS];
             cout <<"# th(r,b)   G2" << endl;
