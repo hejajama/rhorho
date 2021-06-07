@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     cout << "# Git version " << g_GIT_SHA1 << " local repo " << g_GIT_LOCAL_CHANGES << " main build " << __DATE__  << " " << __TIME__ << endl;
 
 
-    LCPT_Dipole dipole("/Users/hejajama/Nextcloud/projects/rhorho/dipole_2d_data/x_0.01/nlo_mc_3e7_puhti_as_0.2.dat");
+    LCPT_Dipole dipole("/Users/hejajama/Nextcloud/projects/rhorho/dipole_2d_data/x_0.01/fixed_ir_nlo_mc_5e7_mq_0.2_as_0.2_large.dat");
     dipole.Set_out_of_range_warnings(false);
     
     cout << "N(r=1,b=2)=" << dipole.Evaluate(1,2) << endl;

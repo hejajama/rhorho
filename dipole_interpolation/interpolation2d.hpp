@@ -42,11 +42,17 @@ class DipoleInterpolator2D
         ~DipoleInterpolator2D();
         
         double Evaluate(double x, double y);
+    
+        double MinX() { return minx; };
+        double MinY() { return miny; };
+        double MaxX() { return maxx; };
+        double MaxY() { return maxy; };
 
     private:
         gsl_spline2d *gslinterp;
         gsl_interp_accel *xacc;
         gsl_interp_accel *yacc;
+        double minx,maxx,miny,maxy;
 
 
 };

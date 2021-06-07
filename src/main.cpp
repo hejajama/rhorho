@@ -48,7 +48,7 @@ int gsl_errno)
 
 int main(int argc, char* argv[])
 {
-    //gsl_set_error_handler(handler);
+    gsl_set_error_handler(handler);
     
     cout << "# Command: ";
     for (int i=1; i<argc; i++)
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
     
     cout << integrator->InfoStr();
     
-    if ( diag == DIAG_3A or diag == DIAG_3A_2 or diag == DIAG_5A or diag == DIAG_5C or diag == DIAG_5C_1)
+    if ( diag == DIAG_2A or diag == DIAG_3A or diag == DIAG_3A_2  or diag == DIAG_3B or diag == DIAG_5A or diag == DIAG_5C or diag == DIAG_5C_1)
         mcintpoints /= 70; // there is one more intergal
                             // within the MC integral
     

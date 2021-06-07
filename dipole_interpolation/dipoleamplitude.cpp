@@ -7,21 +7,13 @@
 #include <sstream>
 #include <iostream>
 #include <cstdlib>
+#include <cmath>
 #include <vector>
 
 using namespace std;
 
-LCPT_Dipole::LCPT_Dipole(string fname)
+DipoleInterpolator2D* InterpolatorFromFile(string fname)
 {
-    // Datafile structure is
-    // b r N(r,b)
-    
-    vector<double> bvals;
-    vector<double> rvals;
-    vector<double> datavals;
-    
-    ifstream file(fname.c_str());
-    
     // Note, we want to initailize a 2d interpolator
     // It needs xgrid and ygrid containing ONLY the
     // distinct grid points
@@ -29,8 +21,14 @@ LCPT_Dipole::LCPT_Dipole(string fname)
     
     // So we say that b is y coordinate, r is x coord
     
+    ifstream file(fname.c_str());
+    
     bool initialized = false;
     bool r_grid_ready = false;
+    vector<double> bvals;
+    vector<double> rvals;
+    vector<double> datavals;
+    
     while(!file.eof())
     {
         string line;
@@ -70,14 +68,34 @@ LCPT_Dipole::LCPT_Dipole(string fname)
         
     }
     
-    interpolator2d = new DipoleInterpolator2D(rvals, bvals, datavals);
     cout << "# Interpolation constructed from the data file " << fname  << endl;
     cout <<  "# In total " << datavals.size() << " points (" << rvals.size() << " rpoints, " << bvals.size() << " bpoints)" << endl;
-   
-    minr = rvals[0];
-    maxr = rvals[rvals.size()-1];
-    minb = bvals[0];
-    maxb = bvals[bvals.size()-1];
+	cout << "# Minr: " << rvals[0] << ", maxr: " << rvals[rvals.size()-1] << ", maxb: " << bvals[bvals.size()-1] << " GeV^-1" << endl;
+    
+    return  new DipoleInterpolator2D(rvals, bvals, datavals);
+    
+    
+    
+}
+
+LCPT_Dipole::LCPT_Dipole(string fname, string v2fname)
+{
+    // Datafile structure is
+    // b r N(r,b)
+    interpolator2d = InterpolatorFromFile(fname);
+    angledep=false;
+    if (v2fname != "")
+    {
+        angledep=true;
+        v2_interpolator2d = InterpolatorFromFile(v2fname);
+    }
+        
+    
+    minr=interpolator2d->MinX();
+    maxr=interpolator2d->MaxX();
+    minb=interpolator2d->MinY();
+    maxb=interpolator2d->MaxY();
+    
     
     out_of_range_warnings=true;
     
@@ -103,7 +121,33 @@ double LCPT_Dipole::Evaluate(double r, double b)
     
 }
 
+double LCPT_Dipole::v2(double r, double b)
+{
+    if (angledep == false)
+        return 0;
+    
+    // Too small r or too large b: assume N(r,b)=0
+    if (r < minr or b>maxb)
+        return 0;
+    
+    // Other out of range errors
+    if (r > maxr or b < minb )
+        return 0;
+    
+    return v2_interpolator2d->Evaluate(r,b);
+}
+
+double  LCPT_Dipole::Evaluate(double r, double b, double phirb)
+{
+    if (angledep == false)
+        return Evaluate(r,b);
+    
+    return Evaluate(r,b)*(1.0 + 2.0*v2(r,b)*std::cos(2.0*phirb));
+    
+}
 LCPT_Dipole::~LCPT_Dipole()
 {
     delete interpolator2d;
+    if (angledep)
+        delete v2_interpolator2d;
 }

@@ -15,7 +15,11 @@
 
 double DipoleInterpolator2D::Evaluate(double x, double y)
 {
-    return gsl_spline2d_eval(gslinterp,x,y, xacc, yacc);
+	double n;
+	int s = gsl_spline2d_eval_e(gslinterp,x,y, xacc, yacc, &n);
+	if (s==GSL_EDOM) return 0;
+	if (s) return 0;
+    return n; //gsl_spline2d_eval(gslinterp,x,y, xacc, yacc);
 
 
 }
@@ -41,6 +45,9 @@ DipoleInterpolator2D::DipoleInterpolator2D(std::vector<double> xgrid,
     
     gslinterp = gsl_spline2d_alloc(T, xgrid.size(), ygrid.size());
     gsl_spline2d_init(gslinterp, xdata, ydata, zdata, xgrid.size(), ygrid.size());
+    
+    minx=xgrid[0]; maxx=xgrid[xgrid.size()-1];
+    miny=ygrid[0]; maxy=ygrid[ygrid.size()-1];
 }
 
 
