@@ -76,8 +76,9 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     Vec kg(vec[7],vec[8]);
     Vec q1 = par->q1;
     Vec q2 = par->q2;
-    Vec q = q1+q2;
-    Vec K = q1*(-1) - q2;
+    Vec q3 = par->q3;
+    Vec q = q1+q2+q3;
+    Vec K = q1*(-1) - q2 - q3;
     
     double x1=vec[4];
     double x2=vec[5];
@@ -337,6 +338,10 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = (p2-q1)*z2 - kg*(1.-z2);
             norm = -1./3. * (CF-2./3.)*6;
             break;
+        
+        //// Odderon
+            
+            
         default:
             cerr << "Unknown diagram in inthelperf_mc_diag2b: " << par->diag << endl;
             exit(1);
@@ -595,6 +600,91 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
             k22 = k2 + (q1+q2+q3)*x2 - q2;
             norm = -6./(2.*Nc*4.) * 2.;
             break;
+            
+        //
+            
+        case ODDERON_DIAG_19:
+            l=q2+q3;
+            l1=Vec(0,0);
+            k12 = k1 + q*x1 - (q2+q3);
+            k22 = k2 + q*x2 - q1;
+            norm=-6*Nc/(2*4);
+            break;
+        
+        case ODDERON_DIAG_30:
+            l=q2;
+            l1=Vec(0,0);
+            k12 = k1 + q*x1 - q2;
+            k22 = k2 + q*x2 - (q1+q3);
+            norm=-6*Nc/(2.*4.);
+            break;
+            
+        case ODDERON_DIAG_33:
+            l=q2;
+            l1=Vec(0,0);
+            k12 = k1 + q*x1 - q2;
+            k22 = k2 + q*x2 - q1;
+            norm=6.*Nc/(2.*4.)*2;
+            break;
+            
+        case ODDERON_DIAG_41:
+            l=q2+q3;
+            l1=q2+q3;
+            k12=k1+q*x1 - (q2+q3);
+            k22 = k2 + q*x2 - q1;
+            norm=6./(2.*Nc*4.);
+            break;
+        
+        case ODDERON_DIAG_42:
+            l=q2;
+            l1=q2;
+            k12=k1+q*x1-q2;
+            k22 = k2 + q*x2 - (q1+q3);
+            norm=6./(2.*Nc*4.);
+            break;
+        
+        case ODDERON_DIAG_48:
+            l=q2;
+            l1=q2;
+            k12=k1+q*x1-q2;
+            k22=k2+q*x2-q1;
+            norm=-6./(2.*Nc*4.)*2.;
+            break;
+            
+        
+        case ODDERON_DIAG_31:
+            l=q3;
+            l1=Vec(0,0);
+            k12=k1+q*x1-q3;
+            k22=k2 + q*x2-(q1+q2);
+            norm=-6.*Nc/(2.*4.);
+            break;
+            
+        case ODDERON_DIAG_34:
+            l=q3;
+            l1=Vec(0,0);
+            k12=k1+q*x1-q3;
+            k22=k2+q*x2-q1;
+            norm=6.*Nc/(2.*4.)*2.;
+            break;
+            
+        case ODDERON_DIAG_43:
+            l=q3;
+            l1=q3;
+            k12=k1+q*x1-q3;
+            k22=k2+q*x2-(q1+q2);
+            norm=6./(4.*2.*Nc);
+            break;
+        
+        case ODDERON_DIAG_49:
+            l=q3;
+            l1=q3;
+            k12=k1+q*x1-q3;
+            k22=k2+q*x2-q1;
+            norm=-6./(4.*2.*Nc)*2.;
+            break;
+            
+        
         default:
             std::cerr << "Unknown diagram " << par->diag << " encountered!" << std::endl;
             exit(1);
@@ -699,6 +789,16 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 
         case ODDERON_DIAG_38:
         case ODDERON_DIAG_39:
         case ODDERON_DIAG_40:
+        case ODDERON_DIAG_19:
+        case ODDERON_DIAG_30:
+        case ODDERON_DIAG_33:
+        case ODDERON_DIAG_41:
+        case ODDERON_DIAG_42:
+        case ODDERON_DIAG_48:
+        case ODDERON_DIAG_31:
+        case ODDERON_DIAG_34:
+        case ODDERON_DIAG_43:
+        case ODDERON_DIAG_49:
             F.dim=6;
             lower = new double[F.dim];
             upper = new double [F.dim];

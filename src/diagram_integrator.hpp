@@ -74,10 +74,24 @@ enum Diagram
     ODDERON_DIAG_32,
     ODDERON_DIAG_38,
     ODDERON_DIAG_39,
-    ODDERON_DIAG_40
+    ODDERON_DIAG_40,
+    
+    ODDERON_DIAG_19,
+    ODDERON_DIAG_30,
+    ODDERON_DIAG_33,
+    ODDERON_DIAG_41,
+    ODDERON_DIAG_42,
+    ODDERON_DIAG_48,
+    
+    // Rest that do not contribute to ward in q3->0
+    ODDERON_DIAG_31,
+    ODDERON_DIAG_34,
+    ODDERON_DIAG_43,
+    ODDERON_DIAG_49,
+    
     
 };
-const int NUM_OF_DIAGRAMS = 35+9+6;
+const int NUM_OF_DIAGRAMS = 35+9+6+6+4;
 const std::string DIAGRAM_STRINGS[NUM_OF_DIAGRAMS] = {"2a", "3a", "3a_2", "3b", "3b_2", "5a", "5c", "5c_1",
         "2b", "3c", "3c_2", "3d", "3d_2", "6e_2", "6f_1",
          "6g_1", "7h", "7i", "7j", "7k", "7l", "7m", "8h_1",
@@ -86,6 +100,11 @@ const std::string DIAGRAM_STRINGS[NUM_OF_DIAGRAMS] = {"2a", "3a", "3a_2", "3b", 
     "odderon_14","odderon_15","odderon_16","odderon_17","odderon_20", "odderon_21","odderon_22","odderon_36","odderon_37",
     
     "odderon_18", "odderon_29", "odderon_32", "odderon_38", "odderon_39", "odderon_40",
+    
+    "odderon_19","odderon_30", "odderon_33", "odderon_41", "odderon_42", "odderon_48",
+    
+    "odderon_31","odderon_34","odderon_43","odderon_49",
+    
 };
 const Diagram DIAGRAMS[NUM_OF_DIAGRAMS] = {
     DIAG_2A,
@@ -144,13 +163,27 @@ const Diagram DIAGRAMS[NUM_OF_DIAGRAMS] = {
     ODDERON_DIAG_37,
     
     
-    // uv divergent
+    // 2nd uv divergent
     ODDERON_DIAG_18,
     ODDERON_DIAG_29,
     ODDERON_DIAG_32,
     ODDERON_DIAG_38,
     ODDERON_DIAG_39,
-    ODDERON_DIAG_40
+    ODDERON_DIAG_40,
+    
+    // 3rd uv div
+    ODDERON_DIAG_19,
+    ODDERON_DIAG_30,
+    ODDERON_DIAG_33,
+    ODDERON_DIAG_41,
+    ODDERON_DIAG_42,
+    ODDERON_DIAG_48,
+    
+    //
+    ODDERON_DIAG_31,
+    ODDERON_DIAG_34,
+    ODDERON_DIAG_43,
+    ODDERON_DIAG_49,
     
 };
 
