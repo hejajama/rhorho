@@ -146,13 +146,27 @@ int main(int argc, char* argv[])
     // Test limit q1->0, q2->K, should vanish
     if (mode == WARD)
     {
-        Vec K(1,0);
+     
+        // Odderon Ward test q1 -> 0, q2,q3 fixed
+        Vec q2(0.4,0.51);
+        Vec q1(-0.25,0.6);
+        for (double q=0.01; q<0.4; q+=0.05)
+        {
+            //Vec q1(q,0);
+            Vec q3(q/std::sqrt(2.), q/std::sqrt(2.));
+            //double d = integrator->IntegrateDiagram(diag, q1,q2,q3);
+            double d = integrator->IntegrateDiagram(diag, q1,q2,q3);
+            cout << q << " " << d << endl;
+        }
+        
+        /*Vec K(1,0);
         for (double q=0.47; q<0.5; q+=0.002)
         {
             Vec q1(q,0);
             double d = integrator->IntegrateDiagram(diag, q1-K*0.5, q1*(-1)-K*0.5);
             cout << (q1-K*0.5).Len() << " " << d << endl;
         }
+         */
     }
     
     if (mode == ONEDIM)

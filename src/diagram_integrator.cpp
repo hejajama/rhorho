@@ -314,28 +314,28 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             ktilde_2 = k2 + q*x2 + kg - q2 - K*xg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3)*6;
+            norm = -1./3. * (CF-2./3.)*6;
             break;
         case DIAG_8L_2:
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - q2 - K*xg;
             A = p1*z1 - kg;
             B = (p2-q2)*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3)*6;
+            norm = -1./3. * (CF-2./3.)*6;
             break;
         case DIAG_8M_1: // 8L_1, q1<->q2
             ktilde_1 =  k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - q1 - K*xg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3)*6;
+            norm = -1./3. * (CF-2./3.)*6;
             break;
         case DIAG_8M_2: // 8L_2, q1<->q2
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - q1 - K*xg;
             A = p1*z1 - kg;
             B = (p2-q1)*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3)*6;
+            norm = -1./3. * (CF-2./3.)*6;
             break;
         default:
             cerr << "Unknown diagram in inthelperf_mc_diag2b: " << par->diag << endl;
@@ -372,6 +372,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
 
 /*
  * Vec components are [k1x,k1y,k2x,k2y,x1,x2]
+ * UV divergent contributions
  */
 double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
 {
@@ -381,6 +382,9 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     Vec k2(vec[2], vec[3]);
     Vec q1 = par->q1;
     Vec q2 = par->q2;
+    Vec q3 = par->q3;
+    
+    Vec q = q1+q2+q3;
     
     double x1=vec[4];
     double x2=vec[5];
@@ -390,7 +394,7 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     if (x3 >= 1 or x3 < x) return 0;
     if (x1+x2 >=1) return 0;
     
-    double wf1 = par->integrator->GetProton().WaveFunction( k1, k2, x1,  x2);
+    double wf1 = par->integrator->GetProton().WaveFunction(k1, k2, x1,  x2);
     
     Vec k12; Vec k22;
     Vec l; Vec l1;
@@ -398,8 +402,12 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     
     double alpha =  par->integrator->GetX() / x1;
     // Default, changed below if necessary
+    
+    const double Nc=3;
+    
     switch(par->diag)
     {
+        // 2 gluon exchange
         case DIAG_2A:
             l=q1+q2;
             l1=Vec(0,0);
@@ -458,6 +466,135 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
             norm = 2./(3.*6.)*6;
             alpha = par->integrator->GetX() / x2;
             break;
+            
+           
+        // **** ODD DIAGRAMS, ODDERON ****
+        // NOTE: In all odderon diags I factor out 2g^5 / (3 * 16pi^3) * d^abc
+        // And f^abc parts are dropped
+            // TODO* 1/4 in (6)
+            // Todo (2pi)^3? see (160)
+        case ODDERON_DIAG_14:
+            l = q1 + q2 + q3;
+            l1 = q3;
+            k12 = k1 - (q1 + q2 + q3)*(1.-x1);
+            k22 = k2 + (q1+q2+q3)*x2;
+            norm = Nc/4. * 3; // 3 is symmetry factor
+
+            // todo: alpha???
+            break;
+        case ODDERON_DIAG_15:
+            l = q1+q2+q3;
+            l1 = q2;
+            k12 = k1 - (q1+q2+q3)*(1.-x1);
+            k22 = k2 + (q1+q2+q3)*x2;
+            norm = Nc/4. * 3;
+            break;
+        
+        case ODDERON_DIAG_16:
+            l = q1+q2+q3;
+            l1 = q1;
+            k12 = k1 - (q1+q2+q3)*(1.-x1);
+            k22 = k2 + (q1+q2+q3)*x2;
+            norm = Nc/4. * 3;
+            break;
+            
+        case ODDERON_DIAG_17:
+            l = q1+q2;
+            l1=Vec(0,0);
+            k12 = k1 + (q1+q2+q3)*x1 - (q1 + q2);
+            k22 = k2 + (q1+q2+q3)*x2 - q3;
+            norm = -Nc/8.0 * 6;
+            break;
+        
+        case ODDERON_DIAG_20:
+            l = q1+q2+q3;
+            l1 = q2 + q3;
+            k12 = k1 + (q1+q2+q3)*x1 - (q1+q2+q3);
+            k22 = k2 + (q1+q2+q3)*x2;
+            norm = -Nc/4. * 3;
+            break;
+            
+        case ODDERON_DIAG_21:
+            l = q1+q2+q3;
+            l1 = q1 + q3;
+            k12 = k1 + (q1+q2+q3)*x1 - (q1+q2+q3);
+            k22 = k2 + (q1+q2+q3)*x2;
+            norm = -Nc/4. * 3;
+            break;
+        
+        case ODDERON_DIAG_22:
+            l = q1+q2+q3;
+            l1 = q1 + q2;
+            k12 = k1 + (q1+q2+q3)*x1 - (q1+q2+q3);
+            k22 = k2 + (q1+q2+q3)*x2;
+            norm = -Nc/4. * 3;
+            break;
+        
+        case ODDERON_DIAG_36:
+            l = q1+q2+q3;
+            l1 = q1+q2+q3;
+            k12 = k1 - (q1+q2+q3)*(1.-x1);
+            k22 = k2 + (q1+q2+q3)*x2;
+            norm =  3. * 2.*CF/4.;
+            break;
+            
+        case ODDERON_DIAG_37:
+            l = q1+q2;
+            l1 = q1+q2;
+            k12 = k1 + (q1+q2+q3)*x1 - (q1+q2);
+            k22 = k2 + (q1+q2+q3)*x2 - q3;
+            norm = 6. / (2.*Nc*4.);
+            break;
+            
+            
+           ///
+        case ODDERON_DIAG_18:
+            l = q1+q3;
+            l1 = Vec(0,0);
+            k12 = k1 + q*x1-(q1+q3);
+            k22 = k2 + q*x2 - q2;
+            norm = -6.*Nc/(2.*4.);
+            break;
+        
+        case ODDERON_DIAG_29:
+            l = q1;
+            l1 = Vec(0,0);
+            k12 = k1 + q*x1 - q1;
+            k22 = k2 + q*x2 - (q2+q3);
+            norm = -6.*Nc/(2.*4.);
+            break;
+            
+        case ODDERON_DIAG_32:
+            l = q1;
+            l1 = Vec(0,0);
+            k12 = k1 + (q1+q2+q3)*x1 - q1;
+            k22 = k2 + (q1+q2+q3)*x2-q2;
+            norm = 6.*Nc/(2.*4.) * 2.;
+            break;
+        
+        case ODDERON_DIAG_38:
+            l=q1+q3;
+            l1 = q1+q3;
+            k12 = k1 + (q1+q2+q3)*x1-(q1+q3);
+            k22 = k2 + (q1+q2+q3)*x2 - q2;
+            norm = 6./(2.*Nc*4.);
+            break;
+            
+        case ODDERON_DIAG_39:
+            l=q1;
+            l1=q1;
+            k12 = k1 + (q1+q2+q3)*x1 - q1;
+            k22 = k2 + (q1+q2+q3)*x2 - (q2+q3);
+            norm= 6./(2.*Nc*4.);
+            break;
+            
+        case ODDERON_DIAG_40:
+            l=q1;
+            l1=q1;
+            k12 = k1 + (q1+q2+q3)*x1 - q1;
+            k22 = k2 + (q1+q2+q3)*x2 - q2;
+            norm = -6./(2.*Nc*4.) * 2.;
+            break;
         default:
             std::cerr << "Unknown diagram " << par->diag << " encountered!" << std::endl;
             exit(1);
@@ -510,16 +647,19 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
         cerr << "Result "<< result << " k1=" << k1 <<", k2=" << k2 << " wf1 " << wf1 << " wf2 " << wf2 << endl;
     }
     
+    //cout << l1 << " " << l << " " << wf1 << " " << wf2 << " " << fintb << endl;
+    
     // Jacobian
     result /= x1*x2*(1.-x1-x2)*8*std::pow(2.0*M_PI,6.);
    
     return 2.0*std::pow(M_PI,3.)*result; // A21 gives 2pi^3
     
 }
-double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
+double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 )
 {
     inthelper_diagint helper;
-    helper.q1=q1; helper.q2=q2; helper.integrator=this;
+    helper.q1=q1; helper.q2=q2; helper.q3=q3;
+    helper.integrator=this;
     helper.diag = diag;
     gsl_monte_function F;
     
@@ -544,6 +684,21 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
         case DIAG_5C:
         case DIAG_5C_1:
         case DIAG_LO:
+        case ODDERON_DIAG_14:
+        case ODDERON_DIAG_15:
+        case ODDERON_DIAG_16:
+        case ODDERON_DIAG_17:
+        case ODDERON_DIAG_20:
+        case ODDERON_DIAG_21:
+        case ODDERON_DIAG_22:
+        case ODDERON_DIAG_36:
+        case ODDERON_DIAG_37:
+        case ODDERON_DIAG_18:
+        case ODDERON_DIAG_29:
+        case ODDERON_DIAG_32:
+        case ODDERON_DIAG_38:
+        case ODDERON_DIAG_39:
+        case ODDERON_DIAG_40:
             F.dim=6;
             lower = new double[F.dim];
             upper = new double [F.dim];

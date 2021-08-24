@@ -54,14 +54,39 @@ enum Diagram
     DIAG_8M_1,
     DIAG_8M_2,
     
-    DIAG_LO
+    DIAG_LO,
+    
+    // ODDERON_DIAG_13  vanishes
+    ODDERON_DIAG_14,
+    ODDERON_DIAG_15,
+    ODDERON_DIAG_16,
+    ODDERON_DIAG_17,
+    ODDERON_DIAG_20,
+    ODDERON_DIAG_21,
+    ODDERON_DIAG_22,
+    ODDERON_DIAG_36,
+    ODDERON_DIAG_37,
+    
+    
+    
+    ODDERON_DIAG_18,
+    ODDERON_DIAG_29,
+    ODDERON_DIAG_32,
+    ODDERON_DIAG_38,
+    ODDERON_DIAG_39,
+    ODDERON_DIAG_40
     
 };
-const int NUM_OF_DIAGRAMS = 35;
+const int NUM_OF_DIAGRAMS = 35+9+6;
 const std::string DIAGRAM_STRINGS[NUM_OF_DIAGRAMS] = {"2a", "3a", "3a_2", "3b", "3b_2", "5a", "5c", "5c_1",
         "2b", "3c", "3c_2", "3d", "3d_2", "6e_2", "6f_1",
          "6g_1", "7h", "7i", "7j", "7k", "7l", "7m", "8h_1",
-    "8h_2", "8i_1", "8i_2", "8j_1", "8j_2", "8k_1", "8k_2", "8l_1", "8l_2", "8m_1", "8m_2", "LO"};
+    "8h_2", "8i_1", "8i_2", "8j_1", "8j_2", "8k_1", "8k_2", "8l_1", "8l_2", "8m_1", "8m_2", "LO",
+    
+    "odderon_14","odderon_15","odderon_16","odderon_17","odderon_20", "odderon_21","odderon_22","odderon_36","odderon_37",
+    
+    "odderon_18", "odderon_29", "odderon_32", "odderon_38", "odderon_39", "odderon_40",
+};
 const Diagram DIAGRAMS[NUM_OF_DIAGRAMS] = {
     DIAG_2A,
     DIAG_3A,
@@ -104,10 +129,32 @@ const Diagram DIAGRAMS[NUM_OF_DIAGRAMS] = {
     DIAG_8M_1,
     DIAG_8M_2,
     
-    DIAG_LO
+    DIAG_LO,
+    
+    
+    // 1st UV diag combination that vanishes in the q3->0 limit (but not q1->0!!!)
+    ODDERON_DIAG_14,
+    ODDERON_DIAG_15,
+    ODDERON_DIAG_16,
+    ODDERON_DIAG_17,
+    ODDERON_DIAG_20,
+    ODDERON_DIAG_21,
+    ODDERON_DIAG_22,
+    ODDERON_DIAG_36,
+    ODDERON_DIAG_37,
+    
+    
+    // uv divergent
+    ODDERON_DIAG_18,
+    ODDERON_DIAG_29,
+    ODDERON_DIAG_32,
+    ODDERON_DIAG_38,
+    ODDERON_DIAG_39,
+    ODDERON_DIAG_40
+    
 };
 
-const int NC=3;
+const double NC=3;
 const double CF = (NC*NC-1.)/(2.*NC);
 
 enum IntegrationMethod
@@ -121,7 +168,7 @@ class DiagramIntegrator
 public:
     DiagramIntegrator();
     ~DiagramIntegrator();
-    double IntegrateDiagram(Diagram diag, Vec q1, Vec q2 );
+    double IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3=Vec(0,0) );
     
     double GetMf() { return mf; }
     Proton& GetProton() { return proton; }
@@ -169,6 +216,7 @@ struct inthelper_diagint
     DiagramIntegrator *integrator;
     Vec q1;
     Vec q2;
+    Vec q3;
     Interpolator *F_B_interpolator;
     Diagram diag;
 };
