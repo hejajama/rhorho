@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
             //Vec q1(q,0);
             Vec q3(q/std::sqrt(2.), q/std::sqrt(2.));
             //double d = integrator->IntegrateDiagram(diag, q1,q2,q3);
-            double d = integrator->IntegrateDiagram(diag, q3,q2,q1);
+            double d = integrator->IntegrateDiagram(diag, q1,q2,q3);
             cout << q << " " << d << endl;
         }
         

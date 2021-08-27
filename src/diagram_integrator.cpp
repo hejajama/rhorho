@@ -340,7 +340,181 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             break;
         
         //// Odderon
+        case ODDERON_DIAG_69:
+            A = p1*z1-kg;
+            B = p2*z2 - (kg-(q1+q2))*(1.-z2);
+            ktilde_1 = k1 + q*x1 - q3 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
+            norm = -1./4. * NC/2. * 6.;
+            break;
             
+        case ODDERON_DIAG_72:
+            A = p1*z1-kg;
+            B = (p2 - q3)*z2 - (kg-(q1+q2))*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q + kg - K*xg;
+            norm = -1./4. * NC/2. * 6; // TODO TR(T^a T^b D^c - T^a T^b T^c)
+            break;
+        case ODDERON_DIAG_75:
+            A =p1*z1-kg;
+            B = p2*z2 - (kg-(q1+q2))*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
+            norm = 1./2. * NC/2. * 6.; // TODO TR T^a T^b D^c
+            break;
+            
+        case ODDERON_DIAG_70:
+            A =p1*z1-kg;
+            B=p2*z2 - (kg-(q1+q3))*(1.-z2);
+            ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
+            norm = -1./4.* NC/2. * 6;
+            break;
+            
+        case ODDERON_DIAG_78:
+            A = p1*z1-kg;
+            B = p2*z2 - (kg-q1)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg - (q2+q3);
+            ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
+            norm = NC/2. * 1./4. * 6.;
+            break;
+            
+        case ODDERON_DIAG_81:
+            A =p1*z1-kg;
+            B = (p2-q3)*z2 - (kg-q1)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg - q2;
+            ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
+            norm = NC/(2.*4.) * 6.; 
+            break;
+            
+        case ODDERON_DIAG_90:
+            A =p1*z1-kg;
+            B = p2*z2 - (kg-q1)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg - q2;
+            ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
+            norm= - 6. * NC/(2.*4.);
+            break;
+            
+            
+        case ODDERON_DIAG_71:
+            A =p1*z1-kg;
+            B = p2*z2 - (kg - (q2+q3))*(1.-z2);
+            ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q2+q3) + kg - K*xg;
+            norm = -1./4. * NC/2. * 6;
+            break;
+        
+        case ODDERON_DIAG_79:
+            A =p1*z1-kg;
+            B = p2*z2 - (kg - q2)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg - (q1+q3);
+            ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
+            norm = NC/2. * 1./4. * 6.;
+            break;
+        
+        case ODDERON_DIAG_82:
+            A = p1*z1-kg;
+            B = (p2-q3)*z2 - (kg-q2)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg - q1;
+            ktilde_2 = k2 + q*x2 - (q2+q3) + kg - K*xg;
+            norm = NC/2. * 1./4. * 6.;
+            break;
+            
+        case ODDERON_DIAG_91:
+            A = p1*z1-kg;
+            B = p2*z2 - (kg-q2)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg - q1;
+            ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
+            norm = -NC/(2.*4.) * 6.;
+            break;
+            
+        case ODDERON_DIAG_74:
+            A = p1*z1 - kg;
+            B = (p2 - q1)*z2 - (kg - (q2+q3))*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q + kg - K*xg;
+            norm = -1./4. * NC/2. * 6.;
+            break;
+            
+        case ODDERON_DIAG_85:
+            A =p1*z1 - kg;
+            B = (p2-q1)*z2 - (kg-q2)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg - q3;
+            ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
+            norm = NC/2. * 1./4. * 6.;
+            break;
+            
+        case ODDERON_DIAG_88:
+            A = p1*z1 - kg;
+            B = (p2-(q1+q3))*z2 - (kg-q2)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q + kg - K*xg;
+            norm = NC/2. * 1./4. * 6.;
+            break;
+        
+        case ODDERON_DIAG_97:
+            A = p1*z1 - kg;
+            B = (p2-q1)*z2 - (kg-q2)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
+            norm = -6. * NC/(4.*2.);
+            break;
+            
+        case ODDERON_DIAG_89:
+            A = p1*z1 - kg;
+            B = (p2 - (q1+q2))*z2 - (kg-q3)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q + kg - K*xg;
+            norm = 6. * NC/2. * 1./4.;
+            break;
+        
+        case ODDERON_DIAG_117:
+            A = p1*z1 - kg;
+            B = (p2 - (q1+q2))*z2 - kg*(1.-z2);
+            ktilde_1 = k1+q*x1 - q3 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
+            norm = -(CF - 1./2.) * 1./4. * 6;
+            break;
+        
+        case ODDERON_DIAG_118:
+            A = p1*z1 - kg;
+            B = (p2-q)*z2 - kg*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q + kg - K*xg;
+            norm = -CF*1./4. * 6;
+            break;
+            
+        case ODDERON_DIAG_119:
+            A = p1*z1 - kg;
+            B = (p2 - (q1+q2))*z2 - kg*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
+            norm = (2.*CF - 1./2. - NC/2.) * 1./4. * 6.;
+            break;
+        
+        case ODDERON_DIAG_76:
+            A = p1*z1 - kg;
+            B = p2*z2 - (kg-(q1+q3))*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
+            norm = 1./2. * NC/2. * 6.;
+            break;
+        
+        case ODDERON_DIAG_93:
+            A = p1*z1 - kg;
+            B = p2*z2 - (kg-q1)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg - q3;
+            ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
+            norm = (-NC*1./4. + 1./4. * NC/2.)*6.;
+            break;
+        
+        case ODDERON_DIAG_99:
+            A = p1*z1 - kg;
+            B = (p2-q3)*z2 - (kg-q1)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
+            norm = (-NC/4. + 1./4.*NC/2.)*6.;
+            break;
             
         default:
             cerr << "Unknown diagram in inthelperf_mc_diag2b: " << par->diag << endl;
