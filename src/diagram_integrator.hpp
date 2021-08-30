@@ -118,9 +118,45 @@ enum Diagram
     ODDERON_DIAG_93,
     ODDERON_DIAG_99,
     
+    ODDERON_DIAG_77,
+    ODDERON_DIAG_94,
+    ODDERON_DIAG_100,
+    
+    ODDERON_DIAG_86,
+    ODDERON_DIAG_114,
+    ODDERON_DIAG_115,
+    ODDERON_DIAG_116,
+    
+    ODDERON_DIAG_83,
+    ODDERON_DIAG_108,
+    ODDERON_DIAG_109,
+    ODDERON_DIAG_110,
+    
+    ODDERON_DIAG_80,
+    ODDERON_DIAG_105,
+    ODDERON_DIAG_106,
+    ODDERON_DIAG_107,
+    
+    // totally not tested
+    ODDERON_DIAG_92,
+    ODDERON_DIAG_111,
+    ODDERON_DIAG_112,
+    ODDERON_DIAG_113,
+    
+    ODDERON_DIAG_95,
+    ODDERON_DIAG_123,
+    ODDERON_DIAG_124,
+    ODDERON_DIAG_125,
+    
+    ODDERON_DIAG_129,
+    ODDERON_DIAG_130,
+    ODDERON_DIAG_131,
+    
     
 };
-const int NUM_OF_DIAGRAMS = 35+9+6+6+4+3+4+4+4+4+3;
+//const int NUM_OF_DIAGRAMS = 35+9+6+6+4+3+4+4+4+4+3;
+
+
 const std::string DIAGRAM_STRINGS[] = {"2a", "3a", "3a_2", "3b", "3b_2", "5a", "5c", "5c_1",
         "2b", "3c", "3c_2", "3d", "3d_2", "6e_2", "6f_1",
          "6g_1", "7h", "7i", "7j", "7k", "7l", "7m", "8h_1",
@@ -140,8 +176,16 @@ const std::string DIAGRAM_STRINGS[] = {"2a", "3a", "3a_2", "3b", "3b_2", "5a", "
     "odderon_74", "odderon_85", "odderon_88", "odderon_97",
     "odderon_89", "odderon_117", "odderon_118", "odderon_119",
     "odderon_76", "odderon_93", "odderon_99",
+    "odderon_77", "odderon_94", "odderon_100",
+    "odderon_86", "odderon_114", "odderon_115", "odderon_116",
+    "odderon_83", "odderon_108", "odderon_109", "odderon_110",
+    "odderon_80", "odderon_105", "odderon_106", "odderon_107",
+    "odderon_92", "odderon_111", "odderon_112", "odderon_113",
+    "odderon_95", "odderon_123", "odderon_124", "odderon_125",
+    "odderon_129", "odderon_130", "odderon_131",
     
 };
+const int NUM_OF_DIAGRAMS = sizeof(DIAGRAM_STRINGS)/sizeof(std::string);
 const Diagram DIAGRAMS[] = {
     DIAG_2A,
     DIAG_3A,
@@ -250,7 +294,39 @@ const Diagram DIAGRAMS[] = {
     ODDERON_DIAG_93,
     ODDERON_DIAG_99,
     
+    ODDERON_DIAG_77,
+    ODDERON_DIAG_94,
+    ODDERON_DIAG_100,
     
+    ODDERON_DIAG_86,
+    ODDERON_DIAG_114,
+    ODDERON_DIAG_115,
+    ODDERON_DIAG_116,
+    
+    ODDERON_DIAG_83,
+    ODDERON_DIAG_108,
+    ODDERON_DIAG_109,
+    ODDERON_DIAG_110,
+    
+    ODDERON_DIAG_80,
+    ODDERON_DIAG_105,
+    ODDERON_DIAG_106,
+    ODDERON_DIAG_107,
+    
+    
+    ODDERON_DIAG_92,
+    ODDERON_DIAG_111,
+    ODDERON_DIAG_112,
+    ODDERON_DIAG_113,
+    
+    ODDERON_DIAG_95,
+    ODDERON_DIAG_123,
+    ODDERON_DIAG_124,
+    ODDERON_DIAG_125,
+    
+    ODDERON_DIAG_129,
+    ODDERON_DIAG_130,
+    ODDERON_DIAG_131,
 };
 
 const double NC=3;
