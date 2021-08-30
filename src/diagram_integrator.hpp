@@ -170,6 +170,7 @@ const std::string DIAGRAM_STRINGS[] = {"2a", "3a", "3a_2", "3b", "3b_2", "5a", "
     
     "odderon_31","odderon_34","odderon_43","odderon_49",
     
+    // uv finite
     "odderon_69", "odderon_72", "odderon_75",
     "odderon_70", "odderon_78", "odderon_81", "odderon_90",
     "odderon_71", "odderon_79", "odderon_82", "odderon_91",
@@ -265,6 +266,8 @@ const Diagram DIAGRAMS[] = {
     ODDERON_DIAG_43,
     ODDERON_DIAG_49,
     
+    
+    // UV FINITE
     //
     ODDERON_DIAG_69,
     ODDERON_DIAG_72,
