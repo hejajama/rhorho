@@ -782,6 +782,63 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
             norm = -(CF - (NC+1.)/2.)*(1./4. + 1./4.) * 6.;
+            break;
+            
+        case ODDERON_DIAG_139:
+            A = p2*z2 - kg*(1.-z2);
+            B = p1*z1 - kg;
+            A2 = A;
+            B2 = (p1 - (q1+q3))*z1 - kg;
+            ktilde_1 = k1 + q*x1 - (q1+q3) - kg + K*xg;
+            ktilde_2 = k2 + q*x2 + kg - K*xg;
+            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
+            break;
+        
+        case ODDERON_DIAG_140:
+            A = p2*z2 - kg*(1.-z2);
+            B = p1*z1 - kg;
+            A2 = (p2-q3)*z2 - kg*(1.-z2);
+            B2 = (p1-q1)*z1 - kg;
+            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
+            break;
+        
+        case ODDERON_DIAG_141:
+            A = p2*z2 - kg*(1.-z2);
+            B = p1*z1 - kg;
+            A2 = A;
+            B2 = (p1-q1)*z1 - kg;
+            ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 + kg - K*xg;
+            norm = -(2.0*CF + (NC + 1.)/2.) * 1./4. * 6.;
+            break;
+            
+        case ODDERON_DIAG_142:
+            A = p2*z2 - kg*(1.-z2);
+            B = p1*z1 - kg;
+            A2 = (p2-q1)*z2 - kg*(1.-z2);
+            B2 = (p1 - (q2+q3))*z1 - kg;
+            ktilde_1 = k1 + q*x1 - (q2+q3) - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
+            norm = (CF - (NC+1.)/2.)*1./4.* 6.;
+            break;
+            
+        case ODDERON_DIAG_143:
+            A = p2*z2 - kg*(1.-z2);
+            B = p1*z1 - kg;
+            A2 = (p2 - (q1+q3))*z2 - kg*(1.-z2);
+            B2 = (p1-q2)*z1 - kg;
+            ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
+            norm = (CF - (NC+1.)/2.)*1./4. * 6.;
+            break;
+            
+        case ODDERON_DIAG_144:
+            A = p2*z2 - kg*(1.-z2);
+            B = p1*z1 - kg;
+            A2 = (p2-q1)*z2 - kg*(1.-z2);
+            B2 = (p1-q2)*z1 - kg;
+            norm = -(CF- (NC+1.)/2.) * (1./4. + 1./4.) * 6.;
+            break;
             
         default:
             cerr << "Unknown diagram in inthelperf_mc_diag2b: " << par->diag << endl;
