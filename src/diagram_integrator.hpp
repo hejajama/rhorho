@@ -137,7 +137,6 @@ enum Diagram
     ODDERON_DIAG_106,
     ODDERON_DIAG_107,
     
-    // totally not tested
     ODDERON_DIAG_92,
     ODDERON_DIAG_111,
     ODDERON_DIAG_112,
@@ -151,6 +150,15 @@ enum Diagram
     ODDERON_DIAG_129,
     ODDERON_DIAG_130,
     ODDERON_DIAG_131,
+    
+    // UV finite operator J
+    ODDERON_DIAG_133,
+    ODDERON_DIAG_134,
+    ODDERON_DIAG_135,
+    
+    ODDERON_DIAG_136,
+    ODDERON_DIAG_137,
+    ODDERON_DIAG_138,
     
     
 };
@@ -184,6 +192,8 @@ const std::string DIAGRAM_STRINGS[] = {"2a", "3a", "3a_2", "3b", "3b_2", "5a", "
     "odderon_92", "odderon_111", "odderon_112", "odderon_113",
     "odderon_95", "odderon_123", "odderon_124", "odderon_125",
     "odderon_129", "odderon_130", "odderon_131",
+    "odderon_133", "odderon_134", "odderon_135",
+    "odderon_136", "odderon_137", "odderon_138"
     
 };
 const int NUM_OF_DIAGRAMS = sizeof(DIAGRAM_STRINGS)/sizeof(std::string);
@@ -330,6 +340,14 @@ const Diagram DIAGRAMS[] = {
     ODDERON_DIAG_129,
     ODDERON_DIAG_130,
     ODDERON_DIAG_131,
+    
+    ODDERON_DIAG_133,
+    ODDERON_DIAG_134,
+    ODDERON_DIAG_135,
+    
+    ODDERON_DIAG_136,
+    ODDERON_DIAG_137,
+    ODDERON_DIAG_138,
 };
 
 const double NC=3;

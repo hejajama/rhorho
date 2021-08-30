@@ -113,6 +113,9 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     
     Vec ktilde_1; Vec ktilde_2;
     Vec A,B;
+    Vec A2(0,0);
+    Vec B2(0,0); // J operator for oddero nneeds
+    
     double f_xg=std::sqrt(x1*x2/((x1-xg)*(x2+xg))) * (1. - (z1+z2)/2. + z1*z2/6.);
     double norm=1; // normalization * symmetry factor
     
@@ -637,7 +640,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             norm = (CF - 1./2. - 1./(2.*NC))*1./4. * 6.;
             break;
             
-        case ODDERON_DIAG_92: // ei yliviivatty padissa
+        case ODDERON_DIAG_92:
             A = p1*z1 - kg;
             B = p2*z2 - (kg-q3)*(1.-z2);
             ktilde_1 = k1 + q*x1 - kg + K*xg - q1;
@@ -675,6 +678,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             ktilde_1 = k1 + q*x1 - kg + K*xg - q2;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
             norm = (-NC/4. + 1./4.*NC/2.)*6.;
+            break;
             
         case ODDERON_DIAG_123:
             A = p1*z1 - kg;
@@ -690,6 +694,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
             norm = ((CF - 1.)*1./4. + (CF-NC/2.)*1./4.)*6.;
+            break;
             
         case ODDERON_DIAG_125:
             A = p1*z1 - kg;
@@ -713,6 +718,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
             norm = (2.*CF-1./2. - NC/2.)*1./4. * 6.;
+            break;
             
         case ODDERON_DIAG_131:
             A = p1*z1 - kg;
@@ -721,6 +727,61 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             ktilde_2 = k2 + q*x2 + kg - K*xg;
             norm = CF*(2.-NC)*1./4.*6.;
             break;
+            
+        case ODDERON_DIAG_133:
+            A = p2*z2 - kg*(1.-z2);
+            B = p1*z1 - kg;
+            A2 = A;
+            B2 = (p1-q)*z1 - kg;
+            ktilde_1 = k1 + q*x1 - q - kg + K*xg;
+            ktilde_2 = k2 + q*x2 + kg - K*xg;
+            norm = CF*1./4. * 6.;
+            break;
+        
+        case ODDERON_DIAG_134:
+            A = p2*z2 - kg*(1.-z2);
+            B = p1*z1 - kg;
+            A2 = (p2-q3)*z2 - kg*(1.-z2);
+            B2 = (p1-(q1+q2))*z1 - kg;
+            norm = (CF - (NC+1.)/2.)*1./4. * 6.;
+            break;
+            
+        case ODDERON_DIAG_135:
+            A = p2*z2 - kg*(1.-z2);
+            B = p1*z1 - kg;
+            A2 = A;
+            B2 = (p1-(q1+q2))*z1 - kg;
+            ktilde_1 = k1 + q*x1 - (q1+q2) - kg + K*xg;
+            ktilde_2 = k2 + q*x2 + kg - K*xg;
+            norm = -(2.0*CF-(NC+1.)/2.) * 1./4.*6.;
+            break;
+            
+        case ODDERON_DIAG_136:
+            A = p2*z2 - kg*(1.-z2);
+            B = p1*z1 - kg;
+            A2 = (p2-q2)*z2 - kg*(1.-z2);
+            B2 = (p1-(q1+q3))*z1 - kg;
+            norm = (CF - (NC+1.)/2.) * 1./4. * 6.;
+            break;
+            
+        case ODDERON_DIAG_137:
+            A = p2*z2 - kg*(1.-z2);
+            B = p1*z1 - kg;
+            A2 = (p2-(q2+q3))*z2 - kg*(1.-z2);
+            B2 = (p1-q1)*z1 - kg;
+            ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q2+q3) + kg - K*xg;
+            norm = (CF - (NC+1.)/2.) * 1./4. * 6.;
+            break;
+            
+        case ODDERON_DIAG_138:
+            A = p2*z2 - kg*(1.-z2);
+            B = p1*z1 - kg;
+            A2 = (p2-q2)*z2 - kg*(1.-z2);
+            B2 = (p1-q1)*z1 - kg;
+            ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
+            norm = -(CF - (NC+1.)/2.)*(1./4. + 1./4.) * 6.;
             
         default:
             cerr << "Unknown diagram in inthelperf_mc_diag2b: " << par->diag << endl;
@@ -740,7 +801,8 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     if (par->integrator->CollinearCutoffUVFinite())
         dotprod = (A*B) / ( (A.LenSqr()+mf*mf)*(B.LenSqr()+mf*mf));
     else
-        dotprod =(A*B)/(A.LenSqr()*B.LenSqr());
+        dotprod =(A*B)/(A.LenSqr()*B.LenSqr()) + (A2*B2)/(A2.LenSqr()*B2.LenSqr());
+    // Note: odderon graphs with J operator (that result in nonzero A2,B2) do not support CollinearCutoffUVFinite
     
     double res = norm*wf1*wf2*f_xg*dotprod;
     
