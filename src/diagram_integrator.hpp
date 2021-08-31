@@ -168,6 +168,26 @@ enum Diagram
     ODDERON_DIAG_143,
     ODDERON_DIAG_144,
     
+    ODDERON_DIAG_145,
+    ODDERON_DIAG_146,
+    ODDERON_DIAG_147,
+    
+    ODDERON_DIAG_148,
+    ODDERON_DIAG_149,
+    ODDERON_DIAG_150,
+    
+    ODDERON_DIAG_151,
+    ODDERON_DIAG_152,
+    ODDERON_DIAG_153,
+    
+    ODDERON_DIAG_154,
+    ODDERON_DIAG_155,
+    ODDERON_DIAG_156,
+    
+    ODDERON_DIAG_157,
+    ODDERON_DIAG_158,
+    ODDERON_DIAG_159,
+    
 };
 //const int NUM_OF_DIAGRAMS = 35+9+6+6+4+3+4+4+4+4+3;
 
@@ -203,6 +223,11 @@ const std::string DIAGRAM_STRINGS[] = {"2a", "3a", "3a_2", "3b", "3b_2", "5a", "
     "odderon_136", "odderon_137", "odderon_138",
     "odderon_139", "odderon_140", "odderon_141",
     "odderon_142", "odderon_143", "odderon_144",
+    "odderon_145", "odderon_146", "odderon_147",
+    "odderon_148", "odderon_149", "odderon_150",
+    "odderon_151", "odderon_152", "odderon_153",
+    "odderon_154", "odderon_155", "odderon_156",
+    "odderon_157", "odderon_158", "odderon_159",
     
 };
 const int NUM_OF_DIAGRAMS = sizeof(DIAGRAM_STRINGS)/sizeof(std::string);
@@ -365,6 +390,26 @@ const Diagram DIAGRAMS[] = {
     ODDERON_DIAG_142,
     ODDERON_DIAG_143,
     ODDERON_DIAG_144,
+    
+    ODDERON_DIAG_145,
+    ODDERON_DIAG_146,
+    ODDERON_DIAG_147,
+    
+    ODDERON_DIAG_148,
+    ODDERON_DIAG_149,
+    ODDERON_DIAG_150,
+    
+    ODDERON_DIAG_151,
+    ODDERON_DIAG_152,
+    ODDERON_DIAG_153,
+    
+    ODDERON_DIAG_154,
+    ODDERON_DIAG_155,
+    ODDERON_DIAG_156,
+    
+    ODDERON_DIAG_157,
+    ODDERON_DIAG_158,
+    ODDERON_DIAG_159,
 };
 
 const double NC=3;
