@@ -743,6 +743,8 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q3)*z2 - kg*(1.-z2);
             B2 = (p1-(q1+q2))*z1 - kg;
+            ktilde_1 = k1 + q*x1 - (q1+q2) - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
             norm = (CF - (NC+1.)/2.)*1./4. * 6.;
             break;
             
@@ -761,6 +763,8 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q2)*z2 - kg*(1.-z2);
             B2 = (p1-(q1+q3))*z1 - kg;
+            ktilde_1 = k1 + q*x1 - (q1+q3) - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
             norm = (CF - (NC+1.)/2.) * 1./4. * 6.;
             break;
             
@@ -799,6 +803,8 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q3)*z2 - kg*(1.-z2);
             B2 = (p1-q1)*z1 - kg;
+            ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
             norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
             break;
         
@@ -837,6 +843,8 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q1)*z2 - kg*(1.-z2);
             B2 = (p1-q2)*z1 - kg;
+            ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
             norm = -(CF- (NC+1.)/2.) * (1./4. + 1./4.) * 6.;
             break;
             
