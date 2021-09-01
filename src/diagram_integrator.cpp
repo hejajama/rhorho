@@ -114,7 +114,8 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     Vec ktilde_1; Vec ktilde_2;
     Vec A,B;
     Vec A2(0,0);
-    Vec B2(0,0); // J operator for oddero nneeds
+    Vec B2(0,0); // J operator for odderon needs these
+    bool include_A2_B2=false;
     
     double f_xg=std::sqrt(x1*x2/((x1-xg)*(x2+xg))) * (1. - (z1+z2)/2. + z1*z2/6.);
     double norm=1; // normalization * symmetry factor
@@ -733,6 +734,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = A;
             B2 = (p1-q)*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
             norm = CF*1./4. * 6.;
@@ -743,6 +745,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q3)*z2 - kg*(1.-z2);
             B2 = (p1-(q1+q2))*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q1+q2) - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
             norm = (CF - (NC+1.)/2.)*1./4. * 6.;
@@ -753,6 +756,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = A;
             B2 = (p1-(q1+q2))*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q1+q2) - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
             norm = -(2.0*CF-(NC+1.)/2.) * 1./4.*6.;
@@ -763,6 +767,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q2)*z2 - kg*(1.-z2);
             B2 = (p1-(q1+q3))*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q1+q3) - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
             norm = (CF - (NC+1.)/2.) * 1./4. * 6.;
@@ -773,6 +778,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-(q2+q3))*z2 - kg*(1.-z2);
             B2 = (p1-q1)*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q2+q3) + kg - K*xg;
             norm = (CF - (NC+1.)/2.) * 1./4. * 6.;
@@ -783,6 +789,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q2)*z2 - kg*(1.-z2);
             B2 = (p1-q1)*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
             norm = -(CF - (NC+1.)/2.)*(1./4. + 1./4.) * 6.;
@@ -793,6 +800,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = A;
             B2 = (p1 - (q1+q3))*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q1+q3) - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
             norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
@@ -803,6 +811,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q3)*z2 - kg*(1.-z2);
             B2 = (p1-q1)*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
             norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
@@ -813,9 +822,10 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = A;
             B2 = (p1-q1)*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -(2.0*CF + (NC + 1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC + 1.)/2.) * 1./4. * 6.;
             break;
             
         case ODDERON_DIAG_142:
@@ -823,6 +833,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q1)*z2 - kg*(1.-z2);
             B2 = (p1 - (q2+q3))*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q2+q3) - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
             norm = (CF - (NC+1.)/2.)*1./4.* 6.;
@@ -833,6 +844,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2 - (q1+q3))*z2 - kg*(1.-z2);
             B2 = (p1-q2)*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
             norm = (CF - (NC+1.)/2.)*1./4. * 6.;
@@ -843,6 +855,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q1)*z2 - kg*(1.-z2);
             B2 = (p1-q2)*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
             norm = -(CF- (NC+1.)/2.) * (1./4. + 1./4.) * 6.;
@@ -853,6 +866,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2 - (q1+q2))*z2 - kg*(1.-z2);
             B2 = (p1-q3)*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q3 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
             norm = (CF - (NC+1.)/2.) * 1./4. * 6.;
@@ -863,6 +877,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q)*z2 - kg*(1.-z2);
             B2 = B;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q + kg - K*xg;
             norm = CF*1./4. * 6.;
@@ -873,6 +888,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-(q1+q2))*z2 - kg*(1.-z2);
             B2=B;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg +K*xg;
             ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
             norm = -(2.*CF - (NC+1.)/2.)*1./4. * 6.;
@@ -883,6 +899,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q1)*z2 - kg*(1.-z2);
             B2 = (p1-q3)*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1+q*x1 - q3 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q1 + kg -K*xg;
             norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
@@ -894,6 +911,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-(q1+q3))*z2 - kg*(1.-z2);
             B2=B;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
             norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
@@ -905,6 +923,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q1)*z2 - kg*(1.-z2);
             B2 = B;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2  =k2 + q*x2 - q1 + kg - K*xg;
             norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
@@ -915,6 +934,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = A;
             B2 = (p1-(q2+q3))*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q2+q3) - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
             norm = -(2.0*CF - (NC+1.)/2.)*1./4. * 6.;
@@ -925,6 +945,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q3)*z2 - kg*(1.-z2);
             B2 = (p1-q2)*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
             norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
@@ -935,6 +956,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = A;
             B2 = (p1-q2)*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
             norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
@@ -945,6 +967,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q2)*z2 - kg*(1.-z2);
             B2 = (p1-q3)*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q3 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
             norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
@@ -955,6 +978,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2 - (q2+q3))*z2 - kg*(1.-z2);
             B2 = B;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q2+q3) + kg - K*xg;
             norm = -(2.0 * CF - (NC+1.)/2.) * 1./4. * 6.;
@@ -965,6 +989,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q2)*z2 - kg*(1.-z2);
             B2 = B;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
             norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
@@ -975,6 +1000,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = A;
             B2 = (p1-q3)*z1 - kg;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q3 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
             norm = -(2.0*CF - (NC+1.)/2.)*1./4. * 6.;
@@ -985,6 +1011,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             A2 = (p2-q3)*z2 - kg*(1.-z2);
             B2 = B;
+            include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
             norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
@@ -1013,11 +1040,17 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     double wf2 = par->integrator->GetProton().WaveFunction(ktilde_1,ktilde_2,x1-xg, x2+xg);
     
     double dotprod = 0;
+    
     double mf = par->integrator->GetMf();
     if (par->integrator->CollinearCutoffUVFinite())
         dotprod = (A*B) / ( (A.LenSqr()+mf*mf)*(B.LenSqr()+mf*mf));
     else
+    {
+        if (include_A2_B2 == true)
         dotprod =(A*B)/(A.LenSqr()*B.LenSqr()) + (A2*B2)/(A2.LenSqr()*B2.LenSqr());
+        else
+            dotprod =(A*B)/(A.LenSqr()*B.LenSqr());
+    }
     // Note: odderon graphs with J operator (that result in nonzero A2,B2) do not support CollinearCutoffUVFinite
     
     double res = norm*wf1*wf2*f_xg*dotprod;
