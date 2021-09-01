@@ -432,6 +432,39 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             norm = -NC/(2.*4.) * 6.;
             break;
             
+        case ODDERON_DIAG_73:
+            A = p1*z1 - kg;
+            B = (p2-q2)*z2 - (kg - (q1+q3))*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q + kg - K*xg;
+            norm = -1./4. * NC/2. * 6.;
+            break;
+            
+        case ODDERON_DIAG_84:
+            A = p1*z1 - kg;
+            B = (p2-q2)*z2 - (kg-q1)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg - q3;
+            ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
+            norm = NC/2. * 1./4. * 6.;
+            break;
+            
+        case ODDERON_DIAG_87:
+            A = p1*z1 - kg;
+            B = (p2-(q2+q3))*z2 - (kg-q2)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q + kg - K*xg;
+            norm = NC/2. * 1./4. * 6.;
+            break;
+            
+        case ODDERON_DIAG_96:
+            A = p1*z1 -kg;
+            B = (p2-q2)*z2 - (kg-q1)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
+            norm = (-NC/4. + 1./4. * NC/2. )* 6.;
+            break;
+            
+            
         case ODDERON_DIAG_74:
             A = p1*z1 - kg;
             B = (p2 - q1)*z2 - (kg - (q2+q3))*(1.-z2);
@@ -728,6 +761,71 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             ktilde_2 = k2 + q*x2 + kg - K*xg;
             norm = CF*(2.-NC)*1./4.*6.;
             break;
+            
+        case ODDERON_DIAG_98:
+            A = p1*z1 - kg;
+            B = (p2-q1)*z2 - (kg-q3)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
+            norm = (-NC/4. + 1./4. * NC/2.) * 6.;
+            break;
+            
+        case ODDERON_DIAG_120:
+            A = p1*z1 - kg;
+            B = (p2-q1)*z2 - kg*(1.-z2);
+            ktilde_1 = k1 + q*x1 - q3 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
+            norm = ((CF-1.)*1./4. + (CF-NC/2.)*1./4.)*6.;
+            break;
+            
+        case ODDERON_DIAG_121:
+            A = p1*z1 - kg;
+            B = (p2-(q1+q3))*z2 - kg*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
+            norm = (2.0*CF - 1./2. - NC/2.)*1./4. * 6.;
+            break;
+            
+        case ODDERON_DIAG_122:
+            A = p1*z1 - kg;
+            B = (p2-q1)*z2 - kg*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
+            norm = (2.0*CF - 1./2. - NC/2.)*1./4. * 6.;
+            break;
+            
+        case ODDERON_DIAG_101:
+            A =p1*z1 - kg;
+            B = (p2-q2)*z2 - (kg-q3)*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q2+q3) + kg - K*xg;
+            norm = (-NC/4. + 1./4. * NC/2.) * 6.;
+            break;
+            
+        case ODDERON_DIAG_126:
+            A = p1*z1 - kg;
+            B = (p2-q2)*z2 - kg*(1.-z2);
+            ktilde_1 = k1 + q*x1 - q3 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
+            norm = ((CF-1.)*1./4. + (CF-NC/2.)*1./4.)*6.;
+            break;
+            
+        case ODDERON_DIAG_127:
+            A = p1*z1 - kg;
+            B = (p2-(q2+q3))*z2 - kg*(1.-z2);
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 - (q2+q3) + kg - K*xg;
+            norm = (2.0*CF - 1./2. - NC/2.) * 1./4. * 6.;
+            break;
+            
+        case ODDERON_DIAG_128:
+            A = p1*z1 - kg;
+            B = (p2-q2)*z2 - kg*(1.-z2);
+            ktilde_1 = (p2-q2)*z2 - kg*(1.-z2);
+            ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
+            norm = (2.0*CF - 1./2. - NC/2.)*1./4. * 6.;
+            break;
+            
             
         case ODDERON_DIAG_133:
             A = p2*z2 - kg*(1.-z2);

@@ -104,6 +104,12 @@ enum Diagram
     ODDERON_DIAG_82,
     ODDERON_DIAG_91,
     
+    ODDERON_DIAG_73,
+    ODDERON_DIAG_84,
+    ODDERON_DIAG_87,
+    ODDERON_DIAG_96,
+    
+    
     ODDERON_DIAG_74,
     ODDERON_DIAG_85,
     ODDERON_DIAG_88,
@@ -150,6 +156,16 @@ enum Diagram
     ODDERON_DIAG_129,
     ODDERON_DIAG_130,
     ODDERON_DIAG_131,
+    
+    ODDERON_DIAG_98,
+    ODDERON_DIAG_120,
+    ODDERON_DIAG_121,
+    ODDERON_DIAG_122,
+    
+    ODDERON_DIAG_101,
+    ODDERON_DIAG_126,
+    ODDERON_DIAG_127,
+    ODDERON_DIAG_128,
     
     // UV finite operator J
     ODDERON_DIAG_133,
@@ -209,6 +225,7 @@ const std::string DIAGRAM_STRINGS[] = {"2a", "3a", "3a_2", "3b", "3b_2", "5a", "
     "odderon_69", "odderon_72", "odderon_75",
     "odderon_70", "odderon_78", "odderon_81", "odderon_90",
     "odderon_71", "odderon_79", "odderon_82", "odderon_91",
+    "odderon_73", "odderon_84", "odderon_87", "odderon_96",
     "odderon_74", "odderon_85", "odderon_88", "odderon_97",
     "odderon_89", "odderon_117", "odderon_118", "odderon_119",
     "odderon_76", "odderon_93", "odderon_99",
@@ -219,6 +236,8 @@ const std::string DIAGRAM_STRINGS[] = {"2a", "3a", "3a_2", "3b", "3b_2", "5a", "
     "odderon_92", "odderon_111", "odderon_112", "odderon_113",
     "odderon_95", "odderon_123", "odderon_124", "odderon_125",
     "odderon_129", "odderon_130", "odderon_131",
+    "odderon_98", "odderon_120", "odderon_121", "odderon_122",
+    "odderon_101", "odderon_126", "odderon_127", "odderon_128",
     "odderon_133", "odderon_134", "odderon_135",
     "odderon_136", "odderon_137", "odderon_138",
     "odderon_139", "odderon_140", "odderon_141",
@@ -327,6 +346,11 @@ const Diagram DIAGRAMS[] = {
     ODDERON_DIAG_82,
     ODDERON_DIAG_91,
     
+    ODDERON_DIAG_73,
+    ODDERON_DIAG_84,
+    ODDERON_DIAG_87,
+    ODDERON_DIAG_96,
+    
     ODDERON_DIAG_74,
     ODDERON_DIAG_85,
     ODDERON_DIAG_88,
@@ -374,6 +398,16 @@ const Diagram DIAGRAMS[] = {
     ODDERON_DIAG_129,
     ODDERON_DIAG_130,
     ODDERON_DIAG_131,
+    
+    ODDERON_DIAG_98,
+    ODDERON_DIAG_120,
+    ODDERON_DIAG_121,
+    ODDERON_DIAG_122,
+    
+    ODDERON_DIAG_101,
+    ODDERON_DIAG_126,
+    ODDERON_DIAG_127,
+    ODDERON_DIAG_128,
     
     ODDERON_DIAG_133,
     ODDERON_DIAG_134,
