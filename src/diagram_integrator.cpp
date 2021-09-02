@@ -574,13 +574,13 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = (p2-q3)*z2 - (kg-q2)*(1.-z2);
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q2+q3) + kg - K*xg;
-            norm = (-NC/4. + 1./4.*NC/2.);
+            norm = (-NC/4. + 1./4.*NC/2.) * 6.;
             break;
             
         case ODDERON_DIAG_86:
             A = p1*z1 - kg;
             B = (p2-q1)*z2 - (kg-q3)*(1.-z2);
-            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_1 = k1 + q*x1 - kg + K*xg - q2;
             ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
             norm = NC/2. * 1./4. * 6.;
             break;
