@@ -134,7 +134,33 @@ int main(int argc, char* argv[])
     
     cout << integrator->InfoStr();
     
-    if ( diag==DIAG_2A or diag == DIAG_3A or diag == DIAG_3A_2 or diag == DIAG_3B or diag == DIAG_3B_2 or diag == DIAG_5A or diag == DIAG_5C or diag == DIAG_5C_1)
+    if ( diag==DIAG_2A or diag == DIAG_3A or diag == DIAG_3A_2 or diag == DIAG_3B or diag == DIAG_3B_2 or diag == DIAG_5A or diag == DIAG_5C or diag == DIAG_5C_1
+        or diag == ODDERON_DIAG_14
+        or diag == ODDERON_DIAG_15
+        or diag == ODDERON_DIAG_16
+        or diag == ODDERON_DIAG_17
+        or diag == ODDERON_DIAG_20
+        or diag == ODDERON_DIAG_21
+        or diag == ODDERON_DIAG_22
+        or diag == ODDERON_DIAG_36
+        or diag == ODDERON_DIAG_37
+        or diag == ODDERON_DIAG_18
+        or diag == ODDERON_DIAG_29
+        or diag == ODDERON_DIAG_32
+        or diag == ODDERON_DIAG_38
+        or diag == ODDERON_DIAG_39
+        or diag == ODDERON_DIAG_40
+        or diag == ODDERON_DIAG_19
+        or diag == ODDERON_DIAG_30
+        or diag == ODDERON_DIAG_33
+        or diag == ODDERON_DIAG_41
+        or diag == ODDERON_DIAG_42
+        or diag == ODDERON_DIAG_48
+        or diag == ODDERON_DIAG_31
+        or diag == ODDERON_DIAG_34
+        or diag == ODDERON_DIAG_43
+        or diag == ODDERON_DIAG_49
+        )
         mcintpoints /= 70; // there is one more intergal
                             // within the MC integral
     
