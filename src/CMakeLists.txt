@@ -8,6 +8,7 @@ add_library(
 	proton.cpp
 	diagram_integrator.cpp
 	interpolation.cpp
+	odderon_ft.cpp
 )
 
 add_executable(

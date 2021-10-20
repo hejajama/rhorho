@@ -42,17 +42,50 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
     if (x1+x2 >=1) return 0;
     
     double wf1 = par->integrator->GetProton().WaveFunction( p1, p2, x1,  x2);
+    double wf2=0;
+    
+    if (par->diag == DIAG_LO)
+    {
+        wf2 =par->integrator->GetProton().WaveFunction(k1 - (q1+q2)*(1.-x1), k2+(q1+q2)*x2, x1, x2)
+        - 0.5*par->integrator->GetProton().WaveFunction(k1+(q1+q2)*x1-q1, k2+(q1+q2)*x2-q2, x1, x2)
+        - 0.5*par->integrator->GetProton().WaveFunction(k1+(q1+q2)*x1-q2, k2+(q1+q2)*x2-q1, x1, x2);
+    
+        wf2 *= 1./6.*3; // 3 is the symmetry factor and 1/6 the normalization in Risto (77)
+    }
+    else if (par->diag == ODDERON_LO)
+    {
+        Vec q3 = par->q3;
+        
+        Vec K = q1*(-1) - q2 - q3;
+        
+        // Risto, Adrian (35)
+        // note that they use q=q1+q2+q3, I write this in
+        // temrs of K = -q
+        // tr(t^a t^b t^c) = 1/4 d^(abc)
+        
+        // So normalization factor is
+        // 1/4 * 1./6. * 3
+        // 1/4 from tr(), 1/6 prefactor, 3 symmetry factor
+        double norm = 1./4. * 1./6. * 3.;
+        
+        wf2 = par->integrator->GetProton().WaveFunction(p1-q1-q2-q3-K*x1, p2-K*x2, x1,x2)
+        - par->integrator->GetProton().WaveFunction(p1-q1-K*x1, p2-q2-q3-K*x2, x1,x2)
+        - par->integrator->GetProton().WaveFunction(p1-q1-q3-K*x1, p2-q2-K*x2, x1, x2)
+        - par->integrator->GetProton().WaveFunction(p1-q1-q2-K*x1, p2-q3-K*x2, x1, x2)
+        + 2.0*par->integrator->GetProton().WaveFunction(p1-q1-K*x1, p2-q2-K*x2, x1, x2);
+        
+        wf2 = wf2*norm;
+        // Now normalization such that I compute
+        // Such that I compute g^3 G_3- = this*d^(abc)*g^3
+    }
     
     
-    // Risto (77)
-    double wf2 =par->integrator->GetProton().WaveFunction(k1 - (q1+q2)*(1.-x1), k2+(q1+q2)*x2, x1, x2)
-    - 0.5*par->integrator->GetProton().WaveFunction(k1+(q1+q2)*x1-q1, k2+(q1+q2)*x2-q2, x1, x2)
-    - 0.5*par->integrator->GetProton().WaveFunction(k1+(q1+q2)*x1-q2, k2+(q1+q2)*x2-q1, x1, x2);
+    
     
     if (isnan(wf1) or isnan(wf2))
         cerr <<"Note: WF NaN at x1 " << x1 << " x2 "<<  x2 << " k1 " << k1 << " k2 " << k2 << " q1 " << q1 << " q2 " << q2 << endl;
     
-    double res = wf1*wf2 * 1./6.*3; // 3 is the symmetry factor and 1/6 the normalization in Risto (77)
+    double res = wf1*wf2;
     
     // 16pi^3 because NLO diagrams do not include 1/(16pi^3) prefactor
     // Python analysis notebook divides by 1/16pi^3
@@ -60,6 +93,8 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
     
 
 }
+
+
 
 /*
  * UV finite diagrams
@@ -1475,7 +1510,7 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
             
         
         default:
-            std::cerr << "Unknown diagram " << par->diag << " encountered!" << std::endl;
+            std::cerr << "Unknown diagram " << par->diag << " encountered in inthelperf_mc_diag2a!" << std::endl;
             exit(1);
     }
     
@@ -1547,6 +1582,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 
     double xup=1.-0.0001;
     double xlow = x;
     
+    
     //double lower[6]={-KLIM,-KLIM,-KLIM,-KLIM,xlim,xlim};
     //double upper[6]={KLIM,KLIM,KLIM,KLIM,1.-xlim,1.-xlim};
     
@@ -1563,6 +1599,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 
         case DIAG_5C:
         case DIAG_5C_1:
         case DIAG_LO:
+        case ODDERON_LO:
         case ODDERON_DIAG_14:
         case ODDERON_DIAG_15:
         case ODDERON_DIAG_16:
@@ -1609,7 +1646,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 
             break;
     }
     
-    if (diag == DIAG_LO)
+    if (diag == DIAG_LO or diag == ODDERON_LO)
         F.f = inthelperf_mc_lo;
     
     Interpolator *F_b_interp;

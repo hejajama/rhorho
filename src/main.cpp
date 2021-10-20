@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
         // Odderon Ward test q1 -> 0, q2,q3 fixed
         Vec q2(0.4,0.51);
         Vec q1(-0.25,0.6);
-        for (double q=0.01; q<0.4; q+=0.05)
+        for (double q=0.001; q<0.4; q+=0.05)
         {
             //Vec q1(q,0);
             Vec q3(q/std::sqrt(2.), q/std::sqrt(2.));
@@ -431,7 +431,31 @@ int main(int argc, char* argv[])
     
     else if (mode == MIXED_SPACE_BRUTEFORCE)
            {
+               // Odderon, q12=q23=0
+               const double MINB = 0;
+               const double MAXB = 6;
+               const int BPOINTS = 40;
+               const double BSTEP = (MAXB-MINB)/(BPOINTS-1);
+               Vec nullvec(0,0,0);
+               double *dipoles = new double[BPOINTS];
                
+               for (int i=0; i<BPOINTS; i++)
+               {
+                   double b = MINB + i*BSTEP;
+                   Vec bv(b*std::cos(theta_b_q),b*std::sin(theta_b_q));
+                   double d = integrator->OdderonG2b(bv, nullvec, nullvec, diag);
+                   dipoles[i]=d;
+               }
+               for (int i=0; i<BPOINTS; i++)
+               {
+                   double b = MINB + i*BSTEP;
+                   cout << b << " " << dipoles[i] << endl;
+               }
+               
+               
+               
+               // Dipole code commented out for now
+               /*
                Vec q12v(q12,0);
                cout <<"#  Mixed space, q12=" << q12 << " angle " << theta_b_q << endl;
                
@@ -454,6 +478,7 @@ int main(int argc, char* argv[])
                    double b = MINB + i*BSTEP;
                    cout << b << " " << dipoles[i] << endl;
                }
+                */
                
                delete[] dipoles;
                

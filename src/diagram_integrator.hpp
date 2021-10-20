@@ -204,6 +204,8 @@ enum Diagram
     ODDERON_DIAG_158,
     ODDERON_DIAG_159,
     
+    ODDERON_LO,
+    
 };
 //const int NUM_OF_DIAGRAMS = 35+9+6+6+4+3+4+4+4+4+3;
 
@@ -247,6 +249,8 @@ const std::string DIAGRAM_STRINGS[] = {"2a", "3a", "3a_2", "3b", "3b_2", "5a", "
     "odderon_151", "odderon_152", "odderon_153",
     "odderon_154", "odderon_155", "odderon_156",
     "odderon_157", "odderon_158", "odderon_159",
+    
+    "odderon_lo"
     
 };
 const int NUM_OF_DIAGRAMS = sizeof(DIAGRAM_STRINGS)/sizeof(std::string);
@@ -444,6 +448,8 @@ const Diagram DIAGRAMS[] = {
     ODDERON_DIAG_157,
     ODDERON_DIAG_158,
     ODDERON_DIAG_159,
+    
+    ODDERON_LO
 };
 
 const double NC=3;
@@ -489,6 +495,9 @@ public:
     bool CollinearCutoffUVFinite() { return collinear_cutoff_uv_finite; }
     void SetCollinearCutoffUVFinite(bool s){ collinear_cutoff_uv_finite=s; }
     
+    // Odderon FT
+    double OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag); // q12=q23=0
+    
 private:
     double mf;      // Quark mass
     IntegrationMethod intmethod;
@@ -502,6 +511,9 @@ private:
     bool collinear_cutoff_uv_finite; // Use collinear cutoff (m) in UV finite diagrams also
 };
 
+double inthelperf_mc_lo(double *vec, size_t dim, void* p);
+double inthelperf_mc_diag2b(double *vec, size_t dim, void* p);
+double inthelperf_mc_diag2a(double *vec, size_t dim, void* p);
 
 struct inthelper_diagint
 {
