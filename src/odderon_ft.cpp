@@ -77,10 +77,13 @@ double inthelperf_mc_odderon_mixedspace(double *vec, size_t dim, void* p)
     else
     {
         K =  Vec(vec[9]*std::cos(vec[10]),vec[9]*std::sin(vec[10]));
-        qv1= q12*0.5 - K*0.5;
-        qv2= q12*(-0.5) - K*0.5;
+        qv1 = (q12*2. + q23 - K)*(1./3.);
+        qv2 = (q12*(-1) + q23 - K)*(1./3.);
+        qv3 = (q12 + q23*2. + K)*(-1./3.);
+        
         momspacehelper.q1 = qv1;
         momspacehelper.q2 = qv2;
+        momspacehelper.q3 = qv3;
         
         double parvec[9] = {vec[0],vec[1],vec[2],vec[3],vec[4],vec[5],vec[6],vec[7],vec[8]};
         momspace = inthelperf_mc_diag2b(parvec, 9, &momspacehelper);

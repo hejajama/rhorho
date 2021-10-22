@@ -160,6 +160,7 @@ int main(int argc, char* argv[])
         or diag == ODDERON_DIAG_34
         or diag == ODDERON_DIAG_43
         or diag == ODDERON_DIAG_49
+        or diag == ODDERON_LO
         )
         mcintpoints /= 70; // there is one more intergal
                             // within the MC integral
