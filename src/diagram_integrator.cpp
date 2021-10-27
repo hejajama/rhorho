@@ -14,7 +14,7 @@
 
 using namespace std;
 
-
+double inthelperf_mc_finitesum(double *vec, size_t dim, void* p);
 
 /*
  * LO diagram
@@ -103,8 +103,16 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
  */
 double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
 {
+    
+    
     if (dim != 9) exit(1);
     inthelper_diagint *par = (inthelper_diagint*)p;
+    
+    // If the integrand is diag sum, use specific integrand funtions
+    if (par->diag == ODDERON_FINITE_SUM)
+    {
+        return inthelperf_mc_finitesum(vec, dim, p);
+    }
     
     Vec k1(vec[0],vec[1]);
     Vec k2(vec[2], vec[3]);

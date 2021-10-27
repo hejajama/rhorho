@@ -134,6 +134,7 @@ int main(int argc, char* argv[])
     
     cout << integrator->InfoStr();
     
+    /*
     if ( diag==DIAG_2A or diag == DIAG_3A or diag == DIAG_3A_2 or diag == DIAG_3B or diag == DIAG_3B_2 or diag == DIAG_5A or diag == DIAG_5C or diag == DIAG_5C_1
         or diag == ODDERON_DIAG_14
         or diag == ODDERON_DIAG_15
@@ -164,6 +165,7 @@ int main(int argc, char* argv[])
         )
         mcintpoints /= 70; // there is one more intergal
                             // within the MC integral
+    */
     
     cout << "# Diagram " << diagram << " id " << diag << " mcintpoints " << mcintpoints << endl << "#" << endl;
     integrator->SetMCIntPoints(mcintpoints);
@@ -216,9 +218,10 @@ int main(int argc, char* argv[])
        //  Vec q2(q/2.,0);
             
 	    // Perpend
-	    Vec q1(q/std::sqrt(2.),0);
-	    Vec q2(0, q/std::sqrt(2.));
-            double d = integrator->IntegrateDiagram(diag, q1, q2);
+            Vec q1(q,0);
+            Vec q2(q,0);
+            Vec q3(q, 0);
+            double d = integrator->IntegrateDiagram(diag, q1, q2, q3);
             if (integrator->Add_Q1Q2_exchange(diag))
             {
                 cout << "#... adding cross graph q1<->q2" << endl;
