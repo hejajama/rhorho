@@ -1914,13 +1914,7 @@ double DiagramIntegrator::MixedSpaceBruteForce(Diagram diag, Vec q12, Vec b)
 ////
 /////// Dipole ampiltude
 
-struct dipole_helper
-{
-    DiagramIntegrator* integrator;
-    Vec r;
-    Vec b;
-    Diagram diag;
-};
+
 
 double inthelperf_mc_dipole(double *vec, size_t dim, void* p)
 {

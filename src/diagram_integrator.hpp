@@ -505,7 +505,8 @@ public:
     void SetCollinearCutoffUVFinite(bool s){ collinear_cutoff_uv_finite=s; }
     
     // Odderon FT
-    double OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag); // q12=q23=0
+    double OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag); 
+    double OdderonAmplitude(Diagram diag, Vec r, Vec b);
     
 private:
     double mf;      // Quark mass
@@ -531,6 +532,14 @@ struct inthelper_diagint
     Vec q2;
     Vec q3;
     Interpolator *F_B_interpolator;
+    Diagram diag;
+};
+
+struct dipole_helper
+{
+    DiagramIntegrator* integrator;
+    Vec r;
+    Vec b;
     Diagram diag;
 };
 

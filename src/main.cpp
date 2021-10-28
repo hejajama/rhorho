@@ -378,7 +378,7 @@ int main(int argc, char* argv[])
         cout << "# r = (r,0)" << endl;
         const double MAXR = 10;
         const double MINR = 0.1;
-        const int rpoints = 30;
+        const int rpoints = 6;
         const double RSTEP = (MAXR-MINR)/rpoints;
         double dipoles[rpoints];
         
@@ -387,7 +387,7 @@ int main(int argc, char* argv[])
         {
             double r = MINR + i*RSTEP;
             Vec rv(r,0);
-            double d = integrator->DipoleAmplitudeBruteForce(diag, rv, bv);
+            double d = integrator->OdderonAmplitude(diag, rv, bv);
             dipoles[i]=d;
         }
         for (int i=0; i<rpoints; i++)
@@ -415,7 +415,7 @@ int main(int argc, char* argv[])
             {
                 double th = MINTH + i*THSTEP;
                 Vec rv(r*std::cos(th),r*std::sin(th));
-                double d = integrator->DipoleAmplitudeBruteForce(diag, rv, bv);
+                double d = integrator->OdderonAmplitude(diag, rv, bv);
                 dipoles[i]=d;
             }
             for (int i=0; i<THPOINTS; i++)
@@ -464,7 +464,7 @@ int main(int argc, char* argv[])
                // Odderon, q12=q23=0
                const double MINB = 0;
                const double MAXB = 6;
-               const int BPOINTS = 40;
+               const int BPOINTS = 10;
                const double BSTEP = (MAXB-MINB)/(BPOINTS-1);
                Vec nullvec(0,0,0);
                double *dipoles = new double[BPOINTS];
