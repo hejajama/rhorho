@@ -18,14 +18,14 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p);
 
 /*
  * LO diagram
- * [k1x,k1y,k2x,k2y,x1,x2]
+ * [k1x,k1y,k2x,k2y,x1,x2] NOW IN RADIAL
  */
 double inthelperf_mc_lo(double *vec, size_t dim, void* p)
 {
     if (dim != 6) exit(1);
     inthelper_diagint *par = (inthelper_diagint*)p;
-    Vec k1(vec[0],vec[1]);
-    Vec k2(vec[2], vec[3]);
+    Vec k1(vec[0]*std::cos(vec[1]),vec[0]*std::sin(vec[1]));
+    Vec k2(vec[2]*std::cos(vec[3]), vec[2]*std::sin(vec[3]));
     Vec q1 = par->q1;
     Vec q2 = par->q2;
     
@@ -89,7 +89,7 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
     
     // 16pi^3 because NLO diagrams do not include 1/(16pi^3) prefactor
     // Python analysis notebook divides by 1/16pi^3
-    return 16.*std::pow(M_PI,3.) * res / (8.0*x1*x2*(1.-x1-x2)*std::pow(2.0*M_PI,6.0));
+    return 16.*std::pow(M_PI,3.) * res * vec[0] * vec[2] / (8.0*x1*x2*(1.-x1-x2)*std::pow(2.0*M_PI,6.0));
     
 
 }
@@ -99,7 +99,7 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
 /*
  * UV finite diagrams
  * Vector components are
- * [k1x,k1y,k2x,k2y,x1,x2,xg,kgx,kgy]
+ * [k1x,k1y,k2x,k2y,x1,x2,xg,kgx,kgy] NOW IN RADIAL COORDIANTES
  */
 double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
 {
@@ -114,9 +114,9 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
         return inthelperf_mc_finitesum(vec, dim, p);
     }
     
-    Vec k1(vec[0],vec[1]);
-    Vec k2(vec[2], vec[3]);
-    Vec kg(vec[7],vec[8]);
+    Vec k1(vec[0]*std::cos(vec[1]), vec[0]*std::sin(vec[1]));
+    Vec k2(vec[2]*std::cos(vec[3]), vec[2]*std::sin(vec[3]));
+    Vec kg(vec[7]*std::cos(vec[8]), vec[7]*std::sin(vec[8]));
     Vec q1 = par->q1;
     Vec q2 = par->q2;
     Vec q3 = par->q3;
@@ -1199,6 +1199,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     res *= inv_xg; // same as res /= xg;
     
     // Jacobian
+    res *= vec[0]*vec[2]*vec[7];
     res /= 8.0*x1*x2*(1.-x1-x2)*std::pow(2.0*M_PI,6.0);
     
     return res;
@@ -1215,8 +1216,8 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
 {
     if (dim != 6) exit(1);
     inthelper_diagint *par = (inthelper_diagint*)p;
-    Vec k1(vec[0],vec[1]);
-    Vec k2(vec[2], vec[3]);
+    Vec k1(vec[0]*std::cos(vec[1]), vec[0]*std::sin(vec[1]));
+    Vec k2(vec[2]*std::cos(vec[3]), vec[2]*std::sin(vec[3]));
     Vec q1 = par->q1;
     Vec q2 = par->q2;
     Vec q3 = par->q3;
@@ -1572,6 +1573,7 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     //cout << l1 << " " << l << " " << wf1 << " " << wf2 << " " << fintb << endl;
     
     // Jacobian
+    result *= vec[0]*vec[2];
     result /= x1*x2*(1.-x1-x2)*8*std::pow(2.0*M_PI,6.);
    
     return 2.0*std::pow(M_PI,3.)*result; // A21 gives 2pi^3
@@ -1846,11 +1848,12 @@ double DiagramIntegrator::MixedSpaceBruteForce(Diagram diag, Vec q12, Vec b)
             F.dim=8;
             lower = new double[F.dim];
             upper = new double [F.dim];
-            lower[0]=lower[1]=lower[2]=lower[3]=-KLIM;
+            lower[0]=lower[1]=lower[2]=lower[3]=0;
             lower[4]=lower[5]=xlow;
             lower[6]=0.01; lower[7]=0; // minK mink theta_k
             
-            upper[0]=upper[1]=upper[2]=upper[3]=KLIM;
+            upper[0]=upper[2]=KLIM;
+            upper[1]=upper[3]=2.0*M_PI;
             upper[4]=upper[5]=xup;
             upper[6]=KLIM; upper[7]=2.0*M_PI; // minK mink theta_k
             break;
@@ -1858,10 +1861,12 @@ double DiagramIntegrator::MixedSpaceBruteForce(Diagram diag, Vec q12, Vec b)
             F.dim=11;
             lower = new double[F.dim];
             upper = new double [F.dim];
-            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=-KLIM;
+            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=0;
             lower[4]=lower[5]=xlow; lower[6]=x;
             lower[9]=0.01; lower[10]=0;
-            upper[0]=upper[1]=upper[2]=upper[3]=upper[7]=upper[8]=KLIM;
+            
+            upper[0]=upper[2]=upper[7]=KLIM;
+            upper[1]=upper[3]=upper[8]=2.0*M_PI;
             upper[4]=upper[5]=upper[6]=xup;
             upper[9]=KLIM; upper[10]=2.0*M_PI;
             
@@ -2136,7 +2141,7 @@ Interpolator* DiagramIntegrator::InitializeInterpolator()
 
 DiagramIntegrator::DiagramIntegrator()
 {
-    mf=0.1;
+    mf=0.2;
     intmethod = VEGAS;
     
     proton.SetBeta(0.55);

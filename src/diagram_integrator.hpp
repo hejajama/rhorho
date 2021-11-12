@@ -207,6 +207,7 @@ enum Diagram
     ODDERON_LO,
     
     ODDERON_FINITE_SUM,
+    ODDERON_UV_SUM
     
 };
 //const int NUM_OF_DIAGRAMS = 35+9+6+6+4+3+4+4+4+4+3;
@@ -255,6 +256,7 @@ const std::string DIAGRAM_STRINGS[] = {"2a", "3a", "3a_2", "3b", "3b_2", "5a", "
     "odderon_lo",
     
     "odderon_finite_sum",
+    "odderon_uv_sum"
     
 };
 const int NUM_OF_DIAGRAMS = sizeof(DIAGRAM_STRINGS)/sizeof(std::string);
@@ -456,10 +458,15 @@ const Diagram DIAGRAMS[] = {
     ODDERON_LO,
     
     ODDERON_FINITE_SUM,
+    
+    ODDERON_UV_SUM,
 };
 
 const unsigned int FIRST_UV_FINITE_ODDERON=60;
 const unsigned int LAST_UV_FINITE_ODDERON = 146;
+
+const unsigned int FIRST_UV_DIV_ODDERON=35;
+const unsigned int LAST_UV_DIV_ODDERON=59;
 
 const double NC=3;
 const double CF = (NC*NC-1.)/(2.*NC);
