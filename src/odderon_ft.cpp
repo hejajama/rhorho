@@ -927,7 +927,7 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
 }
 
 
-double intehelperf_mixed_uvsum(double* vec, size_t dim, void* p)
+double intehelperf_mc_uvsum(double* vec, size_t dim, void* p)
 {
     
     
@@ -967,7 +967,7 @@ double intehelperf_mixed_uvsum(double* vec, size_t dim, void* p)
     {
         Diagram diag = DIAGRAMS[di];
         
-        switch(par->diag)
+        switch(diag)
         {
                
             // **** ODD DIAGRAMS, ODDERON ****
@@ -1395,6 +1395,7 @@ double DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
         case ODDERON_DIAG_34:
         case ODDERON_DIAG_43:
         case ODDERON_DIAG_49:
+        case ODDERON_UV_SUM:
             F.dim=8;
             lower = new double[F.dim];
             upper = new double [F.dim];
