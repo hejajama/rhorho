@@ -1252,6 +1252,10 @@ double inthelperf_mc_odderon_mixedspace(double *vec, size_t dim, void* p)
 {
     /*if (dim != 4) exit(1);*/
     mixed_space_odderon_helper *par = (mixed_space_odderon_helper*)p;
+    
+    // Check kinematical boundary x_1+x_2+x_g < 1
+    if (vec[4] + vec[5] >= 1) return 0;
+    
     Vec q12 = par->q12;
     Vec q23 = par->q23;
     Vec b = par->b;
@@ -1279,6 +1283,10 @@ double inthelperf_mc_odderon_mixedspace(double *vec, size_t dim, void* p)
         momspacehelper.q2 = qv2;
         momspacehelper.q3 = qv3;
         
+        // Ward
+        if (qv1.LenSqr() < 1e-15 or qv3.LenSqr() < 1e-15)
+            return 0;
+        
         double loparvec[6]={vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]};
         
         if (par->diag == ODDERON_LO)
@@ -1294,6 +1302,10 @@ double inthelperf_mc_odderon_mixedspace(double *vec, size_t dim, void* p)
         qv2 = (q12*(-1) + q23 - K)*(1./3.);
         qv3 = (q12 + q23*2. + K)*(-1./3.);
         
+        // Ward
+        if (qv1.LenSqr() < 1e-15 or qv3.LenSqr() < 1e-15)
+            return 0;
+        
         momspacehelper.q1 = qv1;
         momspacehelper.q2 = qv2;
         momspacehelper.q3 = qv3;
@@ -1305,9 +1317,7 @@ double inthelperf_mc_odderon_mixedspace(double *vec, size_t dim, void* p)
 
     
     
-    // Ward
-    if (qv1.LenSqr() < 1e-5 or qv2.LenSqr() < 1e-5)
-        return 0;
+ 
     
  
     // Ward limit
@@ -1353,8 +1363,7 @@ double DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
     // Integrate over K, ktheta
 
 
-    double KLIM = 12;
-    double MINK=0.001;
+    double KLIM = 20;
     double xlow=x;
     double xup = 0.999;
     
@@ -1401,12 +1410,14 @@ double DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
             upper = new double [F.dim];
             lower[0]=lower[1]=lower[2]=lower[3]=0;
             lower[4]=lower[5]=xlow;
-            lower[6]=0; lower[7]=0; // minK mink theta_k
+    
+    
+            lower[6]=0; lower[7]=0; // minK minKtheta
             
             upper[0]=upper[2]=KLIM;
             upper[1]=upper[3]=2.0*M_PI;
             upper[4]=upper[5]=xup;
-            upper[6]=KLIM; upper[7]=2.0*M_PI; // minK mink theta_k
+            upper[6]=KLIM; upper[7]=2.0*M_PI; // maxK maxKtheta
             break;
         default:
             F.dim=11;
@@ -1415,7 +1426,7 @@ double DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
             lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=0;
             
             lower[4]=lower[5]=xlow; lower[6]=x;
-            lower[9]=0.01; lower[10]=0;
+            lower[9]=0; lower[10]=0;
             
             upper[0]=upper[2]=upper[7]=KLIM;
             upper[1]=upper[3]=upper[8]=2.0*M_PI;
