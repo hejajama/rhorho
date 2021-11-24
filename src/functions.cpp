@@ -102,7 +102,7 @@ double F_worker::F_int_B0(Vec l, Vec l1, double alpha, double m2)
         gsl_integration_workspace_free(ws_local);
 
     
-    if (status)
+    if (status and std::abs(abserr/result) > 0.01)
     {
         std::cerr << "Warning: inaccurate F integral = " << result << " +/- " << abserr << std::endl;
     }

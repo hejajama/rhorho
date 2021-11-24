@@ -42,6 +42,8 @@ const char * file,
 int line,
 int gsl_errno)
 {
+    if (gsl_errno == 11)
+        return;
     cerr << "# Error " << gsl_errno << " line " << line << " file " << file << " reason " << reason << endl;
     
 }
@@ -467,20 +469,20 @@ int main(int argc, char* argv[])
                const int BPOINTS = 10;
                const double BSTEP = (MAXB-MINB)/(BPOINTS-1);
                Vec nullvec(0,0,0);
-               double *dipoles = new double[BPOINTS];
+               mcresult *dipoles = new mcresult[BPOINTS];
                
 #pragma omp parallel for
                for (int i=0; i<BPOINTS; i++)
                {
                    double b = MINB + i*BSTEP;
                    Vec bv(b*std::cos(theta_b_q),b*std::sin(theta_b_q));
-                   double d = integrator->OdderonG2b(bv, nullvec, nullvec, diag);
-                   dipoles[i]=d;
+                   mcresult d = integrator->OdderonG2b(bv, nullvec, nullvec, diag);
+                   dipoles[i] = d;
                }
                for (int i=0; i<BPOINTS; i++)
                {
                    double b = MINB + i*BSTEP;
-                   cout << b << " " << dipoles[i] << endl;
+                   cout << b << " " << dipoles[i].result << " " << dipoles[i].error << " " << dipoles[i].chisqr << endl;
                }
                
                

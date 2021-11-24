@@ -1356,9 +1356,9 @@ double inthelperf_mc_odderon_mixedspace(double *vec, size_t dim, void* p)
 
 
 
-double DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
+mcresult DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
 {
-    //cout << "# Integral with b = " << b << endl;
+    cout << "# Integral with b = " << b << endl;
     
     // Integrate over K, ktheta
 
@@ -1445,6 +1445,7 @@ double DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
     const double VEGAS_CHISQR_TOLERANCE = 0.2;
     const double MC_ERROR_TOLERANCE = 0.2;
     
+    mcresult res;
     double result,error;
     if (intmethod == MISER)
     {
@@ -1459,12 +1460,12 @@ double DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
     {
         gsl_monte_vegas_state *s = gsl_monte_vegas_alloc(F.dim);
         gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS/2, rng, s, &result, &error);
-        //cout << "# vegas warmup " << result << " +/- " << error << endl;
+        cout << "# vegas warmup " << result << " +/- " << error << endl;
         int iter=0;
         do
         {
             gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS, rng, s, &result, &error);
-            //cout << "# Vegas interation " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
+            cout << "# Vegas interation " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
             iter++;
         } while ( (std::abs( gsl_monte_vegas_chisq(s) - 1.0) > VEGAS_CHISQR_TOLERANCE or iter < 4 or std::abs(error/result) > MC_ERROR_TOLERANCE) and iter < 10);
         
@@ -1473,15 +1474,21 @@ double DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
             cerr << "Warning: large uncertainty with b=" << b <<", result " << result << " +/- " << error << " chi^2 " <<gsl_monte_vegas_chisq(s) << endl;
         }
         
+        res.chisqr =gsl_monte_vegas_chisq(s);
+        
         gsl_monte_vegas_free(s);
     }
     else
-        return 0;
+        result=0;
     
     delete[] upper;
     delete[] lower;
     
-    return result;
+    
+    res.result=result;
+    res.error=error;
+    
+    return res;
 }
 
 

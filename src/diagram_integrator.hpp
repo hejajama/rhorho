@@ -477,6 +477,13 @@ enum IntegrationMethod
     VEGAS
 };
 
+struct mcresult
+{
+    double result;
+    double error;
+    double chisqr;
+};
+
 class DiagramIntegrator
 {
 public:
@@ -512,7 +519,7 @@ public:
     void SetCollinearCutoffUVFinite(bool s){ collinear_cutoff_uv_finite=s; }
     
     // Odderon FT
-    double OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag); 
+    mcresult OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag);
     double OdderonAmplitude(Diagram diag, Vec r, Vec b);
     
 private:
