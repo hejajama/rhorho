@@ -1253,7 +1253,7 @@ double inthelperf_mc_odderon_mixedspace(double *vec, size_t dim, void* p)
     /*if (dim != 4) exit(1);*/
     mixed_space_odderon_helper *par = (mixed_space_odderon_helper*)p;
     
-    // Check kinematical boundary x_1+x_2+x_g < 1
+    // Check kinematical boundary x_1+x_2 < 1
     if (vec[4] + vec[5] >= 1) return 0;
     
     Vec q12 = par->q12;
@@ -1358,7 +1358,7 @@ double inthelperf_mc_odderon_mixedspace(double *vec, size_t dim, void* p)
 
 double DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
 {
-
+    //cout << "# Integral with b = " << b << endl;
     
     // Integrate over K, ktheta
 
@@ -1442,7 +1442,8 @@ double DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
     F.f = inthelperf_mc_odderon_mixedspace;
     F.params = &helper;
     
-
+    const double VEGAS_CHISQR_TOLERANCE = 0.2;
+    const double MC_ERROR_TOLERANCE = 0.2;
     
     double result,error;
     if (intmethod == MISER)
@@ -1465,7 +1466,13 @@ double DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
             gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS, rng, s, &result, &error);
             //cout << "# Vegas interation " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
             iter++;
-        } while ( (fabs( gsl_monte_vegas_chisq(s) - 1.0) > 0.2 or iter < 3) and iter < 7);
+        } while ( (std::abs( gsl_monte_vegas_chisq(s) - 1.0) > VEGAS_CHISQR_TOLERANCE or iter < 4 or std::abs(error/result) > MC_ERROR_TOLERANCE) and iter < 10);
+        
+        if (fabs( gsl_monte_vegas_chisq(s) - 1.0) > VEGAS_CHISQR_TOLERANCE or std::abs(error/result) > 0.5)
+        {
+            cerr << "Warning: large uncertainty with b=" << b <<", result " << result << " +/- " << error << " chi^2 " <<gsl_monte_vegas_chisq(s) << endl;
+        }
+        
         gsl_monte_vegas_free(s);
     }
     else

@@ -463,8 +463,8 @@ int main(int argc, char* argv[])
            {
                // Odderon, q12=q23=0
                const double MINB = 0;
-               const double MAXB = 4;
-               const int BPOINTS = 20;
+               const double MAXB = 2;
+               const int BPOINTS = 10;
                const double BSTEP = (MAXB-MINB)/(BPOINTS-1);
                Vec nullvec(0,0,0);
                double *dipoles = new double[BPOINTS];
