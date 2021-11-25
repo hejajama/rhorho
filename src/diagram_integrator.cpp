@@ -1174,8 +1174,13 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             break;
     }
     
-    if (A.LenSqr() < 1e-6 or B.LenSqr() < 1e-6)
+    if (A.LenSqr() < 1e-10 or B.LenSqr() < 1e-10)
         return 0;
+    if (include_A2_B2 == true)
+    {
+        if (A2.LenSqr() < 1e-10 or B2.LenSqr() < 1e-10)
+            return 0;
+    }
     
    
     double wf1 =par->integrator->GetProton().WaveFunction(k1, k2, x1, x2);
