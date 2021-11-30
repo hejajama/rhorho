@@ -19,7 +19,7 @@ double intehelperf_mc_uvsum(double* vec, size_t dim, void* p);
 
 /*
  * LO diagram
- * [k1x,k1y,k2x,k2y,x1,x2] NOW IN RADIAL
+ * [k1, th1, k2, th2, x1, x2] 
  */
 double inthelperf_mc_lo(double *vec, size_t dim, void* p)
 {
@@ -76,6 +76,7 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
         + 2.0*par->integrator->GetProton().WaveFunction(p1-q1-K*x1, p2-q2-K*x2, x1, x2);
         
         wf2 = wf2*norm;
+        
         // Now normalization such that I compute
         // Such that I compute g^3 G_3- = this*d^(abc)*g^3
     }
@@ -87,6 +88,8 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
         cerr <<"Note: WF NaN at x1 " << x1 << " x2 "<<  x2 << " k1 " << k1 << " k2 " << k2 << " q1 " << q1 << " q2 " << q2 << endl;
     
     double res = wf1*wf2;
+    
+
     
     // 16pi^3 because NLO diagrams do not include 1/(16pi^3) prefactor
     // Python analysis notebook divides by 1/16pi^3
@@ -1696,7 +1699,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 
         do
         {
             gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS, rng, s, &result, &error);
-            //cout << "# Vegas interation " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
+            //cout << "# Vegas integration " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
             iter++;
         } while ((fabs( gsl_monte_vegas_chisq(s) - 1.0) > 0.4 or iter < 2) and iter < 6);
         gsl_monte_vegas_free(s);
@@ -1909,7 +1912,7 @@ double DiagramIntegrator::MixedSpaceBruteForce(Diagram diag, Vec q12, Vec b)
         do
         {
             gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS, rng, s, &result, &error);
-            //cout << "# Vegas interation " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
+            //cout << "# Vegas integration " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
             iter++;
         } while ((fabs( gsl_monte_vegas_chisq(s) - 1.0) > 0.4 or iter < 2) and iter < 6);
         gsl_monte_vegas_free(s);
@@ -2114,7 +2117,7 @@ double DiagramIntegrator::DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b)
         do
         {
             gsl_monte_vegas_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS, rng, s, &result, &error);
-            //cout << "# Vegas interation " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
+            //cout << "# Vegas interagtion " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
             iter++;
         } while ((fabs( gsl_monte_vegas_chisq(s) - 1.0) > 0.4 or iter < 2) and iter < 6);
         gsl_monte_vegas_free(s);

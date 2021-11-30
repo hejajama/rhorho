@@ -520,7 +520,7 @@ public:
     
     // Odderon FT
     mcresult OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag);
-    double OdderonAmplitude(Diagram diag, Vec r, Vec b);
+    mcresult OdderonAmplitude(Diagram diag, Vec r, Vec b);
     
 private:
     double mf;      // Quark mass

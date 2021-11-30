@@ -33,8 +33,13 @@ BOOST_AUTO_TEST_CASE(Ftest)
 
 BOOST_AUTO_TEST_CASE(LO_DIAG)
 {
+    double k1 = 0.1;
+    double k2 = 0.2;
+    double th1 = 0;
+    double th2 = 0;
+    
     double x1=0.3; double x2=0.4;
-    double intvec[6] = {0.1, 0, 0.2,0, x1,x2}; // k1x  k1y k2x k2y x1 x2
+    double intvec[6] = {k1, th1, k2, th2, x1,x2}; // k1x  k1y k2x k2y x1 x2
     
     DiagramIntegrator *integrator = new DiagramIntegrator;
     integrator->GetProton().SetBeta(0.55);
@@ -52,7 +57,7 @@ BOOST_AUTO_TEST_CASE(LO_DIAG)
     
     // Jacobian and normalizatoin factors should be added to the mathematica result
     double mathematica =-1.0004e6;
-    mathematica *= 16.*std::pow(M_PI,3.)  / (8.0*x1*x2*(1.-x1-x2)*std::pow(2.0*M_PI,6.0));
+    mathematica *= 16.*std::pow(M_PI,3.)*k1*k2  / (8.0*x1*x2*(1.-x1-x2)*std::pow(2.0*M_PI,6.0));
     
     BOOST_CHECK_CLOSE(integrand, mathematica, 0.1);
     

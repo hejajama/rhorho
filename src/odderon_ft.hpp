@@ -10,4 +10,8 @@
 
 #include <stdio.h>
 
+
+const double VEGAS_CHISQR_TOLERANCE = 0.2;
+const double MC_ERROR_TOLERANCE = 0.2;
+
 #endif /* odderon_ft_hpp */

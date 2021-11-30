@@ -378,24 +378,24 @@ int main(int argc, char* argv[])
         Vec bv(b*std::cos(theta_b_q), b*std::sin(theta_b_q));
         cout <<"# Dipole amplitude, b=" << bv << endl;
         cout << "# r = (r,0)" << endl;
-        const double MAXR = 10;
-        const double MINR = 0.1;
-        const int rpoints = 6;
+        const double MAXR = 4;
+        const double MINR = 1;
+        const int rpoints = 4;
         const double RSTEP = (MAXR-MINR)/rpoints;
-        double dipoles[rpoints];
+        mcresult dipoles[rpoints];
         
 #pragma omp parallel for
         for (int i=0; i<rpoints; i++)
         {
             double r = MINR + i*RSTEP;
             Vec rv(r,0);
-            double d = integrator->OdderonAmplitude(diag, rv, bv);
+            mcresult d = integrator->OdderonAmplitude(diag, rv, bv);
             dipoles[i]=d;
         }
         for (int i=0; i<rpoints; i++)
         {
             double r = MINR + i*RSTEP;
-            cout << r << " " << dipoles[i] << endl;
+            cout << r << " " << dipoles[i].result << " " << dipoles[i].error << " " << dipoles[i].chisqr << endl;
         }
         
         
@@ -410,23 +410,22 @@ int main(int argc, char* argv[])
             const double MAXTH = M_PI;
             const int THPOINTS = 11;
             const double THSTEP = (MAXTH-MINTH)/(THPOINTS-1);
-            double *dipoles = new double[THPOINTS];
+            mcresult dipoles[THPOINTS];
             cout <<"# th(r,b)   N(r,b,thrb)" << endl;
     #pragma omp parallel for
             for (int i=0; i<THPOINTS; i++)
             {
                 double th = MINTH + i*THSTEP;
                 Vec rv(r*std::cos(th),r*std::sin(th));
-                double d = integrator->OdderonAmplitude(diag, rv, bv);
+                mcresult d = integrator->OdderonAmplitude(diag, rv, bv);
                 dipoles[i]=d;
             }
             for (int i=0; i<THPOINTS; i++)
             {
                 double th = MINTH + i*THSTEP;
-                cout << th << " " << dipoles[i] << endl;
+                cout << th << " " << dipoles[i].result << endl;
             }
             
-            delete[] dipoles;
             
         }
     

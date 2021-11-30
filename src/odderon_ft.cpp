@@ -6,6 +6,7 @@
 //
 
 #include "diagram_integrator.hpp"
+#include "odderon_ft.hpp"
 #include "proton.hpp"
 #include <vector>
 #include <cmath>
@@ -1442,8 +1443,7 @@ mcresult DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
     F.f = inthelperf_mc_odderon_mixedspace;
     F.params = &helper;
     
-    const double VEGAS_CHISQR_TOLERANCE = 0.2;
-    const double MC_ERROR_TOLERANCE = 0.2;
+    
     
     mcresult res;
     double result,error;
@@ -1465,7 +1465,7 @@ mcresult DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
         do
         {
             gsl_monte_vegas_integrate(&F, lower, upper, F.dim, MCINTPOINTS, rng, s, &result, &error);
-            //cout << "# Vegas interation " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
+            //cout << "# Vegas integration " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
             iter++;
         } while ( (std::abs( gsl_monte_vegas_chisq(s) - 1.0) > VEGAS_CHISQR_TOLERANCE or iter < 4 or std::abs(error/result) > MC_ERROR_TOLERANCE) and iter < 10);
         
@@ -1504,7 +1504,10 @@ mcresult DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
 // https://arxiv.org/pdf/2001.04516.pdf (13)
 double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
 {
-    /*if (dim != 4) exit(1);*/
+    // Check kinematical boundary x_1+x_2 < 1
+    if (vec[4] + vec[5] >= 1) return 0;
+    
+    
     dipole_helper *par = (dipole_helper*)p;
     Vec r = par->r;
     Vec b = par->b;
@@ -1514,6 +1517,8 @@ double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
     Vec q3;
     inthelper_diagint momspacehelper;
     momspacehelper.integrator=par->integrator;
+    
+    
     
     momspacehelper.diag = par->diag;
     
@@ -1527,7 +1532,7 @@ double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
         
 
         
-        if (q1.LenSqr() < 1e-6 or q3.LenSqr() < 1e-6)
+        if (q1.LenSqr() < 1e-15 or q3.LenSqr() < 1e-15)
         {
             return 0; // Ward
         }
@@ -1551,7 +1556,7 @@ double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
         q2 = Vec(vec[11]*std::cos(vec[12]),vec[11]*std::sin(vec[12]));
         q3 = Vec(vec[13]*std::cos(vec[14]),vec[13]*std::sin(vec[14]));
         
-        if (q1.LenSqr() < 1e-6 or q3.LenSqr() < 1e-6)
+        if (q1.LenSqr() < 1e-15 or q3.LenSqr() < 1e-15)
             return 0; // Ward
         
         momspacehelper.q1 = q1;
@@ -1574,13 +1579,12 @@ double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
     res *= (std::sin(r*q1 + (r*K)*0.5) - 1./3.*std::sin((r*K)*0.5));
     
     res *= -std::sin(b*K); // Imaginary part
-    // So this actually computes i*T_ggg
     
     
     // Jacobian
     res *= q1.Len()*q2.Len()*q3.Len();
     
-    res *= 5./18.;
+    res *= -5./18.;
     
     // Note: factor 1/4 which is the difference between <rho rho rho> and G3 is not included here
     
@@ -1602,22 +1606,20 @@ double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
 }
 
 // Color factor -g^2/2 Cf not included
-double DiagramIntegrator::OdderonAmplitude(Diagram diag, Vec r, Vec b)
+mcresult DiagramIntegrator::OdderonAmplitude(Diagram diag, Vec r, Vec b)
 {
 
     // Integrate over q1, qtheta, q2, q2theta, q3, q3theta
 
     // Integrata over the same variables as in the lO diagram + q1, qtheta, q2, q2theta, q3, q3theta
-    double KLIM = 12;
-    double KMIN=0.001;
+    double KLIM = 15;
+    double QMIN=0.01;
     double xlow=x;
     double xup = 0.999;
     
     double *lower;
     double *upper;
     
-    cerr << "Päivitä napakoordinaatteihin\n";
-    exit(1);
     
     gsl_monte_function Ff;
     
@@ -1648,18 +1650,22 @@ double DiagramIntegrator::OdderonAmplitude(Diagram diag, Vec r, Vec b)
         case ODDERON_DIAG_34:
         case ODDERON_DIAG_43:
         case ODDERON_DIAG_49:
+        case ODDERON_UV_SUM:
             Ff.dim=12;
-            ///TODO PÄIVITÄ NAPAKOORDINAATTEIHIN
             lower = new double[Ff.dim];
             upper = new double [Ff.dim];
-            lower[0]=lower[1]=lower[2]=lower[3]=-KLIM;
+            lower[0]=lower[1]=lower[2]=lower[3]=0;
             lower[4]=lower[5]=xlow;
-            lower[6]=KMIN; lower[7]=0; // minq min_theta_q
-            lower[8]=KMIN; lower[9]=0; // minq min_theta_q
-            lower[10]=0.01; lower[11]=0;
-            upper[0]=upper[1]=upper[2]=upper[3]=KLIM;
+            
+            lower[6]=QMIN; lower[7]=0; // q1 q1th
+            lower[8]=QMIN; lower[9]=0; // q2 q2th
+            lower[10]=QMIN; lower[11]=0; // q3 q3th
+            
+            upper[0]=upper[2]=KLIM;
+            upper[1]=upper[3]=2.0*M_PI;
             upper[4]=upper[5]=xup;
-            upper[6]=KLIM; upper[7]=2.0*M_PI; // minK mink theta_k
+            
+            upper[6]=KLIM; upper[7]=2.0*M_PI; // q1 q1th
             upper[8]=KLIM; upper[9]=2.0*M_PI;
             upper[10]=KLIM; upper[11]=2.0*M_PI;
             break;
@@ -1667,12 +1673,14 @@ double DiagramIntegrator::OdderonAmplitude(Diagram diag, Vec r, Vec b)
             Ff.dim=15;
             lower = new double[Ff.dim];
             upper = new double [Ff.dim];
-            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=-KLIM;
+            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=0;
             lower[4]=lower[5]=xlow; lower[6]=x;
-            lower[9]=KMIN; lower[10]=0;
-            lower[11]=KMIN; lower[12]=0;
-            lower[13]=KMIN; lower[14]=0;
-            upper[0]=upper[1]=upper[2]=upper[3]=upper[7]=upper[8]=KLIM;
+            lower[9]=0; lower[10]=0;
+            lower[11]=0; lower[12]=0;
+            lower[13]=0; lower[14]=0;
+            upper[0]=upper[2]=upper[7]=KLIM;
+            upper[1]=upper[3]=upper[8]=2.0*M_PI;
+            
             upper[4]=upper[5]=upper[6]=xup;
             upper[9]=KLIM; upper[10]=2.0*M_PI;
             upper[11]=KLIM; upper[12]=2.0*M_PI;
@@ -1690,35 +1698,46 @@ double DiagramIntegrator::OdderonAmplitude(Diagram diag, Vec r, Vec b)
        
     Ff.params = &helper;
     Ff.f = inthelperf_mc_odderon;
+    
+    mcresult res;
 
     
     double result,error;
     if (intmethod == MISER)
     {
-        gsl_monte_miser_state *s = gsl_monte_miser_alloc(Ff.dim);
+        cerr << "Do not use miser" << endl;
+        exit(1);
+       /* gsl_monte_miser_state *s = gsl_monte_miser_alloc(Ff.dim);
         gsl_monte_miser_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS, rng, s, &result, &error);
         cout << "# Miser result " << result << " err " << error << " relerr " << std::abs(error/result) << endl;
-        gsl_monte_miser_free(s);
+        gsl_monte_miser_free(s);*/
     }
-    else if (intmethod == VEGAS)
+
+    gsl_monte_vegas_state *s = gsl_monte_vegas_alloc(Ff.dim);
+    gsl_monte_vegas_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS/2, rng, s, &result, &error);
+    //cout << "# vegas warmup " << result << " +/- " << error << endl;
+    int iter=0;
+    do
     {
-        gsl_monte_vegas_state *s = gsl_monte_vegas_alloc(Ff.dim);
-        gsl_monte_vegas_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS/2, rng, s, &result, &error);
-        //cout << "# vegas warmup " << result << " +/- " << error << endl;
-        int iter=0;
-        do
-        {
-            gsl_monte_vegas_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS, rng, s, &result, &error);
-            //cout << "# Vegas interation " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
-            iter++;
-        } while ((fabs( gsl_monte_vegas_chisq(s) - 1.0) > 0.3 or iter < 3) and iter < 7);
-        gsl_monte_vegas_free(s);
+        gsl_monte_vegas_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS, rng, s, &result, &error);
+        cout << "# Vegas integration " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
+        iter++;
+    } while ( (std::abs( gsl_monte_vegas_chisq(s) - 1.0) > VEGAS_CHISQR_TOLERANCE or iter < 4 or std::abs(error/result) > MC_ERROR_TOLERANCE) and iter < 10);
+    
+    if (fabs( gsl_monte_vegas_chisq(s) - 1.0) > VEGAS_CHISQR_TOLERANCE or std::abs(error/result) > 0.5)
+    {
+        cerr << "Warning: large uncertainty with b=" << b <<", r=" << r << ", result " << result << " +/- " << error << " chi^2 " <<gsl_monte_vegas_chisq(s) << endl;
     }
-    else
-        return 0;
+    
+    res.chisqr =gsl_monte_vegas_chisq(s);
+    res.result = result;
+    res.error = error;
+    
+    gsl_monte_vegas_free(s);
+
     
     delete[] upper;
     delete[] lower;
     
-    return result;
+    return res;
 }
