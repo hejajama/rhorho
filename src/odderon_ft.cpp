@@ -1675,9 +1675,9 @@ mcresult DiagramIntegrator::OdderonAmplitude(Diagram diag, Vec r, Vec b)
             upper = new double [Ff.dim];
             lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=0;
             lower[4]=lower[5]=xlow; lower[6]=x;
-            lower[9]=0; lower[10]=0;
-            lower[11]=0; lower[12]=0;
-            lower[13]=0; lower[14]=0;
+            lower[9]=QMIN; lower[10]=0;
+            lower[11]=QMIN; lower[12]=0;
+            lower[13]=QMIN; lower[14]=0;
             upper[0]=upper[2]=upper[7]=KLIM;
             upper[1]=upper[3]=upper[8]=2.0*M_PI;
             
