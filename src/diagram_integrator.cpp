@@ -24,8 +24,8 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
 {
     if (dim != 6) exit(1);
     inthelper_diagint *par = (inthelper_diagint*)p;
-    Vec k1(vec[0],vec[1]);
-    Vec k2(vec[2], vec[3]);
+    Vec k1(vec[0]*std::cos(vec[1]),vec[0]*std::sin(vec[1]) );
+    Vec k2(vec[2]*std::cos(vec[3]), std::sin(vec[3]) );
     Vec q1 = par->q1;
     Vec q2 = par->q2;
     
@@ -56,7 +56,7 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
     
     // 16pi^3 because NLO diagrams do not include 1/(16pi^3) prefactor
     // Python analysis notebook divides by 1/16pi^3
-    return 16.*std::pow(M_PI,3.) * res / (8.0*x1*x2*(1.-x1-x2)*std::pow(2.0*M_PI,6.0));
+    return 16.*std::pow(M_PI,3.) * res * vec[0] * vec[2] / (8.0*x1*x2*(1.-x1-x2)*std::pow(2.0*M_PI,6.0));
     
 
 }
@@ -71,9 +71,9 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     if (dim != 9) exit(1);
     inthelper_diagint *par = (inthelper_diagint*)p;
     
-    Vec k1(vec[0],vec[1]);
-    Vec k2(vec[2], vec[3]);
-    Vec kg(vec[7],vec[8]);
+    Vec k1(vec[0]*std::cos(vec[1]), vec[0]*std::sin(vec[1]));
+    Vec k2(vec[2]*std::cos(vec[3]), vec[2]*std::sin(vec[3]));
+    Vec kg(vec[7]*std::cos(vec[8]), vec[7]*std::sin(vec[8]));
     Vec q1 = par->q1;
     Vec q2 = par->q2;
     Vec q = q1+q2;
@@ -362,6 +362,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     res *= inv_xg; // same as res /= xg;
     
     // Jacobian
+    res *= vec[0] * vec[2] * vec[7];
     res /= 8.0*x1*x2*(1.-x1-x2)*std::pow(2.0*M_PI,6.0);
     
     return res;
@@ -377,8 +378,8 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
 {
     if (dim != 6) exit(1);
     inthelper_diagint *par = (inthelper_diagint*)p;
-    Vec k1(vec[0],vec[1]);
-    Vec k2(vec[2], vec[3]);
+    Vec k1(vec[0]*std::cos(vec[1]), vec[0]*std::sin(vec[1]));
+    Vec k2(vec[2]*std::cos(vec[3]), vec[2]*std::sin(vec[3]));
     Vec q1 = par->q1;
     Vec q2 = par->q2;
     
@@ -511,6 +512,7 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     }
     
     // Jacobian
+    result *= vec[0]*vec[2];
     result /= x1*x2*(1.-x1-x2)*8*std::pow(2.0*M_PI,6.);
    
     return 2.0*std::pow(M_PI,3.)*result; // A21 gives 2pi^3
@@ -524,7 +526,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
     gsl_monte_function F;
     
     F.params = &helper;
-    const double KLIM=12;
+    const double KLIM=15;
     double xup=1.-0.0001;
     double xlow = x;
     
@@ -547,7 +549,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
             F.dim=6;
             lower = new double[F.dim];
             upper = new double [F.dim];
-            lower[0]=lower[1]=lower[2]=lower[3]=-KLIM;
+            lower[0]=lower[1]=lower[2]=lower[3]=0;
             lower[4]=lower[5]=xlow;
             upper[0]=upper[1]=upper[2]=upper[3]=KLIM;
             upper[4]=upper[5]=xup;
@@ -557,7 +559,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
             F.dim=9;
             lower = new double[F.dim];
             upper = new double [F.dim];
-            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=-KLIM;
+            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=0;
             lower[4]=lower[5]=xlow; lower[6]=x;
             upper[0]=upper[1]=upper[2]=upper[3]=upper[7]=upper[8]=KLIM;
             upper[4]=upper[5]=upper[6]=xup;
@@ -757,21 +759,21 @@ double DiagramIntegrator::MixedSpaceBruteForce(Diagram diag, Vec q12, Vec b)
             F.dim=8;
             lower = new double[F.dim];
             upper = new double [F.dim];
-            lower[0]=lower[1]=lower[2]=lower[3]=-KLIM;
+            lower[0]=lower[1]=lower[2]=lower[3]=0;
             lower[4]=lower[5]=xlow;
-            lower[6]=0.01; lower[7]=0; // minK mink theta_k
+            lower[6]=0.0; lower[7]=0; // minK  theta_k
             
             upper[0]=upper[1]=upper[2]=upper[3]=KLIM;
             upper[4]=upper[5]=xup;
-            upper[6]=KLIM; upper[7]=2.0*M_PI; // minK mink theta_k
+            upper[6]=KLIM; upper[7]=2.0*M_PI; // maxK theta_k
             break;
         default:
             F.dim=11;
             lower = new double[F.dim];
             upper = new double [F.dim];
-            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=-KLIM;
+            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=0;
             lower[4]=lower[5]=xlow; lower[6]=x;
-            lower[9]=0.01; lower[10]=0;
+            lower[9]=0.0; lower[10]=0;
             upper[0]=upper[1]=upper[2]=upper[3]=upper[7]=upper[8]=KLIM;
             upper[4]=upper[5]=upper[6]=xup;
             upper[9]=KLIM; upper[10]=2.0*M_PI;
@@ -859,7 +861,7 @@ double inthelperf_mc_dipole(double *vec, size_t dim, void* p)
         qv1= q - K*0.5;
         qv2= q*(-1) - K*0.5;
         
-        if (qv1.LenSqr() < 1e-6 or qv2.LenSqr() < 1e-6)
+        if (qv1.LenSqr() < 1e-15 or qv2.LenSqr() < 1e-15)
             return 0;
         
         momspacehelper.q1 = qv1;
@@ -879,7 +881,7 @@ double inthelperf_mc_dipole(double *vec, size_t dim, void* p)
         q = Vec(vec[11]*std::cos(vec[12]),vec[11]*std::sin(vec[12]));
         qv1= q - K*0.5;
         qv2= q*(-1) - K*0.5;
-        if (qv1.LenSqr() < 1e-6 or qv2.LenSqr() < 1e-6)
+        if (qv1.LenSqr() < 1e-15 or qv2.LenSqr() < 1e-15)
             return 0;
         momspacehelper.q1 = qv1;
         momspacehelper.q2 = qv2;
