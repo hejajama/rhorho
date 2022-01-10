@@ -1603,6 +1603,9 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
 }
 double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 )
 {
+    cerr << "Note: THIS METHOD IS NOT MOVED TO POLAR COORDS! DiagramIntegrator::IntegrateDiagram " << endl;
+    exit(1);
+    
     inthelper_diagint helper;
     helper.q1=q1; helper.q2=q2; helper.q3=q3;
     helper.integrator=this;
