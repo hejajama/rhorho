@@ -167,6 +167,9 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
     double f_xg=std::sqrt(x1*x2/((x1-xg)*(x2+xg))) * (1. - (z1+z2)/2. + z1*z2/6.);
     double norm=1; // normalization * symmetry factor
     
+    // Odderon: g^5 / (3*16pi^3) not included
+    // Note that uv div diagrams do not include 2*g^5/(3*16pi^3)
+    
     switch (par->diag) {
         case DIAG_2B:
             ktilde_1 = k1 + q*x1  - kg + K*xg;
@@ -1254,6 +1257,8 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     Vec l; Vec l1;
     double norm=1; // Normalization factor * symmetry factor,not including g^4 / 16pi^3
     
+    // Odderon: norm does not include 2g^5/(3*16 pi^3)
+    
     double alpha =  par->integrator->GetX() / x1;
     // Default, changed below if necessary
     
@@ -1324,9 +1329,10 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
            
         // **** ODD DIAGRAMS, ODDERON ****
         // NOTE: In all odderon diags I factor out 2g^5 / (3 * 16pi^3) * d^abc
+            // THIS IS DIFFERENT FROM WHAT IS FACTORED OUT FORM UV FINITE! FACTOR 2 DIFF
         // And f^abc parts are dropped
-            // TODO* 1/4 in (6)
-            // Todo (2pi)^3? see (160)
+            // 1/4 in (6) is taken into account in analysis notebook
+            //  2pi^3 in (160) is included at the end of this function
         case ODDERON_DIAG_14:
             l = q1 + q2 + q3;
             l1 = q3;
@@ -1592,7 +1598,7 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
     result *= vec[0]*vec[2];
     result /= x1*x2*(1.-x1-x2)*8*std::pow(2.0*M_PI,6.);
    
-    return 2.0*std::pow(M_PI,3.)*result; // A21 gives 2pi^3
+    return 2.0*std::pow(M_PI,3.)*result; // A21 gives 2pi^3 (160 odderon paper v1)
     
 }
 double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 )
