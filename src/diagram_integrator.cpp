@@ -343,7 +343,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             break;
     }
     
-    if (A.LenSqr() < 1e-6 or B.LenSqr() < 1e-6)
+    if (A.LenSqr() < 1e-15 or B.LenSqr() < 1e-15)
         return 0;
     
    
@@ -529,10 +529,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
     const double KLIM=15;
     double xup=1.-0.0001;
     double xlow = x;
-    
-    //double lower[6]={-KLIM,-KLIM,-KLIM,-KLIM,xlim,xlim};
-    //double upper[6]={KLIM,KLIM,KLIM,KLIM,1.-xlim,1.-xlim};
-    
+        
     double *lower;
     double* upper;
     
@@ -680,7 +677,7 @@ double inthelperf_mc_mixedspace(double *vec, size_t dim, void* p)
     
     
     // Ward
-    if (qv1.LenSqr() < 1e-5 or qv2.LenSqr() < 1e-5)
+    if (qv1.LenSqr() < 1e-15 or qv2.LenSqr() < 1e-15)
         return 0;
     
  
@@ -940,7 +937,7 @@ double DiagramIntegrator::DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b)
     double upper[4] = {10,2.0*M_PI,10,2.0*M_PI};
      */
     // Integrata over the same variables as in the lO diagram + k,ktheta,q,qtheta
-    double KLIM = 12;
+    double KLIM = 15;
     double xlow=x;
     double xup = 0.999;
     
@@ -962,23 +959,23 @@ double DiagramIntegrator::DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b)
             Ff.dim=10;
             lower = new double[Ff.dim];
             upper = new double [Ff.dim];
-            lower[0]=lower[1]=lower[2]=lower[3]=-KLIM;
+            lower[0]=lower[1]=lower[2]=lower[3]=0;
             lower[4]=lower[5]=xlow;
-            lower[6]=0.01; lower[7]=0; // minK mink theta_k
-            lower[8]=0.01; lower[9]=0;
+            lower[6]=0; lower[7]=0; // minK  theta_k
+            lower[8]=0; lower[9]=0;
             upper[0]=upper[1]=upper[2]=upper[3]=KLIM;
             upper[4]=upper[5]=xup;
-            upper[6]=KLIM; upper[7]=2.0*M_PI; // minK mink theta_k
+            upper[6]=KLIM; upper[7]=2.0*M_PI; // maxK theta_k
             upper[8]=KLIM; upper[9]=2.0*M_PI;
             break;
         default:
             Ff.dim=13;
             lower = new double[Ff.dim];
             upper = new double [Ff.dim];
-            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=-KLIM;
+            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=0;
             lower[4]=lower[5]=xlow; lower[6]=x;
-            lower[9]=0.01; lower[10]=0;
-            lower[11]=0.01; lower[12]=0;
+            lower[9]=0.; lower[10]=0;
+            lower[11]=0; lower[12]=0;
             upper[0]=upper[1]=upper[2]=upper[3]=upper[7]=upper[8]=KLIM;
             upper[4]=upper[5]=upper[6]=xup;
             upper[9]=KLIM; upper[10]=2.0*M_PI;
