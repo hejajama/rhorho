@@ -372,7 +372,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
 
 
 /*
- * Vec components are [k1x,k1y,k2x,k2y,x1,x2]
+ * Vec components are [k1, theta_1, k2; theta_2, x1, x2]
  */
 double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
 {
@@ -542,7 +542,8 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
             upper = new double [F.dim];
             lower[0]=lower[1]=lower[2]=lower[3]=0;
             lower[4]=lower[5]=xlow;
-            upper[0]=upper[1]=upper[2]=upper[3]=KLIM;
+            upper[0]=upper[2]=KLIM;
+            upper[1]=upper[3]=2.0*M_PI;
             upper[4]=upper[5]=xup;
             F.f=inthelperf_mc_diag2a;
             break;
@@ -552,7 +553,9 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
             upper = new double [F.dim];
             lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=0;
             lower[4]=lower[5]=xlow; lower[6]=x;
-            upper[0]=upper[1]=upper[2]=upper[3]=upper[7]=upper[8]=KLIM;
+            
+            upper[0]=upper[2]=upper[7]=KLIM;
+            upper[1]=upper[3]=upper[8]=2.0*M_PI;
             upper[4]=upper[5]=upper[6]=xup;
             F.f=inthelperf_mc_diag2b;
             break;
@@ -754,7 +757,8 @@ double DiagramIntegrator::MixedSpaceBruteForce(Diagram diag, Vec q12, Vec b)
             lower[4]=lower[5]=xlow;
             lower[6]=0.0; lower[7]=0; // minK  theta_k
             
-            upper[0]=upper[1]=upper[2]=upper[3]=KLIM;
+            upper[0]=upper[2]=KLIM;
+            upper[1]=upper[3]=2.0*M_PI;
             upper[4]=upper[5]=xup;
             upper[6]=KLIM; upper[7]=2.0*M_PI; // maxK theta_k
             break;
@@ -765,7 +769,9 @@ double DiagramIntegrator::MixedSpaceBruteForce(Diagram diag, Vec q12, Vec b)
             lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=0;
             lower[4]=lower[5]=xlow; lower[6]=x;
             lower[9]=0.0; lower[10]=0;
-            upper[0]=upper[1]=upper[2]=upper[3]=upper[7]=upper[8]=KLIM;
+            
+            upper[0]=upper[2]=upper[7]=KLIM;
+            upper[1]=upper[3]=upper[8]=2.0*M_PI;
             upper[4]=upper[5]=upper[6]=xup;
             upper[9]=KLIM; upper[10]=2.0*M_PI;
             
@@ -957,7 +963,8 @@ double DiagramIntegrator::DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b)
             lower[4]=lower[5]=xlow;
             lower[6]=0; lower[7]=0; // minK  theta_k
             lower[8]=0; lower[9]=0;
-            upper[0]=upper[1]=upper[2]=upper[3]=KLIM;
+            upper[0]=upper[2]=KLIM;
+            upper[1]=upper[3]=2.0*M_PI;
             upper[4]=upper[5]=xup;
             upper[6]=KLIM; upper[7]=2.0*M_PI; // maxK theta_k
             upper[8]=KLIM; upper[9]=2.0*M_PI;
@@ -970,7 +977,9 @@ double DiagramIntegrator::DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b)
             lower[4]=lower[5]=xlow; lower[6]=x;
             lower[9]=0.; lower[10]=0;
             lower[11]=0; lower[12]=0;
-            upper[0]=upper[1]=upper[2]=upper[3]=upper[7]=upper[8]=KLIM;
+            upper[0]=upper[2]=upper[7]=KLIM;
+            upper[1]=upper[3]=upper[8]=2.0*M_PI;
+            
             upper[4]=upper[5]=upper[6]=xup;
             upper[9]=KLIM; upper[10]=2.0*M_PI;
             upper[11]=KLIM; upper[12]=2.0*M_PI;
