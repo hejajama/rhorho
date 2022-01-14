@@ -25,7 +25,7 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
     if (dim != 6) exit(1);
     inthelper_diagint *par = (inthelper_diagint*)p;
     Vec k1(vec[0]*std::cos(vec[1]),vec[0]*std::sin(vec[1]) );
-    Vec k2(vec[2]*std::cos(vec[3]), std::sin(vec[3]) );
+    Vec k2(vec[2]*std::cos(vec[3]), vec[2]*std::sin(vec[3]) );
     Vec q1 = par->q1;
     Vec q2 = par->q2;
     
