@@ -488,14 +488,8 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
         double hsqr = l1.LenSqr() + l.LenSqr() - 2.0*(l*l1);
         if (hsqr < 1e-7)
             return 0; // h^2 B0 -> 0
-        double delta = mf*mf;
-        // -1/(8pi^2) \int_{alpha}^1 dz_1/z_1 2 h^2/2 B_0(m^2,m^2,h^2)
-        fintb = -1.0/(8.0*M_PI*M_PI) * (-2.0*std::log(alpha)) * hsqr/2.0 * B0(hsqr,delta);
-        /*double exact=par->integrator->GetF_worker()->F_int_B0(l, l1, alpha, mf*mf);
-        cout << l << endl;
-        cout << l1 << endl;
-        cout << "alpha " << alpha << " smallx " << fintb << " exact " << exact  << " ratio " << exact/fintb <<  endl;
-        exit(1);*/
+        
+        fintb = -1.0/(4.0*M_PI) * std::log(alpha) * std::log(mf*mf*alpha/hsqr);
     }
     else
     {
