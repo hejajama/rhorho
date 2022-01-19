@@ -64,7 +64,7 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
 /*
  * UV finite diagrams
  * Vector components are
- * [k1x,k1y,k2x,k2y,x1,x2,xg,kgx,kgy]
+ * [k1, theta_1, k2, theta_2, x1, x2, xg, kg, theta_g]
  */
 double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
 {
@@ -489,7 +489,7 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
         if (hsqr < 1e-7)
             return 0; // h^2 B0 -> 0
         
-        fintb = -1.0/(4.0*M_PI) * std::log(alpha) * std::log(mf*mf*alpha/hsqr);
+        fintb = -1.0/(4.0*M_PI*M_PI) * std::log(alpha) * std::log(mf*mf*alpha/hsqr);
     }
     else
     {
