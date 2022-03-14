@@ -522,6 +522,9 @@ public:
     mcresult OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag);
     mcresult OdderonAmplitude(Diagram diag, Vec r, Vec b);
     
+    void SetQmin(double qm) { qmin=qm; }
+    double GetQmin() { return qmin; }
+    
 private:
     double mf;      // Quark mass
     IntegrationMethod intmethod;
@@ -533,6 +536,8 @@ private:
     double x; // cutoff
     bool small_x;
     bool collinear_cutoff_uv_finite; // Use collinear cutoff (m) in UV finite diagrams also
+    
+    double qmin; // Lower limit for q_i integrals when computeing FTs to get Odderon
 };
 
 double inthelperf_mc_lo(double *vec, size_t dim, void* p);

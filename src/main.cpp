@@ -115,6 +115,8 @@ int main(int argc, char* argv[])
             integrator->SetSmallX(true);
         else if (string(argv[i])=="-regulate_uv_finite")
             integrator->SetCollinearCutoffUVFinite(true);
+        else if (string(argv[i])=="-qmin")
+            integrator->SetQmin(StrToReal(argv[i+1]));
         else if (string(argv[i]).substr(0,1)=="-")
         {
             cerr << "Unknown parameter " << argv[i] << endl;
@@ -377,10 +379,11 @@ int main(int argc, char* argv[])
     {
         Vec bv(b*std::cos(theta_b_q), b*std::sin(theta_b_q));
         cout <<"# Dipole amplitude, b=" << bv << endl;
+        cout <<"# qmin = " << integrator->GetQmin() << " GeV" << endl;
         cout << "# r = (r,0)" << endl;
-        const double MAXR = 4;
-        const double MINR = 1;
-        const int rpoints = 4;
+        const double MAXR = 5;
+        const double MINR = 0.1;
+        const int rpoints = 8;
         const double RSTEP = (MAXR-MINR)/rpoints;
         mcresult dipoles[rpoints];
         
@@ -405,8 +408,9 @@ int main(int argc, char* argv[])
             
             Vec bv(b,0);
             cout <<"# Dipole amplitude, b=" << b << endl;
+            cout <<"# qmin = " << integrator->GetQmin() << " GeV" << endl;
             cout << "# r = " << r  << endl;
-            const double MINTH = -M_PI;
+            const double MINTH = 0;
             const double MAXTH = M_PI;
             const int THPOINTS = 11;
             const double THSTEP = (MAXTH-MINTH)/(THPOINTS-1);
@@ -423,7 +427,7 @@ int main(int argc, char* argv[])
             for (int i=0; i<THPOINTS; i++)
             {
                 double th = MINTH + i*THSTEP;
-                cout << th << " " << dipoles[i].result << endl;
+                cout << th << " " << dipoles[i].result << " " << dipoles[i].error << " " << dipoles[i].chisqr << endl;
             }
             
             

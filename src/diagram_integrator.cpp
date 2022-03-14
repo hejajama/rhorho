@@ -2182,6 +2182,8 @@ DiagramIntegrator::DiagramIntegrator()
     
     small_x = false;
     collinear_cutoff_uv_finite = false;
+    
+    qmin = 0.01;
 }
 
 
