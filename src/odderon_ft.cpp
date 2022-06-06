@@ -882,7 +882,7 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             break;
         }
         double dotprod=0;
-        if (A.LenSqr() < 1e-6 or B.LenSqr() < 1e-6)
+        if (A.LenSqr() < 1e-15 or B.LenSqr() < 1e-15)
             dotprod=0;
         else
         {

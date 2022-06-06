@@ -1603,8 +1603,6 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
 }
 double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 )
 {
-    cerr << "Note: THIS METHOD IS NOT MOVED TO POLAR COORDS! DiagramIntegrator::IntegrateDiagram " << endl;
-    exit(1);
     
     inthelper_diagint helper;
     helper.q1=q1; helper.q2=q2; helper.q3=q3;
@@ -1613,7 +1611,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 
     gsl_monte_function F;
     
     F.params = &helper;
-    const double KLIM=12;
+    const double KLIM=15;
     double xup=1.-0.0001;
     double xlow = x;
     
@@ -1663,9 +1661,10 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 
             F.dim=6;
             lower = new double[F.dim];
             upper = new double [F.dim];
-            lower[0]=lower[1]=lower[2]=lower[3]=-KLIM;
+            lower[0]=lower[1]=lower[2]=lower[3]=0;
             lower[4]=lower[5]=xlow;
-            upper[0]=upper[1]=upper[2]=upper[3]=KLIM;
+            upper[0]=upper[2]=KLIM;
+            upper[1]=upper[3]=2.0*M_PI;
             upper[4]=upper[5]=xup;
             F.f=inthelperf_mc_diag2a;
             break;
@@ -1673,9 +1672,10 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 
             F.dim=9;
             lower = new double[F.dim];
             upper = new double [F.dim];
-            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=-KLIM;
+            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=0;
             lower[4]=lower[5]=xlow; lower[6]=x;
-            upper[0]=upper[1]=upper[2]=upper[3]=upper[7]=upper[8]=KLIM;
+            upper[0]=upper[2]=upper[7]=KLIM;
+            upper[1]=upper[3]=upper[8]=2.0*M_PI;
             upper[4]=upper[5]=upper[6]=xup;
             F.f=inthelperf_mc_diag2b;
             break;
