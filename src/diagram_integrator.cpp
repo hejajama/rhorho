@@ -1658,6 +1658,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 
         case ODDERON_DIAG_34:
         case ODDERON_DIAG_43:
         case ODDERON_DIAG_49:
+	case ODDERON_UV_SUM:
             F.dim=6;
             lower = new double[F.dim];
             upper = new double [F.dim];

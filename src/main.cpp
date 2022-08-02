@@ -181,15 +181,17 @@ int main(int argc, char* argv[])
     {
      
         // Odderon Ward test q1 -> 0, q2,q3 fixed
-        Vec q2(0.4,0.51);
-        Vec q1(-0.25,0.6);
-        for (double q=0.001; q<0.4; q+=0.05)
+        Vec q2(0.2,0.11);
+        Vec q1(-0.25,0.2);
+        for (double q=0.0001; q<0.4; q*=1.50)
         {
-            //Vec q1(q,0);
             Vec q3(q/std::sqrt(2.), q/std::sqrt(2.));
-            //double d = integrator->IntegrateDiagram(diag, q1,q2,q3);
             double d = integrator->IntegrateDiagram(diag, q1,q2,q3);
-            cout << q << " " << d << endl;
+            double d2 = integrator->IntegrateDiagram(diag, q2,q3,q1);
+            double d3 = integrator->IntegrateDiagram(diag, q3,q1,q2); 
+            //Vec q1(q,0);
+            //double d = integrator->IntegrateDiagram(diag, q1,q2,q3);
+            cout << q << " " << d << " " << d2 << " " << d3 << endl;
         }
         
         /*Vec K(1,0);

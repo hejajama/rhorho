@@ -1329,7 +1329,7 @@ double inthelperf_mc_odderon_mixedspace(double *vec, size_t dim, void* p)
     double res = momspace / std::pow(2.0*M_PI,2.);
     
     
-    res *= std::cos(b*K);
+    res *= std::sin(b*K);
     
     
     // Jacobian
