@@ -1742,3 +1742,251 @@ mcresult DiagramIntegrator::OdderonAmplitude(Diagram diag, Vec r, Vec b)
     
     return res;
 }
+
+
+
+
+
+
+
+///
+/// Mixed odderon as a function of r,K
+/// Needed e.g. for eta_c production
+/// Dumitru et al, 1903.07660 (26)
+
+// TODO: ETUTEKIJÄ 2pi EI TARKISTETTU!
+
+double inthelperf_mc_odderon_mixed_Tggg(double *vec, size_t dim, void* p)
+{
+    // Check kinematical boundary x_1+x_2 < 1
+    if (vec[4] + vec[5] >= 1) return 0;
+    
+    
+    dipole_helper *par = (dipole_helper*)p;
+    Vec r = par->r;
+    Vec K = par->K;
+    
+    Vec q1;
+    Vec q2;
+    Vec q3;
+    inthelper_diagint momspacehelper;
+    momspacehelper.integrator=par->integrator;
+    
+    
+    
+    momspacehelper.diag = par->diag;
+    
+    
+    double momspace=0;
+    if (dim == 10) // LO or type a
+    {
+        q1 = Vec(vec[6]*std::cos(vec[7]),vec[6]*std::sin(vec[7]));
+        q2 = Vec(vec[8]*std::cos(vec[9]),vec[8]*std::sin(vec[9]));
+        q3 = q1*(-1) + q2*(-1) + K*(-1);  //Vec(vec[10]*std::cos(vec[11]),vec[10]*std::sin(vec[11]));
+        
+
+        
+        if (q1.LenSqr() < 1e-15 or q2.LenSqr() < 1e-15 or q3.LenSqr() < 1e-15)
+        {
+            return 0; // Ward
+        }
+            
+        
+        momspacehelper.q1 = q1;
+        momspacehelper.q2 = q2;
+        momspacehelper.q3 = q3;
+        
+        double loparvec[6]={vec[0], vec[1], vec[2], vec[3], vec[4], vec[5]};
+        
+        if (par->diag == ODDERON_LO)
+            momspace = inthelperf_mc_lo(loparvec, 6, &momspacehelper);
+        else
+            momspace = inthelperf_mc_diag2a(loparvec, 6, &momspacehelper);
+        
+    }
+    else
+    {
+        q1 = Vec(vec[9]*std::cos(vec[10]),vec[9]*std::sin(vec[10]));
+        q2 = Vec(vec[11]*std::cos(vec[12]),vec[11]*std::sin(vec[12]));
+        //q3 = Vec(vec[13]*std::cos(vec[14]),vec[13]*std::sin(vec[14]));
+        q3 = q1*(-1) + q2*(-1) + K*(-1);
+        
+        if (q1.LenSqr() < 1e-15 or q2.LenSqr() < 1e-15 or q3.LenSqr() < 1e-15)
+            return 0; // Ward
+        
+        momspacehelper.q1 = q1;
+        momspacehelper.q2 = q2;
+        momspacehelper.q3 = q3;
+        
+        double parvec[9] = {vec[0],vec[1],vec[2],vec[3],vec[4],vec[5],vec[6],vec[7],vec[8]};
+        momspace = inthelperf_mc_diag2b(parvec, 9, &momspacehelper);
+        
+    }
+    
+    
+    
+    double res = momspace / std::pow(2.0*M_PI,6.);
+    
+    res /= (q1.LenSqr() * q2.LenSqr() * q3.LenSqr());
+    
+    res *= (std::sin(r*q1 + (r*K)*0.5) - 1./3.*std::sin((r*K)*0.5));
+
+    
+    
+    // Jacobian
+    res *= q1.Len()*q2.Len();
+    
+    res *= -5./18.;
+    
+    // Note: factor 1/4 which is the difference between <rho rho rho> and G3 is not included here
+    
+    if (isnan(res))
+    {
+        //return 0;
+        //err << "NaN with K " << K << " q " << q << endl;
+        //cerr << "Diag is " << diag_momentumspace << endl;
+        //cerr << "Argumets" << endl;
+        //cerr << qv1 << endl;
+        //cerr << qv2 << endl;
+        cerr << "NaN, this probably means that you need more MC integration points" << endl;
+        
+        
+        cerr << endl;
+    }
+    
+    return res;
+}
+
+// Color factor -g^2/2 Cf not included
+mcresult DiagramIntegrator::OdderonMixedTggg(Diagram diag, Vec r, Vec K)
+{
+
+    // Integrate over q1, qtheta, q2, q2theta, q3, q3theta
+
+    // Integrate over the same variables as in the lO diagram + q1, qtheta, q2, q2theta
+    double QMIN=GetQmin();
+    double xlow=x;
+    double xup = 0.999;
+    const double KLIM=15;
+    
+    double *lower;
+    double *upper;
+    
+    
+    gsl_monte_function Ff;
+    
+    switch (diag) {
+        case ODDERON_LO:
+        case ODDERON_DIAG_14:
+        case ODDERON_DIAG_15:
+        case ODDERON_DIAG_16:
+        case ODDERON_DIAG_17:
+        case ODDERON_DIAG_20:
+        case ODDERON_DIAG_21:
+        case ODDERON_DIAG_22:
+        case ODDERON_DIAG_36:
+        case ODDERON_DIAG_37:
+        case ODDERON_DIAG_18:
+        case ODDERON_DIAG_29:
+        case ODDERON_DIAG_32:
+        case ODDERON_DIAG_38:
+        case ODDERON_DIAG_39:
+        case ODDERON_DIAG_40:
+        case ODDERON_DIAG_19:
+        case ODDERON_DIAG_30:
+        case ODDERON_DIAG_33:
+        case ODDERON_DIAG_41:
+        case ODDERON_DIAG_42:
+        case ODDERON_DIAG_48:
+        case ODDERON_DIAG_31:
+        case ODDERON_DIAG_34:
+        case ODDERON_DIAG_43:
+        case ODDERON_DIAG_49:
+        case ODDERON_UV_SUM:
+            Ff.dim=10;
+            lower = new double[Ff.dim];
+            upper = new double [Ff.dim];
+            lower[0]=lower[1]=lower[2]=lower[3]=0;
+            lower[4]=lower[5]=xlow;
+            
+            lower[6]=QMIN; lower[7]=0; // q1 q1th
+            lower[8]=QMIN; lower[9]=0; // q2 q2th
+            
+            upper[0]=upper[2]=KLIM;
+            upper[1]=upper[3]=2.0*M_PI;
+            upper[4]=upper[5]=xup;
+            
+            upper[6]=KLIM; upper[7]=2.0*M_PI; // q1 q1th
+            upper[8]=KLIM; upper[9]=2.0*M_PI;
+            break;
+        default:
+            Ff.dim=13;
+            lower = new double[Ff.dim];
+            upper = new double [Ff.dim];
+            lower[0]=lower[1]=lower[2]=lower[3]=lower[7]=lower[8]=0;
+            lower[4]=lower[5]=xlow; lower[6]=x;
+            lower[9]=QMIN; lower[10]=0;
+            lower[11]=QMIN; lower[12]=0;
+            upper[0]=upper[2]=upper[7]=KLIM;
+            upper[1]=upper[3]=upper[8]=2.0*M_PI;
+            
+            upper[4]=upper[5]=upper[6]=xup;
+            upper[9]=KLIM; upper[10]=2.0*M_PI;
+            upper[11]=KLIM; upper[12]=2.0*M_PI;
+            
+    };
+    
+   
+    
+    
+    dipole_helper helper;
+    helper.r=r; helper.K=K; helper.integrator=this;
+    helper.diag = diag;
+    
+       
+    Ff.params = &helper;
+    Ff.f = inthelperf_mc_odderon_mixed_Tggg;
+    
+    mcresult res;
+
+    
+    double result,error;
+    if (intmethod == MISER)
+    {
+        cerr << "Do not use miser" << endl;
+        exit(1);
+       /* gsl_monte_miser_state *s = gsl_monte_miser_alloc(Ff.dim);
+        gsl_monte_miser_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS, rng, s, &result, &error);
+        cout << "# Miser result " << result << " err " << error << " relerr " << std::abs(error/result) << endl;
+        gsl_monte_miser_free(s);*/
+    }
+
+    gsl_monte_vegas_state *s = gsl_monte_vegas_alloc(Ff.dim);
+    gsl_monte_vegas_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS/2, rng, s, &result, &error);
+    //cout << "# vegas warmup " << result << " +/- " << error << endl;
+    int iter=0;
+    do
+    {
+        gsl_monte_vegas_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS, rng, s, &result, &error);
+        cout << "# Vegas integration " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
+        iter++;
+    } while ( (std::abs( gsl_monte_vegas_chisq(s) - 1.0) > VEGAS_CHISQR_TOLERANCE or iter < 4 or std::abs(error/result) > MC_ERROR_TOLERANCE) and iter < 10);
+    
+    if (fabs( gsl_monte_vegas_chisq(s) - 1.0) > VEGAS_CHISQR_TOLERANCE or std::abs(error/result) > 0.5)
+    {
+        cerr << "Warning: large uncertainty with K=" << K <<", r=" << r << ", result " << result << " +/- " << error << " chi^2 " <<gsl_monte_vegas_chisq(s) << endl;
+    }
+    
+    res.chisqr =gsl_monte_vegas_chisq(s);
+    res.result = result;
+    res.error = error;
+    
+    gsl_monte_vegas_free(s);
+
+    
+    delete[] upper;
+    delete[] lower;
+    
+    return res;
+}
+

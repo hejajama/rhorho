@@ -34,7 +34,8 @@ enum MODE
     DIPOLE_BRUTEFORCE,
     DIPOLE_BRUTEFORCE_ANGLEDEP,
     MIXED_SPACE_BRUTEFORCE,
-    MIXED_SPACE_BRUTEFORCE_ANGLEDEP
+    MIXED_SPACE_BRUTEFORCE_ANGLEDEP,
+    ODDERON_TGGG_MIXED
 };
 
 void handler (const char * reason,
@@ -68,6 +69,7 @@ int main(int argc, char* argv[])
     double theta_b_q = 0;
     double b=0;
     double r=1;
+    double K=0;
     
     for (int i=1; i< argc; i++)
     {
@@ -95,6 +97,8 @@ int main(int argc, char* argv[])
             mode = FOURDIM;
         else if (string(argv[i])=="-ward")
             mode = WARD;
+        else if (string(argv[i])=="-Tggg_mixed")
+            mode = ODDERON_TGGG_MIXED;
         else if (string(argv[i])=="-q12")
             q12 = StrToReal(argv[i+1]);
         else if (string(argv[i])=="-theta_b_q")
@@ -111,6 +115,8 @@ int main(int argc, char* argv[])
             b = StrToReal(argv[i+1]);
         else if (string(argv[i])=="-r")
             r = StrToReal(argv[i+1]);
+        else if (string(argv[i])=="-K")
+            K = StrToReal(argv[i+1]);
         else if (string(argv[i])=="-smallx")
             integrator->SetSmallX(true);
         else if (string(argv[i])=="-regulate_uv_finite")
@@ -521,6 +527,35 @@ int main(int argc, char* argv[])
                delete[] dipoles;
                
            }
+    
+    else if (mode == ODDERON_TGGG_MIXED)
+    {
+        const double MINR = 0.1;
+        const double MAXR = 5;
+        const int RPOINTS = 8;
+        const double RSTEP = (MAXR-MINR)/(RPOINTS-1);
+        mcresult *dipoles = new mcresult[RPOINTS];
+        
+        Vec Kv(K,0);
+        
+        cout <<"# Tggg, K=" << Kv << endl;
+        
+#pragma omp parallel for
+        for (int i=0; i<RPOINTS; i++)
+        {
+            double tmpr = MINR + i*RSTEP;
+            Vec rv(r,0); // Along x axis
+            
+            mcresult d = integrator->OdderonMixedTggg(diag, rv, Kv);
+            dipoles[i] = d;
+        }
+        
+        for (int i=0; i<RPOINTS; i++)
+        {
+            double tmpr = MINR + i*RSTEP;
+            cout << tmpr << " " << dipoles[i].result << " " << dipoles[i].error << " " << dipoles[i].chisqr << endl;
+        }
+    }
     
     
     

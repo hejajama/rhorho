@@ -521,6 +521,7 @@ public:
     // Odderon FT
     mcresult OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag);
     mcresult OdderonAmplitude(Diagram diag, Vec r, Vec b);
+    mcresult OdderonMixedTggg(Diagram diag, Vec r, Vec K);
     
     void SetQmin(double qm) { qmin=qm; }
     double GetQmin() { return qmin; }
@@ -559,6 +560,7 @@ struct dipole_helper
     DiagramIntegrator* integrator;
     Vec r;
     Vec b;
+    Vec K;
     Diagram diag;
 };
 
