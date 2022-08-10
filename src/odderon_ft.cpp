@@ -1584,8 +1584,8 @@ double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
     
     // IR cutoff as in https://arxiv.org/pdf/1903.07660.pdf (29)
     // Note that our results in principle should not depend on this cutoff!
-    const double lambda = std::pow(par->integrator->GetQmin(),2)
-    res *= (1.0 - np.exp(-q1.LenSqr()/(2.0*lambda)))*(1.0 - np.exp(-q2.LenSqr()/(2.0*lambda)))*(1.0 - np.exp(-q3.LenSqr()/(2.0*lambda)));
+    const double lambda = std::pow(par->integrator->GetQmin(),2);
+    res *= (1.0 - std::exp(-q1.LenSqr()/(2.0*lambda)))*(1.0 - std::exp(-q2.LenSqr()/(2.0*lambda)))*(1.0 - std::exp(-q3.LenSqr()/(2.0*lambda)));
     
     
     // Jacobian
@@ -1841,8 +1841,8 @@ double inthelperf_mc_odderon_mixed_Tggg(double *vec, size_t dim, void* p)
     
     // IR cutoff as in https://arxiv.org/pdf/1903.07660.pdf (29)
     // Note that our results in principle should not depend on this cutoff!
-    const double lambda = std::pow(par->integrator->GetQmin(),2)
-    res *= (1.0 - np.exp(-q1.LenSqr()/(2.0*lambda)))*(1.0 - np.exp(-q2.LenSqr()/(2.0*lambda)))*(1.0 - np.exp(-q3.LenSqr()/(2.0*lambda)));
+    const double lambda = std::pow(par->integrator->GetQmin(),2);
+    res *= (1.0 - std::exp(-q1.LenSqr()/(2.0*lambda)))*(1.0 - std::exp(-q2.LenSqr()/(2.0*lambda)))*(1.0 - std::exp(-q3.LenSqr()/(2.0*lambda)));
     
     
     res /= (q1.LenSqr() * q2.LenSqr() * q3.LenSqr());

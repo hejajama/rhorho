@@ -392,7 +392,7 @@ int main(int argc, char* argv[])
         const double MAXR = 5;
         const double MINR = 0.1;
         const int rpoints = 8;
-        const double RSTEP = (MAXR-MINR)/rpoints;
+        const double RSTEP = (MAXR-MINR)/(rpoints-1);
         mcresult dipoles[rpoints];
         
 #pragma omp parallel for
