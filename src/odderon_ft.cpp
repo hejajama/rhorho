@@ -1588,7 +1588,26 @@ double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
     
     res /= (q1.LenSqr() * q2.LenSqr() * q3.LenSqr());
     
-    res *= (std::sin(r*q1 + (r*K)*0.5) - 1./3.*std::sin((r*K)*0.5));
+    //res *= (std::sin(r*q1 + (r*K)*0.5) - 1./3.*std::sin((r*K)*0.5));
+    
+    // Potnetial large cancellation 1
+    // Compute q_i such that the component parallel to b is inverted
+    // Note that I always choose b || x axis
+    if (std::abs(b.GetY()) > 1e-7)
+    {
+        std::cerr << "Cancellation trick is implemented requiring that b is parallel to x axis" << endl;
+        exit(1);
+    }
+    Vec q1prime(-q1.GetX(), q1.GetY(), q1.GetZ());
+    Vec q2prime(-q2.GetX(), q2.GetY(), q2.GetZ());
+    Vec q3prime(-q3.GetX(), q3.GetY(), q3.GetZ());
+    Vec Kprime = (q1prime+q2prime+q3prime)*(-1);
+    
+    res *= 0.5*std::sin(r*q1 + (r*K)*0.5) - 1./3.*std::sin((r*K)*0.5)
+         - std::sin(r*q1prime + (r*Kprime)*0.5) + 1./3.*std::sin((r*Kprime)*0.5);
+    
+    
+    
     
     res *= -std::sin(b*K); // Imaginary part
 //	res *= cos(b*K);
