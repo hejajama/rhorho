@@ -1531,11 +1531,16 @@ double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
         q3 = Vec(vec[10]*std::cos(vec[11]),vec[10]*std::sin(vec[11]));
         
 
-        
-        /*if (q1.LenSqr() < 1e-15 or q3.LenSqr() < 1e-15)
+        if (qmin_ir_cutoff == HARD)
         {
-            return 0; // Ward
-        }*/
+            const double minq2 = std::pow(par->integrator->GetQmin(),2);
+        
+            if (q1.LenSqr() < minq2 or q2.LenSqr() < minq2 or q3.LenSqr() < minq2)
+            {
+                return 0; // Ward
+            }
+        }
+            
             
         
         momspacehelper.q1 = q1;
@@ -1556,9 +1561,16 @@ double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
         q2 = Vec(vec[11]*std::cos(vec[12]),vec[11]*std::sin(vec[12]));
         q3 = Vec(vec[13]*std::cos(vec[14]),vec[13]*std::sin(vec[14]));
         
-        //if (q1.LenSqr() < 1e-15 or q3.LenSqr() < 1e-15)
-        //    return 0; // Ward
+        if (qmin_ir_cutoff == HARD)
+        {
+            const double minq2 = std::pow(par->integrator->GetQmin(),2);
         
+            if (q1.LenSqr() < minq2 or q2.LenSqr() < minq2 or q3.LenSqr() < minq2)
+            {
+                return 0; // Ward
+            }
+        }
+
         momspacehelper.q1 = q1;
         momspacehelper.q2 = q2;
         momspacehelper.q3 = q3;
@@ -1581,12 +1593,14 @@ double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
     res *= -std::sin(b*K); // Imaginary part
 //	res *= cos(b*K);
     
-    
-    // IR cutoff as in https://arxiv.org/pdf/1903.07660.pdf (29)
-    // Note that our results in principle should not depend on this cutoff!
-    const double lambda = std::pow(par->integrator->GetQmin(),2);
-    res *= (1.0 - std::exp(-q1.LenSqr()/(2.0*lambda)))*(1.0 - std::exp(-q2.LenSqr()/(2.0*lambda)))*(1.0 - std::exp(-q3.LenSqr()/(2.0*lambda)));
-    
+   
+    if (qmin_ir_cutoff == GAUSSIAN)
+    { 
+        // IR cutoff as in https://arxiv.org/pdf/1903.07660.pdf (29)
+        // Note that our results in principle should not depend on this cutoff!
+        const double lambda = std::pow(par->integrator->GetQmin(),2);
+        res *= (1.0 - std::exp(-q1.LenSqr()/(2.0*lambda)))*(1.0 - std::exp(-q2.LenSqr()/(2.0*lambda)))*(1.0 - std::exp(-q3.LenSqr()/(2.0*lambda)));
+    }
     
     // Jacobian
     res *= q1.Len()*q2.Len()*q3.Len();
@@ -1790,12 +1804,15 @@ double inthelperf_mc_odderon_mixed_Tggg(double *vec, size_t dim, void* p)
         q2 = Vec(vec[8]*std::cos(vec[9]),vec[8]*std::sin(vec[9]));
         q3 = q1*(-1) + q2*(-1) + K*(-1);  //Vec(vec[10]*std::cos(vec[11]),vec[10]*std::sin(vec[11]));
         
-        /*const double minq2 = std::pow(par->integrator->GetQmin(),2);
-        
-        if (q1.LenSqr() < minq2 or q2.LenSqr() < minq2 or q3.LenSqr() < minq2)
+        if (qmin_ir_cutoff == HARD)
         {
-            return 0; // Ward
-        }*/
+            const double minq2 = std::pow(par->integrator->GetQmin(),2);
+        
+            if (q1.LenSqr() < minq2 or q2.LenSqr() < minq2 or q3.LenSqr() < minq2)
+            {
+                return 0; // Ward
+            }
+        }
             
         
         momspacehelper.q1 = q1;
@@ -1816,13 +1833,16 @@ double inthelperf_mc_odderon_mixed_Tggg(double *vec, size_t dim, void* p)
         q2 = Vec(vec[11]*std::cos(vec[12]),vec[11]*std::sin(vec[12]));
         //q3 = Vec(vec[13]*std::cos(vec[14]),vec[13]*std::sin(vec[14]));
         q3 = q1*(-1) + q2*(-1) + K*(-1);
+    
+        if (qmin_ir_cutoff == HARD)
+        {    
+            const double minq2 = std::pow(par->integrator->GetQmin(),2);
         
-        /*const double minq2 = std::pow(par->integrator->GetQmin(),2);
-        
-        if (q1.LenSqr() < minq2 or q2.LenSqr() < minq2 or q3.LenSqr() < minq2)
-        {
-            return 0; // Ward
-        }*/
+            if (q1.LenSqr() < minq2 or q2.LenSqr() < minq2 or q3.LenSqr() < minq2)
+            {
+                return 0; // Ward
+            }
+        }
         
         momspacehelper.q1 = q1;
         momspacehelper.q2 = q2;
@@ -1838,12 +1858,14 @@ double inthelperf_mc_odderon_mixed_Tggg(double *vec, size_t dim, void* p)
     
     double res = momspace / std::pow(2.0*M_PI,6.);
     
-    
-    // IR cutoff as in https://arxiv.org/pdf/1903.07660.pdf (29)
-    // Note that our results in principle should not depend on this cutoff!
-    const double lambda = std::pow(par->integrator->GetQmin(),2);
-    res *= (1.0 - std::exp(-q1.LenSqr()/(2.0*lambda)))*(1.0 - std::exp(-q2.LenSqr()/(2.0*lambda)))*(1.0 - std::exp(-q3.LenSqr()/(2.0*lambda)));
-    
+   
+    if (qmin_ir_cutoff == GAUSSIAN)
+    { 
+        // IR cutoff as in https://arxiv.org/pdf/1903.07660.pdf (29)
+        // Note that our results in principle should not depend on this cutoff!
+        const double lambda = std::pow(par->integrator->GetQmin(),2);
+        res *= (1.0 - std::exp(-q1.LenSqr()/(2.0*lambda)))*(1.0 - std::exp(-q2.LenSqr()/(2.0*lambda)))*(1.0 - std::exp(-q3.LenSqr()/(2.0*lambda)));
+    }
     
     res /= (q1.LenSqr() * q2.LenSqr() * q3.LenSqr());
     

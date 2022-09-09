@@ -391,8 +391,8 @@ int main(int argc, char* argv[])
         cout << "# r = (r,0)" << endl;
         const double MAXR = 5;
         const double MINR = 0.1;
-        const int rpoints = 8;
-        const double RSTEP = (MAXR-MINR)/(rpoints-1);
+        const int rpoints = 1;
+        const double RSTEP = 0; //(MAXR-MINR)/(rpoints-1);
         mcresult dipoles[rpoints];
         
 #pragma omp parallel for
@@ -420,7 +420,7 @@ int main(int argc, char* argv[])
             cout << "# r = " << r  << endl;
             const double MINTH = 0;
             const double MAXTH = M_PI;
-            const int THPOINTS = 11;
+            const int THPOINTS = 9;
             const double THSTEP = (MAXTH-MINTH)/(THPOINTS-1);
             mcresult dipoles[THPOINTS];
             cout <<"# th(r,b)   N(r,b,thrb)" << endl;

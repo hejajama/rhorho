@@ -14,4 +14,12 @@
 const double VEGAS_CHISQR_TOLERANCE = 0.2;
 const double MC_ERROR_TOLERANCE = 0.2;
 
+enum QMIN_CUTOFF
+{
+ HARD,
+ GAUSSIAN
+};
+
+const QMIN_CUTOFF qmin_ir_cutoff = HARD;
+
 #endif /* odderon_ft_hpp */
