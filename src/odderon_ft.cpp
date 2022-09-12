@@ -1603,8 +1603,9 @@ double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
     Vec q3prime(-q3.GetX(), q3.GetY(), q3.GetZ());
     Vec Kprime = (q1prime+q2prime+q3prime)*(-1);
     
-    res *= 0.5*std::sin(r*q1 + (r*K)*0.5) - 1./3.*std::sin((r*K)*0.5)
-         - std::sin(r*q1prime + (r*Kprime)*0.5) + 1./3.*std::sin((r*Kprime)*0.5);
+    res *= 0.5*
+        (std::sin(r*q1 + (r*K)*0.5) - 1./3.*std::sin((r*K)*0.5)
+         - std::sin(r*q1prime + (r*Kprime)*0.5) + 1./3.*std::sin((r*Kprime)*0.5));
     
     
     
