@@ -420,7 +420,7 @@ int main(int argc, char* argv[])
             cout << "# r = " << r  << endl;
             const double MINTH = 0;
             const double MAXTH = M_PI;
-            const int THPOINTS = 9;
+            const int THPOINTS = 5;
             const double THSTEP = (MAXTH-MINTH)/(THPOINTS-1);
             mcresult dipoles[THPOINTS];
             cout <<"# th(r,b)   N(r,b,thrb)" << endl;
