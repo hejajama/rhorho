@@ -418,25 +418,43 @@ int main(int argc, char* argv[])
             cout <<"# Dipole amplitude, b=" << b << endl;
             cout <<"# qmin = " << integrator->GetQmin() << " GeV" << endl;
             cout << "# r = " << r  << endl;
-            const double MINTH = 0;
-            const double MAXTH = M_PI;
-            const int THPOINTS = 9;
-            const double THSTEP = (MAXTH-MINTH)/(THPOINTS-1);
+            
+            // Use the fact that odderon vanishes at pi/2, this is an
+            // analytically and numerically confirmed fact
+            
+            // Generate thpoints that we want to calculate
+            const int THPOINTS = 2*5; // assumed to be even
             mcresult dipoles[THPOINTS];
+            double thetavals[THPOINTS];
+            
+            for (int i=0; i < THPOINTS/2; i++)
+            {
+                thetavals[i] = static_cast<double>(i)/static_cast<double>(THPOINTS/2)*(M_PI/2.);
+                thetavals[THPOINTS/2+i] = M_PI/2. +  static_cast<double>(i+1)/static_cast<double>(THPOINTS/2)*(M_PI/2.);
+            }
+            
             cout <<"# th(r,b)   N(r,b,thrb)" << endl;
     #pragma omp parallel for
             for (int i=0; i<THPOINTS; i++)
             {
-                double th = MINTH + i*THSTEP;
-                Vec rv(r*std::cos(th),r*std::sin(th));
+                Vec rv(r*std::cos(thetavals[i]),r*std::sin(thetavals[i]));
                 mcresult d = integrator->OdderonAmplitude(diag, rv, bv);
                 dipoles[i]=d;
             }
+            
             for (int i=0; i<THPOINTS; i++)
             {
-                double th = MINTH + i*THSTEP;
-                cout << th << " " << dipoles[i].result << " " << dipoles[i].error << " " << dipoles[i].chisqr << endl;
+                if (i>0 and i < THPOINTS-1)
+                {
+                    if (thetavals[i-1] < M_PI/2. and thetavals[i] > M_PI/2.)
+                    {
+                        cout << M_PI/2. << " 0 0 0" << endl;
+                    }
+                }
+                cout << thetavals[i] << " " << dipoles[i].result << " " << dipoles[i].error << " " << dipoles[i].chisqr << endl;
             }
+            
+            
             
             
         }
