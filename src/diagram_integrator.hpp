@@ -54,14 +54,21 @@ enum Diagram
     DIAG_8M_1,
     DIAG_8M_2,
     
-    DIAG_LO
+    DIAG_LO,
+    
+    DIAG_FINITE_SUM,
+    DIAG_UV_SUM
     
 };
-const int NUM_OF_DIAGRAMS = 35;
+const int FIRST_UV_FINITE = 8;
+const int LAST_UV_FINITE = 33;
+const int FIRST_UV_DIV = 0;
+const int LAST_UV_DIV = 7;
+const int NUM_OF_DIAGRAMS = 35+2;
 const std::string DIAGRAM_STRINGS[NUM_OF_DIAGRAMS] = {"2a", "3a", "3a_2", "3b", "3b_2", "5a", "5c", "5c_1",
         "2b", "3c", "3c_2", "3d", "3d_2", "6e_2", "6f_1",
          "6g_1", "7h", "7i", "7j", "7k", "7l", "7m", "8h_1",
-    "8h_2", "8i_1", "8i_2", "8j_1", "8j_2", "8k_1", "8k_2", "8l_1", "8l_2", "8m_1", "8m_2", "LO"};
+    "8h_2", "8i_1", "8i_2", "8j_1", "8j_2", "8k_1", "8k_2", "8l_1", "8l_2", "8m_1", "8m_2", "LO", "finite_sum","uv_sum"};
 const Diagram DIAGRAMS[NUM_OF_DIAGRAMS] = {
     DIAG_2A,
     DIAG_3A,
@@ -104,11 +111,18 @@ const Diagram DIAGRAMS[NUM_OF_DIAGRAMS] = {
     DIAG_8M_1,
     DIAG_8M_2,
     
-    DIAG_LO
+    DIAG_LO,
+    
+    DIAG_FINITE_SUM,
+    DIAG_UV_SUM
 };
 
 const int NC=3;
 const double CF = (NC*NC-1.)/(2.*NC);
+
+// Color factors
+const double COLOR_ADJ = 3.;
+const double COLOR_FUND = 0.5;
 
 enum IntegrationMethod
 {

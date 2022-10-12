@@ -332,10 +332,10 @@ int main(int argc, char* argv[])
         Vec bv(b*std::cos(theta_b_q), b*std::sin(theta_b_q));
         cout <<"# Dipole amplitude, b=" << bv << endl;
         cout << "# r = (r,0)" << endl;
-        const double MAXR = 10;
+        const double MAXR = 5;
         const double MINR = 0.1;
-        const int rpoints = 30;
-        const double RSTEP = (MAXR-MINR)/rpoints;
+        const int rpoints = 10;
+        const double RSTEP = (MAXR-MINR)/(rpoints-1);
         double dipoles[rpoints];
         
 #pragma omp parallel for

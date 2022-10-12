@@ -14,7 +14,8 @@
 
 using namespace std;
 
-
+double inthelperf_mc_finitesum(double *vec, size_t dim, void* p);
+double inthelperf_mc_uvsum(double* vec, size_t dim, void* p);
 
 /*
  * LO diagram
@@ -52,7 +53,7 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
     if (isnan(wf1) or isnan(wf2))
         cerr <<"Note: WF NaN at x1 " << x1 << " x2 "<<  x2 << " k1 " << k1 << " k2 " << k2 << " q1 " << q1 << " q2 " << q2 << endl;
     
-    double res = wf1*wf2 * 1./6.*3; // 3 is the symmetry factor and 1/6 the normalization in Risto (77)
+    double res = wf1*wf2 * 1./6.*3*COLOR_FUND; // 3 is the symmetry factor and 1/6 the normalization in Risto (77)
     
     // 16pi^3 because NLO diagrams do not include 1/(16pi^3) prefactor
     // Python analysis notebook divides by 1/16pi^3
@@ -70,6 +71,14 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
 {
     if (dim != 9) exit(1);
     inthelper_diagint *par = (inthelper_diagint*)p;
+    
+    // If the integrand is diag sum, use specific integrand funtions
+    if (par->diag == DIAG_FINITE_SUM)
+    {
+         return inthelperf_mc_finitesum(vec, dim, p);
+    }
+    
+    std::cerr << "NOTE: No color factors included when computing individual diagrams!" << endl;
     
     Vec k1(vec[0]*std::cos(vec[1]), vec[0]*std::sin(vec[1]));
     Vec k2(vec[2]*std::cos(vec[3]), vec[2]*std::sin(vec[3]));
@@ -378,6 +387,14 @@ double inthelperf_mc_diag2a(double *vec, size_t dim, void* p)
 {
     if (dim != 6) exit(1);
     inthelper_diagint *par = (inthelper_diagint*)p;
+    
+    // If the integrand is diag sum, use specific integrand funtions
+    if (par->diag == DIAG_UV_SUM)
+    {
+         return inthelperf_mc_uvsum(vec, dim, p);
+    }
+    
+    std::cerr << "NOTE: No color factors included when computing individual diagrams!" << endl;
     Vec k1(vec[0]*std::cos(vec[1]), vec[0]*std::sin(vec[1]));
     Vec k2(vec[2]*std::cos(vec[3]), vec[2]*std::sin(vec[3]));
     Vec q1 = par->q1;
@@ -955,6 +972,7 @@ double DiagramIntegrator::DipoleAmplitudeBruteForce(Diagram diag, Vec r, Vec b)
         case DIAG_5A:
         case DIAG_5C:
         case DIAG_5C_1:
+        case DIAG_UV_SUM:
         case DIAG_LO:
             Ff.dim=10;
             lower = new double[Ff.dim];
@@ -1055,7 +1073,7 @@ Interpolator* DiagramIntegrator::InitializeInterpolator()
 
 DiagramIntegrator::DiagramIntegrator()
 {
-    mf=0.1;
+    mf=0.2;
     intmethod = VEGAS;
     
     proton.SetBeta(0.55);

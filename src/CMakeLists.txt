@@ -7,6 +7,7 @@ add_library(
 	vector.cpp
 	proton.cpp
 	diagram_integrator.cpp
+	diagram_sum.cpp
 	interpolation.cpp
 )
 
