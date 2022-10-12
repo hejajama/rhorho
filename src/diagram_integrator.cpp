@@ -77,8 +77,8 @@ double inthelperf_mc_lo(double *vec, size_t dim, void* p)
         
         wf2 = wf2*norm;
         
-        // Now normalization such that I compute
-        // Such that I compute g^3 G_3- = this*d^(abc)*g^3
+        // Now normalization such that I compute <rho rho rho> d^(abc) without g^3,
+        // so G3  = 4*this
     }
     
     
