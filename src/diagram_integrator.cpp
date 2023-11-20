@@ -160,66 +160,72 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = (p2-q2)*z2 - (kg-q1)*(1.-z2);
             norm=1./12.*6.;
             break;
-        /*case DIAG_6E: // Risto (82)
-            return 0;
-            ktilde_1 =
-            ktilde_2 =
+        case DIAG_6E: // (82): now included when symmetry factors fixed
+            ktilde_1 = k1 - q*(1.-x1) - kg + K*xg;
+            ktilde_2 = k2 + q*x2 + kg - K*xg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
             norm = -CF/3.*6;
             break;
-        case DIAG_6E_1: // (85), note that 6E + 6E_1 = 0!
-            return 0;
-            ktilde_1 =
-            ktilde_2 =
-            A = p1*z1 - kg;
-            B = p2*z1 - kg*(1.-z2);
-            norm = CF/3. * 6;
-            break;
-         */
-        case DIAG_6E_2: // Risto (86)
-            ktilde_1 = k1 - q*(1.-x1) -kg+K*xg;
+        case DIAG_6E_1: // (85), previously  6E + 6E_1 = 0, but now not true with fixed symmetry factors
+            ktilde_1 = k1 - q*(1.-x1) - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            A = (p1-q1-q2)*z1 -kg;
+            A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = CF/3. * 6;
+            norm = CF/3. * 3;
             break;
-        //case DIAG_6F: // Cancels with 6f''
-       //     return 0;
-       //     break;
+        case DIAG_6E_2: // Risto (86)
+            ktilde_1 = k1 - q*(1.-x1) - kg + K*xg;
+            ktilde_2 = k2 + q*x2 + kg - K*xg;
+            A = (p1-q)*z1 -kg;
+            B = p2*z2 - kg*(1.-z2);
+            norm = CF/3. * 3;   // Symmetry factor fixed
+            break;
+        case DIAG_6F: // Cancelled with with 6f'' originally, not anymore with fixed symmetry factors
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 - q*(1.-x2) + kg - K*xg;
+            A = p1*z1 - kg;
+            B = (p2-q)*z2 - kg*(1.-z2);
+            norm = -CF/3.*6;
+            break;
         case DIAG_6F_1: // (87)
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 - q*(1.-x2) + kg - K*xg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = CF/3. * 6;
+            norm = CF/3. * 3;
             break;
-        /*case DIAG_6F_2: // Cancels with 6F
-            ktilde_1 =
-            ktilde_2 =
+        case DIAG_6F_2: // Originally cancelled with 6f, not with fixed symmetry factors, (88)
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 - q*(1.-x2) + kg - K*xg;
             A = p1*z1-kg;
-            B = (p2-q1-q2)*z2 - kg*(1.-z2);
-            norm = 1./3. * 6;
-            break;*/
-        /*
-         case DIAG_6G:
-            return 0; // Cancels with DIAG_6G_2
-         */
+            B = (p2-q)*z2 - kg*(1.-z2);
+            norm = CF/3. * 3;
+            break;
+        
+/* 6g+6g'+6g''=0 with fixed symmetry factors
+         case DIAG_6G: // Included with fixed symmetry factors, originally cancelled with 6G''
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 + kg - K*xg; 
+            A = p1*z1 - kg;
+            B = p2*z2 - kg*(1.-z2);
+            norm = -1./3. * CF * 6;
+            break;
         case DIAG_6G_1: // (89)
-            ktilde_1 = k1 + q*x1 - kg +  K*xg;
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = CF*1./3. * 6;
+            norm = CF*1./3. * 3; // Symmetry factor fixed
             break;
-        /*case DIAG_6G_2:
-            return 0; // Cancels with 6G
-            ktilde_1 = k1 + (q1+q2)*x1 - kg;
-            ktilde_2 = k2 + (q1+q2)*x2 + kg;
+        case DIAG_6G_2:  // Originally cancelled with 6G, not with fixed symmetry factors
+            ktilde_1 = k1 + q*x1 - kg + K*xg;
+            ktilde_2 = k2 + q*x2 + kg - K*xg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = 1./3. * CF * 6;*/
+            norm = 1./3. * CF * 3; // Symmetry factor fixed
             break;
+            */
         case DIAG_7H:
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
@@ -267,84 +273,84 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             ktilde_2 = k2 + q*x2 + kg - q1 - K*xg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -2./9.*6;
+            norm = -2./9.*3;
             break;
         case DIAG_8H_2:
             ktilde_1 = k1 + q*x1 - kg - q2 + K*xg;
             ktilde_2 = k2 + q*x2 + kg - q1 - K*xg;
             A = (p1-q2)*z1-kg;
             B = (p2-q1)*z2 - kg*(1.-z2);
-            norm = -2./9. * 6;
+            norm = -2./9. * 3;
             break;
         case DIAG_8I_1: // 8H_1, q1 <-> q2
             ktilde_1 = k1 + q*x1 - kg - q1 + K*xg;
             ktilde_2 = k2 + q*x2 + kg - q2 - K*xg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -2./9.*6;
+            norm = -2./9. * 3;
             break;
         case DIAG_8I_2: // 8H_2, q1 <-> q2
             ktilde_1 = k1 + q*x1 - kg - q1 + K*xg;
             ktilde_2 = k2 + q*x2 + kg - q2 - K*xg;
             A = (p1-q1)*z1-kg;
             B = (p2-q2)*z2 - kg*(1.-z2);
-            norm = -2./9. * 6;
+            norm = -2./9. * 3;
             break;
         case DIAG_8J_1:
             ktilde_1 = k1 + q*x1 - kg - q2 + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3.)*6;
+            norm = -1./3. * (CF-2./3.)*3;
             break;
         case DIAG_8J_2:
             ktilde_1 = k1 + q*x1 - kg - q2 + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
             A = (p1-q2)*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3.)*6;
+            norm = -1./3. * (CF-2./3.)*3;
             break;
         case DIAG_8K_1: // 8J_1, q1 <-> q2
             ktilde_1 = k1 + q*x1 - kg - q1 + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3.)*6;
+            norm = -1./3. * (CF-2./3.)*3;
             break;
         case DIAG_8K_2: // 8J_2, q1 <-> q2
             ktilde_1 = k1 + q*x1 - kg - q1 + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
             A = (p1-q1)*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3.)*6;
+            norm = -1./3. * (CF-2./3.)*3;
             break;
         case DIAG_8L_1:
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - q2 - K*xg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3)*6;
+            norm = -1./3. * (CF-2./3)*3;
             break;
         case DIAG_8L_2:
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - q2 - K*xg;
             A = p1*z1 - kg;
             B = (p2-q2)*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3)*6;
+            norm = -1./3. * (CF-2./3)*3;
             break;
         case DIAG_8M_1: // 8L_1, q1<->q2
             ktilde_1 =  k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - q1 - K*xg;
             A = p1*z1 - kg;
             B = p2*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3)*6;
+            norm = -1./3. * (CF-2./3)*3;
             break;
         case DIAG_8M_2: // 8L_2, q1<->q2
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - q1 - K*xg;
             A = p1*z1 - kg;
             B = (p2-q1)*z2 - kg*(1.-z2);
-            norm = -1./3. * (CF-2./3)*6;
+            norm = -1./3. * (CF-2./3)*3;
             break;
         default:
             cerr << "Unknown diagram in inthelperf_mc_diag2b: " << par->diag << endl;
