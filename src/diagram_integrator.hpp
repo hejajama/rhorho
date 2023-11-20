@@ -28,13 +28,15 @@ enum Diagram
     DIAG_3C_2,
     DIAG_3D,
     DIAG_3D_2,
-    //DIAG_6E, // cancel
-    //DIAG_6E_1,
+    DIAG_6E, 
+    DIAG_6E_1,
     DIAG_6E_2,
+    DIAG_6F,   
     DIAG_6F_1,
-    //DIAG_6F_2, // cancels with 6f
-    DIAG_6G_1,
-    //DIAG_6G_2, // cancels with 6g
+    DIAG_6F_2, 
+    //DIAG_6G, // With fixed symmetry factors 6g+6g'+6g''=0
+    //DIAG_6G_1,
+    //DIAG_6G_2, 
     DIAG_7H,
     DIAG_7I,
     DIAG_7J,
@@ -60,14 +62,19 @@ enum Diagram
     DIAG_UV_SUM
     
 };
-const int FIRST_UV_FINITE = 8;
-const int LAST_UV_FINITE = 33;
+const int FIRST_UV_FINITE = 8; 
+const int LAST_UV_FINITE = 36; 
 const int FIRST_UV_DIV = 0;
 const int LAST_UV_DIV = 7;
-const int NUM_OF_DIAGRAMS = 35+2;
+const int NUM_OF_DIAGRAMS = 37+3;
 const std::string DIAGRAM_STRINGS[NUM_OF_DIAGRAMS] = {"2a", "3a", "3a_2", "3b", "3b_2", "5a", "5c", "5c_1",
-        "2b", "3c", "3c_2", "3d", "3d_2", "6e_2", "6f_1",
-         "6g_1", "7h", "7i", "7j", "7k", "7l", "7m", "8h_1",
+        "2b", "3c", "3c_2", "3d", "3d_2",
+        "6e","6e_1", // Added when fixing symmetry factors
+         "6e_2", 
+         "6f", // Added when fixing symmetry factors
+         "6f_1",
+         "6f_2", // Added when fixing symmetry factors
+         "7h", "7i", "7j", "7k", "7l", "7m", "8h_1",
     "8h_2", "8i_1", "8i_2", "8j_1", "8j_2", "8k_1", "8k_2", "8l_1", "8l_2", "8m_1", "8m_2", "LO", "finite_sum","uv_sum"};
 const Diagram DIAGRAMS[NUM_OF_DIAGRAMS] = {
     DIAG_2A,
@@ -85,13 +92,15 @@ const Diagram DIAGRAMS[NUM_OF_DIAGRAMS] = {
     DIAG_3C_2,
     DIAG_3D,
     DIAG_3D_2,
-    //DIAG_6E, // cancel
-    //DIAG_6E_1,
+    DIAG_6E, 
+    DIAG_6E_1,
     DIAG_6E_2,
+    DIAG_6F,   
     DIAG_6F_1,
-    //DIAG_6F_2, // cancels with 6f
-    DIAG_6G_1,
-    //DIAG_6G_2, // cancels with 6g
+    DIAG_6F_2, 
+//    DIAG_6G,
+//    DIAG_6G_1,
+//    DIAG_6G_2, 
     DIAG_7H,
     DIAG_7I,
     DIAG_7J,
