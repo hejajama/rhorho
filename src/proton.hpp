@@ -28,6 +28,7 @@ public:
     double GetP() { return wf_power; }
     void SetWaveFunction(ProtonWaveFunction wf) { wave_function = wf; }
     ProtonWaveFunction GetWaveFunction() { return wave_function; }
+    void ScaleWaveFunctionParameters(double alphas, double x); // For HO wavef scale beta depending on x, as
 private:
     ProtonWaveFunction wave_function;
     double beta;   // In HO wave function

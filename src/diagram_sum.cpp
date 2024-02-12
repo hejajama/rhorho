@@ -103,7 +103,7 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
                 B = (p2-q1)*z2 - (kg-q2)*(1.-z2);
                 norm=1./12.*6.*COLOR_ADJ;
                 break;
-            case DIAG_3D_2:
+            case DIAG_3D_2: // q1 <-> q2
                 ktilde_1 = k1 + q*x1 - kg + K*xg;
                 ktilde_2 = k2 - q*(1.-x2)+kg-K*xg;
                 A = p1*z1 - kg;

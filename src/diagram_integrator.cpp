@@ -560,6 +560,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2 )
         case DIAG_5C:
         case DIAG_5C_1:
         case DIAG_LO:
+        case DIAG_UV_SUM:
             F.dim=6;
             lower = new double[F.dim];
             upper = new double [F.dim];

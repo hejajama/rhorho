@@ -48,6 +48,51 @@ Proton::Proton()
 }
 
 
+double Close(double a, double b, double eps=1e-6)
+{
+    if (std::abs(a-b)<eps) return true;
+    else return false;
+}
+void Proton::ScaleWaveFunctionParameters(double alphas, double x)
+{
+    if (!Close(beta,0.55))
+    {
+        cerr << "Proton::ScaleWaveFunctionParameters only works if default value for beta (0.55) is used, but here we have " << beta << endl;
+        exit(1);
+    }
+    if (wave_function != HarmoinicOscillator)
+    {
+        cerr << "Proton::ScaleWaveFunctionParameters only works  for harmonic oscillator wave funtion" << endl;
+        exit(1);
+    }
+
+    // Table by Drumitru, Stebel, email 31.1.2024
+    if ( Close(alphas, 0.2) and Close(x, 0.3) )
+        beta *= 1.014;
+    else if ( Close(alphas, 0.25) and Close(x, 0.3) )
+        beta *= 1.018;
+    else if ( Close(alphas, 0.3) and Close(x, 0.3) )
+        beta *= 1.022;
+    else if ( Close(alphas, 0.2) and Close(x, 0.1) )
+        beta *= 1.057;
+    else if ( Close(alphas, 0.25) and Close(x, 0.1))
+        beta *= 1.076;
+    else if ( Close(alphas, 0.3) and Close(x, 0.1))
+        beta *= 1.096;
+    else if ( Close(alphas, 0.2) and Close(x, 0.05))
+        beta *= 1.1;
+    else if (Close(alphas, 0.25) and Close(x,0.05))
+        beta *= 1.14;
+    else if (Close(alphas, 0.05) and Close(x,0.3))
+        beta *= 1.19;
+    else
+    {
+        cerr << "Proton::ScaleWaveFunctionParameters does not support alphas="<< alphas <<", x=" << x << endl;
+        exit(1);
+    }
+}
+
+
 struct inthelper_norm
 {
     Proton* proton;

@@ -28,7 +28,7 @@ long int StrToInt(std::string str)
 enum MODE
 {
     ONEDIM,
-    TWODIM,
+    TWODIM, 
     WARD,
     FOURDIM,
     DIPOLE_BRUTEFORCE,
@@ -66,11 +66,18 @@ int main(int argc, char* argv[])
     double theta_b_q = 0;
     double b=0;
     double r=1;
+    double alpha_s=0;
+    double x=0;
+
+    bool scale_wf_params=false;
     
     for (int i=1; i< argc; i++)
     {
         if (string(argv[i])=="-x")
+        {
             integrator->SetX(StrToReal(argv[i+1]));
+            x=StrToReal(argv[i+1]);
+        }
         else if (string(argv[i])=="-beta")
             integrator->GetProton().SetBeta(StrToReal(argv[i+1]));
         else if (string(argv[i])=="-wavef_mass")
@@ -113,6 +120,11 @@ int main(int argc, char* argv[])
             integrator->SetSmallX(true);
         else if (string(argv[i])=="-regulate_uv_finite")
             integrator->SetCollinearCutoffUVFinite(true);
+        else if (string(argv[i])=="-scale_beta")
+        {
+            scale_wf_params=true;
+            alpha_s = StrToReal(argv[i+1]);
+        }
         else if (string(argv[i]).substr(0,1)=="-")
         {
             cerr << "Unknown parameter " << argv[i] << endl;
@@ -121,7 +133,12 @@ int main(int argc, char* argv[])
     
     }
     
-    
+    if (scale_wf_params)
+    {
+        cout <<"# Scaling wave function parameters: x and alpha_s dependent beta" << endl;
+        cout <<"# Note that this data now only supports alphas=" << alpha_s << endl;
+        integrator->GetProton().ScaleWaveFunctionParameters(alpha_s, x);
+    }
     integrator->GetProton().ComputeWFNormalizationCoefficient();
     
     
@@ -147,7 +164,7 @@ int main(int argc, char* argv[])
     if (mode == WARD)
     {
         Vec K(1,0);
-        for (double q=0.47; q<0.5; q+=0.002)
+        for (double q=0.49; q<=0.5; q+=0.001)
         {
             Vec q1(q,0);
             double d = integrator->IntegrateDiagram(diag, q1-K*0.5, q1*(-1)-K*0.5);
@@ -360,9 +377,9 @@ int main(int argc, char* argv[])
             Vec bv(b,0);
             cout <<"# Dipole amplitude, b=" << b << endl;
             cout << "# r = " << r  << endl;
-            const double MINTH = -M_PI;
-            const double MAXTH = M_PI;
-            const int THPOINTS = 11;
+            const double MINTH = 0;
+            const double MAXTH = M_PI/2.;
+            const int THPOINTS = 3;
             const double THSTEP = (MAXTH-MINTH)/(THPOINTS-1);
             double *dipoles = new double[THPOINTS];
             cout <<"# th(r,b)   N(r,b,thrb)" << endl;
