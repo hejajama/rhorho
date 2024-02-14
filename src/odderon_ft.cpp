@@ -94,7 +94,12 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
         
     
         switch (diag) {
+
+            // Note: diagram numbering refers to arXiv v1 https://arxiv.org/pdf/2106.12623v1.pdf
+            // Note: norm contains a factor 1/4 originating from tr(t^a t^b t^c) = 1/4(d^(abc) + if^(abc)),
+            // and we are here computing the symmetric part proportional to d. See footnote 4 in 2106.12623v1
         
+            // Similarly we use Tr(D^cT^aT^b - tr T^bT^cT^a) = Nc/2*[d^(abc) - if^(abc)].
         //// Odderon
         case ODDERON_DIAG_69:
             A = p1*z1-kg;
@@ -104,19 +109,19 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             norm = -1./4. * NC/2. * 6.;
             break;
             
-        case ODDERON_DIAG_72:
+        case ODDERON_DIAG_72: // Fig. 4(q2gg)
             A = p1*z1-kg;
             B = (p2 - q3)*z2 - (kg-(q1+q2))*(1.-z2);
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q + kg - K*xg;
-            norm = -1./4. * NC/2. * 6; // TODO TR(T^a T^b D^c - T^a T^b T^c)
+            norm = -1./4. * NC/2. * 6; //  TR(T^a T^b D^c - T^a T^b T^c) -> Nc/2
             break;
         case ODDERON_DIAG_75:
             A =p1*z1-kg;
             B = p2*z2 - (kg-(q1+q2))*(1.-z2);
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
-            norm = 1./2. * NC/2. * 6.; // TODO TR T^a T^b D^c
+            norm = 1./2. * NC/2. * 6.; 
             break;
             
         case ODDERON_DIAG_70:
@@ -579,7 +584,7 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             break;
             
             
-        case ODDERON_DIAG_133:
+        case ODDERON_DIAG_133: // Fig. 7(q1q1q1)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = A;
@@ -587,10 +592,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = CF*1./4. * 6.;
+            norm = CF*1./4. * 3.; // Symmetry factor fixed 2024
             break;
         
-        case ODDERON_DIAG_134:
+        case ODDERON_DIAG_134: // Fig. 7(q2q1q1)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2-q3)*z2 - kg*(1.-z2);
@@ -598,10 +603,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q1+q2) - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
-            norm = (CF - (NC+1.)/2.)*1./4. * 6.;
+            norm = (CF - (NC+1.)/2.)*1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_135:
+        case ODDERON_DIAG_135: // Fig. 7(q3q1q1)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = A;
@@ -609,10 +614,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q1+q2) - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -(2.0*CF-(NC+1.)/2.) * 1./4.*6.;
+            norm = -(2.0*CF-(NC+1.)/2.) * 1./4.*3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_136:
+        case ODDERON_DIAG_136: // Fig. 7(q1q2q1)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2-q2)*z2 - kg*(1.-z2);
@@ -620,10 +625,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q1+q3) - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
-            norm = (CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = (CF - (NC+1.)/2.) * 1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_137:
+        case ODDERON_DIAG_137: // Fig. 7 (q2q2q1)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2-(q2+q3))*z2 - kg*(1.-z2);
@@ -631,10 +636,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q2+q3) + kg - K*xg;
-            norm = (CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = (CF - (NC+1.)/2.) * 1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_138:
+        case ODDERON_DIAG_138: // Fig. 7(q3q2q1)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2-q2)*z2 - kg*(1.-z2);
@@ -642,10 +647,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
-            norm = -(CF - (NC+1.)/2.)*(1./4. + 1./4.) * 6.;
+            norm = -(CF - (NC+1.)/2.)*(1./4. + 1./4.) * 3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_139:
+        case ODDERON_DIAG_139: // FIg. 7(q1q3q1)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = A;
@@ -653,10 +658,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q1+q3) - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 3.; // Symmetry factor fixed 2024
             break;
         
-        case ODDERON_DIAG_140:
+        case ODDERON_DIAG_140: // FIg. 7(q2q3q1)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2-q3)*z2 - kg*(1.-z2);
@@ -664,10 +669,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
-            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
+            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*3.; // Symmetry factor fixed 2024
             break;
         
-        case ODDERON_DIAG_141:
+        case ODDERON_DIAG_141: // Fig. 7(q3q3q1)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = A;
@@ -675,10 +680,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -(2.0*CF - (NC + 1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC + 1.)/2.) * 1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_142:
+        case ODDERON_DIAG_142: // Fig. 7(q1q1q2)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2-q1)*z2 - kg*(1.-z2);
@@ -686,10 +691,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q2+q3) - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
-            norm = (CF - (NC+1.)/2.)*1./4.* 6.;
+            norm = (CF - (NC+1.)/2.)*1./4.* 3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_143:
+        case ODDERON_DIAG_143: // Fig. 7(q2q1q2)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2 - (q1+q3))*z2 - kg*(1.-z2);
@@ -697,10 +702,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
-            norm = (CF - (NC+1.)/2.)*1./4. * 6.;
+            norm = (CF - (NC+1.)/2.)*1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_144:
+        case ODDERON_DIAG_144: // Fig. 7(q3q1q2)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2-q1)*z2 - kg*(1.-z2);
@@ -708,10 +713,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
-            norm = -(CF- (NC+1.)/2.) * (1./4. + 1./4.) * 6.;
+            norm = -(CF- (NC+1.)/2.) * (1./4. + 1./4.) * 3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_145:
+        case ODDERON_DIAG_145: // FIg. 7(q1q2q2)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2 - (q1+q2))*z2 - kg*(1.-z2);
@@ -719,10 +724,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q3 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
-            norm = (CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = (CF - (NC+1.)/2.) * 1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_146:
+        case ODDERON_DIAG_146: // Fig. 7(q2q2q2)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2-q)*z2 - kg*(1.-z2);
@@ -730,10 +735,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q + kg - K*xg;
-            norm = CF*1./4. * 6.;
+            norm = CF*1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_147:
+        case ODDERON_DIAG_147: //Fig. 7(q3q2q2)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2-(q1+q2))*z2 - kg*(1.-z2);
@@ -741,10 +746,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg +K*xg;
             ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
-            norm = -(2.*CF - (NC+1.)/2.)*1./4. * 6.;
+            norm = -(2.*CF - (NC+1.)/2.)*1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_148:
+        case ODDERON_DIAG_148: // Fig. 7(q1q3q2)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2-q1)*z2 - kg*(1.-z2);
@@ -752,11 +757,11 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1+q*x1 - q3 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q1 + kg -K*xg;
-            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
+            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*3.; // Symmetry factor fixed 2024
             break;
             
             
-        case ODDERON_DIAG_149:
+        case ODDERON_DIAG_149: // Fig. 7(q2q3q2)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2-(q1+q3))*z2 - kg*(1.-z2);
@@ -764,11 +769,11 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
         
-        case ODDERON_DIAG_150:
+        case ODDERON_DIAG_150: // Fig. 7(q3q3q2)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = (p2-q1)*z2 - kg*(1.-z2);
@@ -776,7 +781,7 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2  =k2 + q*x2 - q1 + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
         case ODDERON_DIAG_151:
@@ -787,7 +792,7 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q2+q3) - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.)*1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.)*1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
         case ODDERON_DIAG_152:
@@ -798,7 +803,7 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
-            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
+            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*3.; // Symmetry factor fixed 2024
             break;
             
         case ODDERON_DIAG_153:
@@ -809,7 +814,7 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
         case ODDERON_DIAG_154:
@@ -820,7 +825,7 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q3 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
-            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
+            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*3.; // Symmetry factor fixed 2024
             break;
             
         case ODDERON_DIAG_155:
@@ -831,7 +836,7 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q2+q3) + kg - K*xg;
-            norm = -(2.0 * CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = -(2.0 * CF - (NC+1.)/2.) * 1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
         case ODDERON_DIAG_156:
@@ -842,10 +847,10 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_157:
+        case ODDERON_DIAG_157: // Fig. q3q2q3
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             A2 = A;
@@ -853,7 +858,7 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q3 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.)*1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.)*1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
         case ODDERON_DIAG_158:
@@ -864,15 +869,15 @@ double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
-        case ODDERON_DIAG_159:
+        case ODDERON_DIAG_159: // Fig. 7(q3q3q3)
             A = p2*z2 - kg*(1.-z2);
             B = p1*z1 - kg;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -2.0*CF*(2.-NC)*1./4. * 6.;
+            norm = -2.0*CF*(2.-NC)*1./4. * 3.; // Symmetry factor fixed 2024
             break;
             
             
