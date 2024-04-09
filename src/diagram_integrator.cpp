@@ -885,7 +885,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = CF*1./4. * 6.;
+            norm = CF*1./4. * 3.;
             break;
         
         case ODDERON_DIAG_134:
@@ -896,7 +896,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q1+q2) - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
-            norm = (CF - (NC+1.)/2.)*1./4. * 6.;
+            norm = (CF - (NC+1.)/2.)*1./4. * 3.;
             break;
             
         case ODDERON_DIAG_135:
@@ -907,7 +907,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q1+q2) - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -(2.0*CF-(NC+1.)/2.) * 1./4.*6.;
+            norm = -(2.0*CF-(NC+1.)/2.) * 1./4.*3.;
             break;
             
         case ODDERON_DIAG_136:
@@ -918,7 +918,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q1+q3) - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
-            norm = (CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = (CF - (NC+1.)/2.) * 1./4. * 3.;
             break;
             
         case ODDERON_DIAG_137:
@@ -929,7 +929,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q2+q3) + kg - K*xg;
-            norm = (CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = (CF - (NC+1.)/2.) * 1./4. * 3.;
             break;
             
         case ODDERON_DIAG_138:
@@ -940,7 +940,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
-            norm = -(CF - (NC+1.)/2.)*(1./4. + 1./4.) * 6.;
+            norm = -(CF - (NC+1.)/2.)*(1./4. + 1./4.) * 3.;
             break;
             
         case ODDERON_DIAG_139:
@@ -951,7 +951,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q1+q3) - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 3.;
             break;
         
         case ODDERON_DIAG_140:
@@ -962,7 +962,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
-            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
+            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*3.;
             break;
         
         case ODDERON_DIAG_141:
@@ -973,7 +973,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -(2.0*CF - (NC + 1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC + 1.)/2.) * 1./4. * 3.;
             break;
             
         case ODDERON_DIAG_142:
@@ -984,7 +984,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q2+q3) - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
-            norm = (CF - (NC+1.)/2.)*1./4.* 6.;
+            norm = (CF - (NC+1.)/2.)*1./4.* 3.;
             break;
             
         case ODDERON_DIAG_143:
@@ -995,7 +995,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
-            norm = (CF - (NC+1.)/2.)*1./4. * 6.;
+            norm = (CF - (NC+1.)/2.)*1./4. * 3.;
             break;
             
         case ODDERON_DIAG_144:
@@ -1006,7 +1006,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q1 + kg - K*xg;
-            norm = -(CF- (NC+1.)/2.) * (1./4. + 1./4.) * 6.;
+            norm = -(CF- (NC+1.)/2.) * (1./4. + 1./4.) * 3.;
             break;
             
         case ODDERON_DIAG_145:
@@ -1017,7 +1017,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q3 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
-            norm = (CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = (CF - (NC+1.)/2.) * 1./4. * 3.;
             break;
             
         case ODDERON_DIAG_146:
@@ -1028,7 +1028,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q + kg - K*xg;
-            norm = CF*1./4. * 6.;
+            norm = CF*1./4. * 3.;
             break;
             
         case ODDERON_DIAG_147:
@@ -1039,7 +1039,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg +K*xg;
             ktilde_2 = k2 + q*x2 - (q1+q2) + kg - K*xg;
-            norm = -(2.*CF - (NC+1.)/2.)*1./4. * 6.;
+            norm = -(2.*CF - (NC+1.)/2.)*1./4. * 3.;
             break;
             
         case ODDERON_DIAG_148:
@@ -1050,7 +1050,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1+q*x1 - q3 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q1 + kg -K*xg;
-            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
+            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*3.;
             break;
             
             
@@ -1062,7 +1062,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q1+q3) + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 3.;
             break;
             
         
@@ -1074,7 +1074,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2  =k2 + q*x2 - q1 + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 3.;
             break;
             
         case ODDERON_DIAG_151:
@@ -1085,7 +1085,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - (q2+q3) - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.)*1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.)*1./4. * 3.;
             break;
             
         case ODDERON_DIAG_152:
@@ -1096,7 +1096,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
-            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
+            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*3.;
             break;
             
         case ODDERON_DIAG_153:
@@ -1107,7 +1107,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q2 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 3.;
             break;
             
         case ODDERON_DIAG_154:
@@ -1118,7 +1118,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q3 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q2 + kg - K*xg;
-            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*6.;
+            norm = -(CF - (NC+1.)/2.) * (1./4. + 1./4.)*3.;
             break;
             
         case ODDERON_DIAG_155:
@@ -1129,7 +1129,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - (q2+q3) + kg - K*xg;
-            norm = -(2.0 * CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = -(2.0 * CF - (NC+1.)/2.) * 1./4. * 3.;
             break;
             
         case ODDERON_DIAG_156:
@@ -1151,7 +1151,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - q3 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.)*1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.)*1./4. * 3.;
             break;
             
         case ODDERON_DIAG_158:
@@ -1162,7 +1162,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             include_A2_B2=true;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 - q3 + kg - K*xg;
-            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 6.;
+            norm = -(2.0*CF - (NC+1.)/2.) * 1./4. * 3.;
             break;
             
         case ODDERON_DIAG_159:
@@ -1170,7 +1170,7 @@ double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
             B = p1*z1 - kg;
             ktilde_1 = k1 + q*x1 - kg + K*xg;
             ktilde_2 = k2 + q*x2 + kg - K*xg;
-            norm = -2.0*CF*(2.-NC)*1./4. * 6.;
+            norm = -2.0*CF*(2.-NC)*1./4. * 3.;
             break;
             
             
