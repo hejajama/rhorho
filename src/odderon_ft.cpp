@@ -16,6 +16,7 @@
 #include <gsl/gsl_monte_miser.h>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_monte_vegas.h>
+#include "cuba.h"
 
 using namespace std;
 
@@ -26,7 +27,7 @@ using namespace std;
 /*
  * UV finite diagrams
  * Vector components are
- * [k1x,k1y,k2x,k2y,x1,x2,xg,kgx,kgy]
+ * [k1, th1, k2, th2,x1,x2,xg,kg,thg]
  */
 double inthelperf_mc_finitesum(double *vec, size_t dim, void* p)
 {
@@ -1251,6 +1252,7 @@ struct mixed_space_odderon_helper
     Vec q12;
     Vec q23;
     Vec b;
+    double x;
     Diagram diag;
 };
 
@@ -1321,7 +1323,7 @@ double inthelperf_mc_odderon_mixedspace(double *vec, size_t dim, void* p)
         
     }
 
-    
+
     
  
     
@@ -1357,7 +1359,73 @@ double inthelperf_mc_odderon_mixedspace(double *vec, size_t dim, void* p)
     return res;
 }
 
+int inthelperf_mc_odderon_mixedspace_cuba(const int *ndim, const double x[],
+  const int *ncomp, double f[], void *userdata)
+{
+    mixed_space_odderon_helper *helper = (mixed_space_odderon_helper*)userdata;
 
+    if (*ndim == 8)
+    {
+    // LO or type a
+        // Cuba integrates from 0->1, scale, remember that the parameter vec is [k1, th1, k2, th2, x1, x2, K, Kth] 
+        // k1, k2 go from KMIN to KLIM
+        double k1 = MIXED_FT_LOWER_K + (MIXED_FT_UPPER_K-MIXED_FT_LOWER_K)*x[0];
+        double k2 = MIXED_FT_LOWER_K + (MIXED_FT_UPPER_K-MIXED_FT_LOWER_K)*x[2];
+        double th1 = 2.0*M_PI*x[1];
+        double th2 = 2.0*M_PI*x[3];
+        double x1 = MIXED_FT_X_LOW + (MIXED_FT_X_UP-MIXED_FT_X_LOW)*x[4];
+        double x2 = MIXED_FT_X_LOW + (MIXED_FT_X_UP-MIXED_FT_X_LOW)*x[5];
+        double K = MIXED_FT_LOWER_K + (MIXED_FT_UPPER_K-MIXED_FT_LOWER_K)*x[6];
+        double Kth = 2.0*M_PI*x[7];
+        double vec[8]={ k1, th1, k2, th2, x1, x2, K, Kth };
+
+        //upper[0]=upper[2]=KLIM;
+        //    upper[1]=upper[3]=2.0*M_PI;
+        //    upper[4]=upper[5]=xup;
+        //    upper[6]=KLIM; upper[7]=2.0*M_PI; // maxK maxKtheta
+
+        
+        double jacobian = std::pow(MIXED_FT_UPPER_K-MIXED_FT_LOWER_K,3) * std::pow(2.0*M_PI, 3);
+        
+        int n = *ndim;
+
+        f[0]=inthelperf_mc_odderon_mixedspace(vec, *ndim, userdata)*jacobian;
+        return 0;
+    }
+    else if (*ndim==11)
+    {
+        // First 9 components are [k1, th1, k2, th2,x1,x2,xg,kg,thg]
+        // then K, Kth
+        
+        double k1 = MIXED_FT_LOWER_K + (MIXED_FT_UPPER_K-MIXED_FT_LOWER_K)*x[0];
+        double k2 = MIXED_FT_LOWER_K + (MIXED_FT_UPPER_K-MIXED_FT_LOWER_K)*x[2];
+        double kg =  MIXED_FT_LOWER_K + (MIXED_FT_UPPER_K-MIXED_FT_LOWER_K)*x[7];
+        double th1 = 2.0*M_PI*x[1];
+        double th2 = 2.0*M_PI*x[3];
+        double thg = 2.0*M_PI*x[8];
+
+        double x1 = MIXED_FT_X_LOW + (MIXED_FT_X_UP-MIXED_FT_X_LOW)*x[4];
+        double x2 = MIXED_FT_X_LOW + (MIXED_FT_X_UP-MIXED_FT_X_LOW)*x[5];
+
+        double minxg = helper->x;
+        double xg = minxg + (1.-minxg)*x[6]; // gluon x from x to 1
+        
+        double K = MIXED_FT_LOWER_K + (MIXED_FT_UPPER_K-MIXED_FT_LOWER_K)*x[9];
+        double Kth = 2.0*M_PI*x[10];
+        
+        double vec[11] = { k1, th1, k2, th2,x1,x2,xg,kg,thg, K, Kth};
+
+        double jacobian = std::pow(MIXED_FT_UPPER_K-MIXED_FT_LOWER_K,4) * std::pow(2.0*M_PI, 4)*(1-minxg);
+
+        int n = *ndim;
+
+        f[0]=inthelperf_mc_odderon_mixedspace(vec, *ndim, userdata)*jacobian;
+        return 0;
+    }
+ 
+   return -999; 
+
+}
 
 
 
@@ -1374,6 +1442,7 @@ mcresult DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
     double xup = 0.999;
     
     mixed_space_odderon_helper helper;
+    helper.x=x;
     helper.q12=q12;
     helper.q23=q23;
     helper.b=b; helper.integrator=this;
@@ -1452,6 +1521,29 @@ mcresult DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
     
     mcresult res;
     double result,error;
+
+
+    
+    const int VERBOSE=0;
+    int neval, fail, nregions;
+    double *prob = new double[F.dim];
+    
+    //Vegas(F.dim, 1, inthelperf_mc_odderon_mixedspace_cuba, &helper, 1, 1e-4, 0, VERBOSE, 0, MCINTPOINTS/2, MCINTPOINTS*5, //MCINTPOINTS*10,
+    //     MCINTPOINTS/2, MCINTPOINTS/3, 1, 0, "", NULL, &neval, &fail, &result, &error, prob  );
+       //  cout <<"neval="<<neval<<", fail="<< fail  << endl;
+    
+
+    int nnew=MCINTPOINTS, nmin=200; // nnew=10e3
+    double flatness=1; //25;
+    Suave(F.dim, 1, inthelperf_mc_odderon_mixedspace_cuba, &helper, 1, 1e-4, 0, VERBOSE, 0, MCINTPOINTS/2, MCINTPOINTS*5, 
+         nnew, nmin, flatness, "", NULL, &nregions, &neval, &fail, &result, &error, prob  );
+    
+
+
+    delete[] prob;
+    
+/*
+
     if (intmethod == MISER)
     {
         cerr << "You should not use MISER!" << endl;
@@ -1485,6 +1577,7 @@ mcresult DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
     }
     else
         result=0;
+        */
     
     delete[] upper;
     delete[] lower;

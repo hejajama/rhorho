@@ -8,6 +8,7 @@ include_directories("./src/")
 
 # Git module
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+link_directories("/opt/homebrew/opt/cuba/lib/")
 include(GetGitRevisionDescription)
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 git_describe(GIT_DESCRIBE)

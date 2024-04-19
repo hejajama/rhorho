@@ -564,4 +564,10 @@ struct dipole_helper
     Diagram diag;
 };
 
+
+const double MIXED_FT_LOWER_K=0.01;
+const double MIXED_FT_UPPER_K=12;
+const double MIXED_FT_X_LOW=1e-4;
+const double MIXED_FT_X_UP=1.-MIXED_FT_X_LOW;
+
 #endif
