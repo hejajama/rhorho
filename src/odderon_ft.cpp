@@ -1522,29 +1522,32 @@ mcresult DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
     mcresult res;
     double result,error;
 
-
+    if (intmethod == CUBA_SUAVE or intmethod == CUBA_VEGAS)
+    {
     
-    const int VERBOSE=0;
-    int neval, fail, nregions;
-    double *prob = new double[F.dim];
-    
-    //Vegas(F.dim, 1, inthelperf_mc_odderon_mixedspace_cuba, &helper, 1, 1e-4, 0, VERBOSE, 0, MCINTPOINTS/2, MCINTPOINTS*5, //MCINTPOINTS*10,
-    //     MCINTPOINTS/2, MCINTPOINTS/3, 1, 0, "", NULL, &neval, &fail, &result, &error, prob  );
-       //  cout <<"neval="<<neval<<", fail="<< fail  << endl;
-    
+        const int VERBOSE=0;
+        int neval, fail, nregions;
+        double *prob = new double[F.dim];
 
-    int nnew=MCINTPOINTS, nmin=200; // nnew=10e3
-    double flatness=1; //25;
-    Suave(F.dim, 1, inthelperf_mc_odderon_mixedspace_cuba, &helper, 1, 1e-4, 0, VERBOSE, 0, MCINTPOINTS/2, MCINTPOINTS*5, 
-         nnew, nmin, flatness, "", NULL, &nregions, &neval, &fail, &result, &error, prob  );
-    
+        if (intmethod == CUBA_VEGAS)
+        {
+            Vegas(F.dim, 1, inthelperf_mc_odderon_mixedspace_cuba, &helper, 1, 1e-4, 0, VERBOSE, 0, MCINTPOINTS/2, MCINTPOINTS*5, //MCINTPOINTS*10,
+             MCINTPOINTS/2, MCINTPOINTS/3, 1, 0, "", NULL, &neval, &fail, &result, &error, prob  );
+            //cout <<"neval="<<neval<<", fail="<< fail  << endl;
+        }
+        else if (intmethod == CUBA_SUAVE)
+        {
+            // Note that this needs quite a bit of memory, roughly 3GB for 1e7 mcintpoints
+            int nnew=MCINTPOINTS, nmin=200; // nnew=10e3
+            double flatness=1; //25;
+            Suave(F.dim, 1, inthelperf_mc_odderon_mixedspace_cuba, &helper, 1, 1e-4, 0, VERBOSE, 0, MCINTPOINTS/2, MCINTPOINTS*5, 
+                nnew, nmin, flatness, "", NULL, &nregions, &neval, &fail, &result, &error, prob  );
+        }   
 
 
-    delete[] prob;
-    
-/*
-
-    if (intmethod == MISER)
+        delete[] prob;
+    }
+    else if (intmethod == MISER)
     {
         cerr << "You should not use MISER!" << endl;
         exit(1);
@@ -1577,7 +1580,7 @@ mcresult DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
     }
     else
         result=0;
-        */
+    
     
     delete[] upper;
     delete[] lower;

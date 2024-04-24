@@ -64,6 +64,8 @@ int main(int argc, char* argv[])
     long int mcintpoints = 1e6;
     string diagram = "LO";
     MODE mode = ONEDIM;
+
+    IntegrationMethod intmethod = VEGAS;
     
     double q12=0.5;
     double theta_b_q = 0;
@@ -123,6 +125,22 @@ int main(int argc, char* argv[])
             integrator->SetCollinearCutoffUVFinite(true);
         else if (string(argv[i])=="-qmin")
             integrator->SetQmin(StrToReal(argv[i+1]));
+        else if (string(argv[i])=="-intmethod")
+        {
+            if (string(argv[i+1])=="vegas")
+                intmethod = VEGAS;
+            else if (string(argv[i+1])=="miser")
+                intmethod = MISER;
+            else if (string(argv[i+1])=="cuba_vegas")
+                intmethod = CUBA_VEGAS;
+            else if (string(argv[i+1])=="cuba_suave")
+                intmethod = CUBA_SUAVE;
+            else 
+            {
+                cerr << "Unknown integration method " << argv[i+1] << endl;
+                return 0;
+            }
+        }
         else if (string(argv[i]).substr(0,1)=="-")
         {
             cerr << "Unknown parameter " << argv[i] << endl;
@@ -133,7 +151,7 @@ int main(int argc, char* argv[])
     
     
     integrator->GetProton().ComputeWFNormalizationCoefficient();
-    
+    integrator->SetIntegrationMethod(intmethod);
     
     
    

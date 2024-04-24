@@ -474,7 +474,9 @@ const double CF = (NC*NC-1.)/(2.*NC);
 enum IntegrationMethod
 {
     MISER,
-    VEGAS
+    VEGAS,
+    CUBA_VEGAS,
+    CUBA_SUAVE
 };
 
 struct mcresult
@@ -522,6 +524,8 @@ public:
     mcresult OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag);
     mcresult OdderonAmplitude(Diagram diag, Vec r, Vec b);
     mcresult OdderonMixedTggg(Diagram diag, Vec r, Vec K);
+
+    void SetIntegrationMethod(IntegrationMethod m) { intmethod = m; }
     
     void SetQmin(double qm) { qmin=qm; }
     double GetQmin() { return qmin; }
@@ -566,7 +570,7 @@ struct dipole_helper
 
 
 const double MIXED_FT_LOWER_K=0.0001;
-const double MIXED_FT_UPPER_K=25;
+const double MIXED_FT_UPPER_K=45;
 const double MIXED_FT_X_LOW=1e-4;
 const double MIXED_FT_X_UP=1.-MIXED_FT_X_LOW;
 

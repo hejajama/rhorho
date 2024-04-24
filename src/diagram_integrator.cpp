@@ -1743,6 +1743,7 @@ double DiagramIntegrator::IntegrateDiagram(Diagram diag, Vec q1, Vec q2, Vec q3 
     }
     else
     {
+        cerr <<"Unknown integration method at IntegrateDiagram()" << endl;
         result=0;error=0;
     }
     
