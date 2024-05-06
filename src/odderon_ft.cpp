@@ -1622,9 +1622,10 @@ double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
     res *= factor;
     
     
-    
+    // Note: this should be +sin(b*K), see eq (3) in 2210.05390
+    // In order to keep datafiles consistent, we keep the old sign, and the sign is fixed in the 
+    // notebook that processes the data
     res *= -std::sin(b*K); // Imaginary part
-//	res *= cos(b*K);
     
    
     if (qmin_ir_cutoff == GAUSSIAN)
