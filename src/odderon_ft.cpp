@@ -1309,7 +1309,7 @@ double inthelperf_mc_odderon_mixedspace(double *vec, size_t dim, void* p)
         qv3 = (q12 + q23*2. + K)*(-1./3.);
         
         // Ward
-        if (qv1.LenSqr() < 1e-15 or qv3.LenSqr() < 1e-15)
+        if (qv1.LenSqr() < 1e-10 or qv3.LenSqr() < 1e-10 or qv2.LenSqr() < 1e-10)
             return 0;
         
         momspacehelper.q1 = qv1;
@@ -1342,7 +1342,7 @@ double inthelperf_mc_odderon_mixedspace(double *vec, size_t dim, void* p)
     
     if (isnan(res))
     {
-        //return 0;
+        return 0;
         cerr << "NaN with K " << K << " q12 " << q12 << endl;
         //cerr << "Diag is " << diag_momentumspace << endl;
         cerr << "Argumets" << endl;
@@ -1369,9 +1369,9 @@ mcresult DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
     // Integrate over K, ktheta
 
 
-    double KLIM = 20;
+    double KLIM = 30;
     double xlow=x;
-    double xup = 0.999;
+    double xup = 0.99;
     
     mixed_space_odderon_helper helper;
     helper.q12=q12;

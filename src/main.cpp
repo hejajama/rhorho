@@ -495,7 +495,7 @@ int main(int argc, char* argv[])
                // Odderon, q12=q23=0
                const double MINB = 0;
                const double MAXB = 2;
-               const int BPOINTS = 10;
+               const int BPOINTS = 1;
                const double BSTEP = (MAXB-MINB)/(BPOINTS-1);
                Vec nullvec(0,0,0);
                mcresult *dipoles = new mcresult[BPOINTS];
@@ -503,14 +503,14 @@ int main(int argc, char* argv[])
 #pragma omp parallel for
                for (int i=0; i<BPOINTS; i++)
                {
-                   double b = MINB + i*BSTEP;
+                   //double b = MINB + i*BSTEP;
                    Vec bv(b*std::cos(theta_b_q),b*std::sin(theta_b_q));
                    mcresult d = integrator->OdderonG2b(bv, nullvec, nullvec, diag);
                    dipoles[i] = d;
                }
                for (int i=0; i<BPOINTS; i++)
                {
-                   double b = MINB + i*BSTEP;
+                   //double b = MINB + i*BSTEP;
                    cout << b << " " << dipoles[i].result << " " << dipoles[i].error << " " << dipoles[i].chisqr << endl;
                }
                
