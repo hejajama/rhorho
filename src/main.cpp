@@ -64,9 +64,12 @@ int main(int argc, char* argv[])
     long int mcintpoints = 1e6;
     string diagram = "LO";
     MODE mode = ONEDIM;
+    bool scale_wf_params = false;
+    double alpha_s = 0.2;
     
     double q12=0.5;
     double theta_b_q = 0;
+    double x=-1;
     double b=0;
     double r=1;
     double K=0;
@@ -74,7 +77,10 @@ int main(int argc, char* argv[])
     for (int i=1; i< argc; i++)
     {
         if (string(argv[i])=="-x")
+        {
             integrator->SetX(StrToReal(argv[i+1]));
+            x = StrToReal(argv[i+1]);
+        }
         else if (string(argv[i])=="-beta")
             integrator->GetProton().SetBeta(StrToReal(argv[i+1]));
         else if (string(argv[i])=="-wavef_mass")
@@ -123,6 +129,11 @@ int main(int argc, char* argv[])
             integrator->SetCollinearCutoffUVFinite(true);
         else if (string(argv[i])=="-qmin")
             integrator->SetQmin(StrToReal(argv[i+1]));
+        else if (string(argv[i])=="-scale_beta")
+        {
+            scale_wf_params=true;
+            alpha_s = StrToReal(argv[i+1]);
+        }
         else if (string(argv[i]).substr(0,1)=="-")
         {
             cerr << "Unknown parameter " << argv[i] << endl;
@@ -131,6 +142,12 @@ int main(int argc, char* argv[])
     
     }
     
+    if (scale_wf_params)
+    {
+        cout <<"# Scaling wave function parameters: x and alpha_s dependent beta" << endl;
+        cout <<"# Note that this data now only supports alphas=" << alpha_s << endl;
+        integrator->GetProton().ScaleWaveFunctionParameters(alpha_s, x);
+    }
     
     integrator->GetProton().ComputeWFNormalizationCoefficient();
     
