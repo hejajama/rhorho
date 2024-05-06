@@ -135,6 +135,10 @@ int main(int argc, char* argv[])
                 intmethod = CUBA_VEGAS;
             else if (string(argv[i+1])=="cuba_suave")
                 intmethod = CUBA_SUAVE;
+            else if (string(argv[i+1])=="cuba_divonne")
+                intmethod = CUBA_DIVONNE;
+            else if (string(argv[i+1])=="cuba_cuhre")
+                intmethod = CUBA_CUHRE;
             else 
             {
                 cerr << "Unknown integration method " << argv[i+1] << endl;

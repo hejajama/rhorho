@@ -36,8 +36,8 @@ target_link_libraries(
 target_link_libraries(
 	rhotest
 	PRIVATE
-	rholib
 	cuba
+	rholib
 	${Boost_LIBRARIES}
 	GSL::gsl
 	GSL::gslcblas

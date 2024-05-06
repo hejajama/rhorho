@@ -476,7 +476,9 @@ enum IntegrationMethod
     MISER,
     VEGAS,
     CUBA_VEGAS,
-    CUBA_SUAVE
+    CUBA_SUAVE,
+    CUBA_DIVONNE,
+    CUBA_CUHRE
 };
 
 struct mcresult

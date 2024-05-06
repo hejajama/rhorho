@@ -1522,7 +1522,7 @@ mcresult DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
     mcresult res;
     double result,error;
 
-    if (intmethod == CUBA_SUAVE or intmethod == CUBA_VEGAS)
+    if (intmethod == CUBA_SUAVE or intmethod == CUBA_VEGAS or intmethod == CUBA_SUAVE or intmethod == CUBA_CUHRE)
     {
     
         const int VERBOSE=0;
@@ -1543,10 +1543,28 @@ mcresult DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
             Suave(F.dim, 1, inthelperf_mc_odderon_mixedspace_cuba, &helper, 1, 1e-4, 0, VERBOSE, 0, MCINTPOINTS/2, MCINTPOINTS*5, 
                 nnew, nmin, flatness, "", NULL, &nregions, &neval, &fail, &result, &error, prob  );
         }   
+         else if (intmethod == CUBA_DIVONNE)
+        {
+            int key1=9, key2=7, key3=1, maxpass=5, ngiven=0, nextra=0;
+            double border=1e-8, maxchisq=10, mindeviation=0.25;
+            Divonne(F.dim, 1, inthelperf_mc_odderon_mixedspace_cuba, &helper, 1, 1e-4, 0, VERBOSE, 0, MCINTPOINTS/2, MCINTPOINTS*5, 
+                key1, key2, key3, maxpass, border, maxchisq, mindeviation, ngiven, F.dim, NULL, nextra, NULL, "", NULL,
+                 &nregions, &neval, &fail, &result, &error, prob  );
+        }
+        else if (intmethod == CUBA_CUHRE)
+        {
+            int key=9;
+            double fail2;
+            Cuhre(F.dim, 1, inthelperf_mc_odderon_mixedspace_cuba, &helper, 1, 1e-4, 0, VERBOSE, MCINTPOINTS/2,
+                MCINTPOINTS*5,key,"",NULL,
+                &nregions,&neval,&fail,&result,&error,prob);
+         }
 
-
-        delete[] prob;
+         delete[] prob;
     }
+
+
+
     else if (intmethod == MISER)
     {
         cerr << "You should not use MISER!" << endl;
