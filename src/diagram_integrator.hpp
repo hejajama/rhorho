@@ -568,11 +568,12 @@ struct dipole_helper
     Vec b;
     Vec K;
     Diagram diag;
+    double x;
 };
 
 
-const double MIXED_FT_LOWER_K=0.0001;
-const double MIXED_FT_UPPER_K=45;
+const double MIXED_FT_LOWER_K=0.0;
+const double MIXED_FT_UPPER_K=20;
 const double MIXED_FT_X_LOW=1e-4;
 const double MIXED_FT_X_UP=1.-MIXED_FT_X_LOW;
 

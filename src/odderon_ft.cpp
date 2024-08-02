@@ -1619,6 +1619,82 @@ mcresult DiagramIntegrator::OdderonG2b(Vec b, Vec q12, Vec q23, Diagram diag)
 ////
 /////// Dipole ampiltude
 
+double inthelperf_mc_odderon(double *vec, size_t dim, void* p);
+int inthelperf_mc_odderon_coordinatespace_cuba(const int *ndim, const double x[],
+  const int *ncomp, double f[], void *userdata)
+{
+    dipole_helper *helper = (dipole_helper*)userdata;
+
+    double qmin = helper->integrator->GetQmin();
+
+    if (*ndim == 12)
+    {
+    // LO or type a
+        // Cuba integrates from 0->1, scale, remember that the parameter vec is [k1, th1, k2, th2, x1, x2, q1, q1th, q2, q2th, q3, q3th]
+        // k1, k2 go from KMIN to KLIM
+        double k1 = MIXED_FT_LOWER_K + (MIXED_FT_UPPER_K-MIXED_FT_LOWER_K)*x[0];
+        double k2 = MIXED_FT_LOWER_K + (MIXED_FT_UPPER_K-MIXED_FT_LOWER_K)*x[2];
+        double th1 = 2.0*M_PI*x[1];
+        double th2 = 2.0*M_PI*x[3];
+        double x1 = MIXED_FT_X_LOW + (MIXED_FT_X_UP-MIXED_FT_X_LOW)*x[4];
+        double x2 = MIXED_FT_X_LOW + (MIXED_FT_X_UP-MIXED_FT_X_LOW)*x[5];
+        double q1 = qmin + (MIXED_FT_UPPER_K-qmin)*x[6];
+        double q1th = 2.0*M_PI*x[7];
+        double q2 = qmin + (MIXED_FT_UPPER_K-qmin)*x[8];
+        double q2th = 2.0*M_PI*x[9];
+        double q3 = qmin + (MIXED_FT_UPPER_K-qmin)*x[10];
+        double q3th = 2.0*M_PI*x[11];
+        double vec[12]={ k1, th1, k2, th2, x1, x2, q1, q1th, q2, q2th, q3, q3th };
+
+
+        
+        double jacobian = std::pow(MIXED_FT_UPPER_K-MIXED_FT_LOWER_K,2) * std::pow(MIXED_FT_UPPER_K - qmin, 3) * std::pow(2.0*M_PI, 5);
+        
+        int n = *ndim;
+
+        f[0]=inthelperf_mc_odderon(vec, *ndim, userdata)*jacobian;
+        return 0;
+    }
+    else if (*ndim==15)
+    {
+        // The vector is [k1,thk1, k2, thk2, x1, x2, xg, kg, thkg, q1, thq1, q2, thq2, q3, thq3]
+
+        
+        double k1 = MIXED_FT_LOWER_K + (MIXED_FT_UPPER_K-MIXED_FT_LOWER_K)*x[0];
+        double k2 = MIXED_FT_LOWER_K + (MIXED_FT_UPPER_K-MIXED_FT_LOWER_K)*x[2];
+        double kg =  MIXED_FT_LOWER_K + (MIXED_FT_UPPER_K-MIXED_FT_LOWER_K)*x[7];
+        double th1 = 2.0*M_PI*x[1];
+        double th2 = 2.0*M_PI*x[3];
+        double thg = 2.0*M_PI*x[8];
+
+        double x1 = MIXED_FT_X_LOW + (MIXED_FT_X_UP-MIXED_FT_X_LOW)*x[4];
+        double x2 = MIXED_FT_X_LOW + (MIXED_FT_X_UP-MIXED_FT_X_LOW)*x[5];
+
+        double minxg = helper->x;
+        double xg = minxg + (1.-minxg)*x[6]; // gluon x from x to 1
+        
+        double q1 = qmin + (MIXED_FT_UPPER_K-qmin)*x[9];
+        double thq1 = 2.0*M_PI*x[10];
+        double q2 = qmin + (MIXED_FT_UPPER_K-qmin)*x[11];
+        double thq2 = 2.0*M_PI*x[12];
+        double q3 = qmin + (MIXED_FT_UPPER_K-qmin)*x[13];
+        double thq3 = 2.0*M_PI*x[14];
+        
+        double vec[15] = { k1, th1, k2, th2,x1,x2,xg,kg,thg, q1, thq1, q2, thq2, q3, thq3};
+
+        double jacobian = std::pow(MIXED_FT_UPPER_K-MIXED_FT_LOWER_K,3) * std::pow(MIXED_FT_UPPER_K - qmin, 3) * std::pow(2.0*M_PI, 6)*(1.-minxg);
+
+        int n = *ndim;
+
+        f[0]=inthelperf_mc_odderon(vec, *ndim, userdata)*jacobian;
+        return 0;
+    }
+ 
+   return -999; 
+
+}
+
+
 
 // https://arxiv.org/pdf/2001.04516.pdf (13)
 double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
@@ -1736,9 +1812,9 @@ double inthelperf_mc_odderon(double *vec, size_t dim, void* p)
     res *= factor;
     
     
-    
+    // Note: should not have a - here, but I think that is now (2.8.2024) taken care of by the analysis notebook
     res *= -std::sin(b*K); // Imaginary part
-//	res *= cos(b*K);
+	//res *= cos(b*K);
     
    
     if (qmin_ir_cutoff == GAUSSIAN)
@@ -1862,6 +1938,7 @@ mcresult DiagramIntegrator::OdderonAmplitude(Diagram diag, Vec r, Vec b)
     dipole_helper helper;
     helper.r=r; helper.b=b; helper.integrator=this;
     helper.diag = diag;
+    helper.x=xlow;
     
        
     Ff.params = &helper;
@@ -1871,7 +1948,51 @@ mcresult DiagramIntegrator::OdderonAmplitude(Diagram diag, Vec r, Vec b)
 
     
     double result,error;
-    if (intmethod == MISER)
+
+    if (intmethod == CUBA_SUAVE or intmethod == CUBA_VEGAS or intmethod == CUBA_SUAVE or intmethod == CUBA_CUHRE)
+    {
+    
+        const int VERBOSE=0;
+        int neval, fail, nregions;
+        double *prob = new double[Ff.dim];
+
+        if (intmethod == CUBA_VEGAS)
+        {
+            Vegas(Ff.dim, 1, inthelperf_mc_odderon_coordinatespace_cuba, &helper, 1, 1e-4, 0, VERBOSE, 0, MCINTPOINTS/2, MCINTPOINTS*5, //MCINTPOINTS*10,
+             MCINTPOINTS/2, MCINTPOINTS/3, 1, 0, "", NULL, &neval, &fail, &result, &error, prob  );
+            
+        }
+        else if (intmethod == CUBA_SUAVE)
+        {
+            // Note that this needs quite a bit of memory, roughly 3GB for 1e7 mcintpoints
+            int nnew=MCINTPOINTS, nmin=200; // nnew=10e3
+            double flatness=1; //25;
+            Suave(Ff.dim, 1, inthelperf_mc_odderon_coordinatespace_cuba, &helper, 1, 1e-4, 0, VERBOSE, 0, MCINTPOINTS/2, MCINTPOINTS*5, 
+                nnew, nmin, flatness, "", NULL, &nregions, &neval, &fail, &result, &error, prob  );
+        }   
+         else if (intmethod == CUBA_DIVONNE)
+        {
+            int key1=9, key2=7, key3=1, maxpass=5, ngiven=0, nextra=0;
+            double border=1e-8, maxchisq=10, mindeviation=0.25;
+            Divonne(Ff.dim, 1, inthelperf_mc_odderon_coordinatespace_cuba, &helper, 1, 1e-4, 0, VERBOSE, 0, MCINTPOINTS/2, MCINTPOINTS*5, 
+                key1, key2, key3, maxpass, border, maxchisq, mindeviation, ngiven, Ff.dim, NULL, nextra, NULL, "", NULL,
+                 &nregions, &neval, &fail, &result, &error, prob  );
+        }
+        else if (intmethod == CUBA_CUHRE)
+        {
+            int key=9;
+            double fail2;
+            Cuhre(Ff.dim, 1, inthelperf_mc_odderon_coordinatespace_cuba, &helper, 1, 1e-4, 0, VERBOSE, MCINTPOINTS/2,
+                MCINTPOINTS*5,key,"",NULL,
+                &nregions,&neval,&fail,&result,&error,prob);
+         }
+
+        res.result = result;
+        res.error = error;
+
+         delete[] prob;
+    }
+    else if (intmethod == MISER)
     {
         cerr << "Do not use miser" << endl;
         exit(1);
@@ -1880,28 +2001,34 @@ mcresult DiagramIntegrator::OdderonAmplitude(Diagram diag, Vec r, Vec b)
         cout << "# Miser result " << result << " err " << error << " relerr " << std::abs(error/result) << endl;
         gsl_monte_miser_free(s);*/
     }
-
-    gsl_monte_vegas_state *s = gsl_monte_vegas_alloc(Ff.dim);
-    gsl_monte_vegas_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS/2, rng, s, &result, &error);
-    //cout << "# vegas warmup " << result << " +/- " << error << endl;
-    int iter=0;
-    do
+    else if (intmethod == VEGAS)
     {
-        gsl_monte_vegas_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS, rng, s, &result, &error);
-        cout << "# Vegas integration " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
-        iter++;
-    } while ( (std::abs( gsl_monte_vegas_chisq(s) - 1.0) > VEGAS_CHISQR_TOLERANCE or iter < 4 or std::abs(error/result) > MC_ERROR_TOLERANCE) and iter < 10);
-    
-    if (fabs( gsl_monte_vegas_chisq(s) - 1.0) > VEGAS_CHISQR_TOLERANCE or std::abs(error/result) > 0.5)
-    {
-        cerr << "Warning: large uncertainty with b=" << b <<", r=" << r << ", result " << result << " +/- " << error << " chi^2 " <<gsl_monte_vegas_chisq(s) << endl;
+        gsl_monte_vegas_state *s = gsl_monte_vegas_alloc(Ff.dim);
+        gsl_monte_vegas_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS/2, rng, s, &result, &error);
+        //cout << "# vegas warmup " << result << " +/- " << error << endl;
+        int iter=0;
+        do
+        {
+            gsl_monte_vegas_integrate(&Ff, lower, upper, Ff.dim, MCINTPOINTS, rng, s, &result, &error);
+            cout << "# Vegas integration " << result << " +/- " << error << " chisqr " << gsl_monte_vegas_chisq(s) << endl;
+            iter++;
+        } while ( (std::abs( gsl_monte_vegas_chisq(s) - 1.0) > VEGAS_CHISQR_TOLERANCE or iter < 4 or std::abs(error/result) > MC_ERROR_TOLERANCE) and iter < 10);
+        
+        if (fabs( gsl_monte_vegas_chisq(s) - 1.0) > VEGAS_CHISQR_TOLERANCE or std::abs(error/result) > 0.5)
+        {
+            cerr << "Warning: large uncertainty with b=" << b <<", r=" << r << ", result " << result << " +/- " << error << " chi^2 " <<gsl_monte_vegas_chisq(s) << endl;
+        }
+        
+        res.chisqr =gsl_monte_vegas_chisq(s);
+        res.result = result;
+        res.error = error;
+        
+        gsl_monte_vegas_free(s);
     }
-    
-    res.chisqr =gsl_monte_vegas_chisq(s);
-    res.result = result;
-    res.error = error;
-    
-    gsl_monte_vegas_free(s);
+    else if (intmethod == CUBA_SUAVE)
+    {
+
+    }
 
     
     delete[] upper;

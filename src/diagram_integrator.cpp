@@ -130,7 +130,7 @@ double inthelperf_mc_lo_cuba(const int *ndim, const double x[],
 /*
  * UV finite diagrams
  * Vector components are
- * [k1x,k1y,k2x,k2y,x1,x2,xg,kgx,kgy] NOW IN RADIAL COORDIANTES
+ * [k1,thk1, k2, thk2, x1, x2, xg, kg, thkg] NOW IN RADIAL COORDIANTES
  */
 double inthelperf_mc_diag2b(double *vec, size_t dim, void* p)
 {
