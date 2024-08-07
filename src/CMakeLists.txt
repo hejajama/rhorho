@@ -29,6 +29,7 @@ target_link_libraries(
 	rhorho
 	PRIVATE
 	rholib
+	cuba
 	GSL::gsl
 	GSL::gslcblas
 )
@@ -36,6 +37,7 @@ target_link_libraries(
 	rhotest
 	PRIVATE
 	rholib
+	cuba
 	${Boost_LIBRARIES}
 	GSL::gsl
 	GSL::gslcblas

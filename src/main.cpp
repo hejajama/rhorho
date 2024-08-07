@@ -66,6 +66,7 @@ int main(int argc, char* argv[])
     MODE mode = ONEDIM;
     bool scale_wf_params = false;
     double alpha_s = 0.2;
+    IntegrationMethod intmethod = VEGAS;
     
     double q12=0.5;
     double theta_b_q = 0;
@@ -129,10 +130,32 @@ int main(int argc, char* argv[])
             integrator->SetCollinearCutoffUVFinite(true);
         else if (string(argv[i])=="-qmin")
             integrator->SetQmin(StrToReal(argv[i+1]));
+<<<<<<< HEAD
         else if (string(argv[i])=="-scale_beta")
         {
             scale_wf_params=true;
             alpha_s = StrToReal(argv[i+1]);
+=======
+        else if (string(argv[i])=="-intmethod")
+        {
+            if (string(argv[i+1])=="vegas")
+                intmethod = VEGAS;
+            else if (string(argv[i+1])=="miser")
+                intmethod = MISER;
+            else if (string(argv[i+1])=="cuba_vegas")
+                intmethod = CUBA_VEGAS;
+            else if (string(argv[i+1])=="cuba_suave")
+                intmethod = CUBA_SUAVE;
+            else if (string(argv[i+1])=="cuba_divonne")
+                intmethod = CUBA_DIVONNE;
+            else if (string(argv[i+1])=="cuba_cuhre")
+                intmethod = CUBA_CUHRE;
+            else 
+            {
+                cerr << "Unknown integration method " << argv[i+1] << endl;
+                return 0;
+            }
+>>>>>>> use_cuba_odderon
         }
         else if (string(argv[i]).substr(0,1)=="-")
         {
@@ -150,7 +173,7 @@ int main(int argc, char* argv[])
     }
     
     integrator->GetProton().ComputeWFNormalizationCoefficient();
-    
+    integrator->SetIntegrationMethod(intmethod);
     
     
    
@@ -516,7 +539,7 @@ int main(int argc, char* argv[])
                const double BSTEP = (MAXB-MINB)/(BPOINTS-1);
                Vec nullvec(0,0,0);
                mcresult *dipoles = new mcresult[BPOINTS];
-               
+               theta_b_q=0.;
 #pragma omp parallel for
                for (int i=0; i<BPOINTS; i++)
                {
